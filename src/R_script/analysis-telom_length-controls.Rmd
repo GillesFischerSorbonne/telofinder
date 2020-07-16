@@ -1,0 +1,255 @@
+---
+title: "PHENOVAR: detection of telomere sequences"
+author: "Gilles Fischer"
+date: "2020/05/26"
+output:
+  html_document:
+    self_contained: yes
+    fig_caption: yes
+    highlight: zenburn
+    theme: cerulean
+    toc: yes
+    toc_depth: 3
+    toc_float: yes
+    code_folding: "hide"
+  pdf_document:
+    fig_caption: yes
+    highlight: zenburn
+    toc: yes
+    toc_depth: 3
+  powerpoint_presentation:
+    slide_level: 2
+    fig_caption: yes
+    fig_height: 5
+    fig_width: 7
+    toc: yes
+font-import: http://fonts.googleapis.com/css?family=Risque
+subtitle: DUBii 2020
+font-family: Oswald
+transition: linear
+editor_options: 
+  chunk_output_type: inline
+---
+```{r}
+
+### load python telomere data:
+## on phenovar strains
+
+setwd("~/Documents/DUBii/Projet/results/Telomere_length/Assemblies-m2")
+
+tel <- read.table("/Users/gilles/Documents/DUBii/Projet/results/Telomere_length/Assemblies-m2/telom_length_assemblies-m2-v2.csv",header = T, stringsAsFactors = F)
+## on S288C
+my_s288c <- read.table("telom_length_S288C.csv", sep = ";", header = T, stringsAsFactors = F)
+
+## load phenovar strain information
+strains <- read.table(file = "~/Documents/DUBii/Projet/data/phenovar_strains/113_strains_phenovar.csv", header = TRUE, sep = ";", stringsAsFactors = FALSE, fill = TRUE, na.strings=c("","NA"))
+
+## load the sgd table
+sgd_s288c <- read.table("/Users/gilles/Documents/DUBii/Projet/data/S288C/SGD_term_telom_.txt", header = T, stringsAsFactors = F)
+
+## load the nanopore read length table
+read_length <- read.table("/Users/gilles/Documents/DUBii/Projet/data/phenovar_reads/phenovar_reads_telomereaverage.csv", header = T, stringsAsFactors = F)
+
+## load bash  (Sam) telomere data
+bash_res <- read.table("Sam_ALL_7max_summary.csv", stringsAsFactors = FALSE, header = TRUE)
+```
+### 
+```{r}
+tot_genome <- length(unique(tel$Strain))
+#tot_genome
+```
+
+## Data source: PHENOVAR
+
+- number of assembled genomes: `r tot_genome`
+- assemblies in "~/Documents/DUBii/Projet/data/phenovar_assemblies_m2-v2"
+- results in the dataframe: "telom_length_assemblies-m2-v2.csv"  
+- Telomere sizes were obtained running the python script '00_analyze_telom_length-v2.py' using the following criteria:
+  - cumulative size of sliding windows of 20 bp from each contig end on the 5' to 3' strand:
+    - at most 3 G or T in the 20 bp window: #C + #A>= 17 (telomere sequence (C1-3A)) 
+    -  and #C >= 8 and #A" >= 3
+    - and not 4 "A" in a row ("AAA" is allowed though)
+  - an offset of up to 1500 bases of non-telomeric sequence (ie #C + #A < 19/20) is allowed at both 5' end of the contigs before the presence of the telomere sequence itself. The value of the offset is reported in the dataframe
+
+
+
+
+
+# 1 - Detection of telomere sequences at both contig ends:
+```{r}
+
+
+par(mfrow=c(1,2))
+hist(tel$Telom_length, breaks = 50, xlab = "all ends", ylab = "number of ends", main = "")
+withTel <- tel$Telom_length[tel$Telom_length!= 0]
+#summary(withTel)
+hist(withTel, breaks = (50), xlab = "ends with telomere", ylab = "number of ends" , main = "")
+
+```
+```{r}
+## control no bias on contig side R/L
+par(mfrow=c(1,2))
+hist(tel$Telom_length[tel$Contig_side== "R"],col='skyblue',border=F, breaks = 20, xlab = "Right ends", main = "")
+hist(tel$Telom_length[tel$Contig_side== "L"], col=scales::alpha('red',.5),border=F, breaks = 20, xlab = "Left ends", main ="")
+
+par(mfrow=c(1,1))
+
+```
+
+
+**Conclusions:**
+
+- no bias on the contig side
+
+
+```{r}
+library(stringi)
+tel$Strain_Chr <- stri_join(tel$Strain,tel$Chromosome,sep="_")
+not_2tel <- unique(tel$Strain_Chr[tel$Telom_length==0])
+double_tel = length(unique(tel$Strain_Chr)) - length(not_2tel)
+
+## Number of contigs lacking telomere at both ends
+totTelLength <- aggregate(Telom_length~Strain_Chr, data=tel, FUN=sum)
+no_tel <- length(totTelLength$Strain_Chr[totTelLength$Telom_length==0])
+
+## Number of contigs with telomre at only 1 end
+single_tel <- length(totTelLength$Strain_Chr) - double_tel - no_tel
+
+```
+
+
+# 2 - Comparison between SGD telomere sizes and the python results for S288C
+
+```{r}
+library(ggplot2)
+## create a "side" and a "chr_side" columns
+sgd_s288c$side <- substr(sgd_s288c$Tel, 6, 6)
+sgd_s288c$chr_side <- paste(sgd_s288c$chr, "_", sgd_s288c$side)
+
+## !!! NEED TO MANUALLY REPLACE THE CHROMOSOME NAMES !!!
+my_s288c$chr_side <- paste(my_s288c$Chromosome, "_", my_s288c$Contig_side)
+## merge by chr_side
+comp <- merge(sgd_s288c, my_s288c, by ="chr_side")
+## plot sgd vs my telomere sizes
+ggplot(comp, aes(x=length, y=Telom_length)) +
+  geom_point()
+
+```
+
+
+
+**Conclusions:**$
+
+- very good correlation between SGD annotation and this analysis on the ref genome
+
+# 3 - Telomere size and read length
+```{r, echo=FALSE,  warning = FALSE, message = FALSE, }
+library(dplyr)
+## filter the contig ends without telomere
+tel_filtered <- filter(tel, Telom_length != 0)
+moy_tel_filtered <- aggregate(tel_filtered$Telom_length, by = list(tel_filtered$Strain), mean) 
+## Use the dataset filtered for contig ends lacking telomere
+read_length_filtered <- merge(read_length, moy_tel_filtered, by.x = "strain", by.y = "Group.1")
+colnames(read_length_filtered)[9] <- "mean_telom_length_filtered"
+## plot read length  vs telomere sizes
+ggplot(read_length_filtered, aes(x=mean, y=mean_telom_length_filtered)) +
+  geom_point() +
+  xlab("Mean read length")
+
+```
+
+
+
+**Conclusions:**``
+
+- telomere length not biased by the read length
+
+
+# 4 - Comparison with a bash script from Samuel O'Donnell on 95 Phenovar strains
+  bash script name: processing_telomeres_cerevisiae.sh
+
+```{r}
+
+## format  Sam's data
+colnames(bash_res)[2] <- "chromosome"
+bash_res$side <- "L"
+bash_res <- bash_res[,c(1,2,11,3,4,5,6,7,8,9,10)]
+bash_res$side.1 <- "R"
+
+bash_res_L <- bash_res[, 1:6]
+colnames(bash_res_L)[6] <- "offset"
+colnames(bash_res_L)[5] <- "bash_size"
+
+bash_res_R <- bash_res[, c(1,2, 8, 9, 10, 12)]
+colnames(bash_res_R)[3]  <- "telomere"
+colnames(bash_res_R)[4]  <- "bash_size"
+colnames(bash_res_R)[5]  <- "offset"
+colnames(bash_res_R)[6]  <- "side"
+bash_res_R <- bash_res_R[, c(1, 2, 6, 3, 4, 5)]
+
+all_bash_res <- rbind(bash_res_L, bash_res_R)
+all_bash_res[is.na(all_bash_res)] <- 0
+
+## merge bash and python dataset
+tel$Strain_Chr_Side <- paste(tel$Strain_Chr, "_", tel$Contig_side, sep = "")
+all_bash_res$Strain_Chr_Side <- paste(all_bash_res$strain, "_", all_bash_res$chromosome, "_", all_bash_res$side, sep = "")
+
+python_bash_res <- merge(x = tel, y = all_bash_res, by.x = "Strain_Chr_Side", by.y = "Strain_Chr_Side")
+colnames(python_bash_res)[5] <- "Python_size"
+python_bash_res$diff_size <- python_bash_res$Python_size - python_bash_res$bash_size
+
+## correlation between the 2 dataset:
+ggplot(python_bash_res, aes(x=Python_size, y=bash_size)) +
+  geom_point() +
+  xlab("Mean telomere length Python") +
+  ylab("Mean telomere length bash") +
+  ggtitle("Comparison script bash vs python")
+
+## correlation with hexbin plot
+# Packages
+library(hexbin)
+library(RColorBrewer)
+# Create data
+x <- python_bash_res$Python_size
+y <- python_bash_res$bash_size
+# Make the plot
+bin<-hexbin(x, y, xbins=35)
+my_colors=colorRampPalette(rev(brewer.pal(11,'Spectral')))
+plot(bin, main="Comparison telomere length" , colramp=my_colors , legend=F, xlab = "Python ", ylab = "bash")
+
+## Draw histog of the differences:
+hist(x = python_bash_res$diff_size, breaks = 60, xlab = "", main = "Difference telomere length (python - bash)")
+```
+
+
+
+**Conclusions:**
+
+- the 2 scripts estimate very similar telomere lengths for the vast majority of the contig ends.  
+
+
+
+### Plot the same data in y log-scale:
+
+```{r, message=FALSE, warning=FALSE}
+ggplot(python_bash_res, aes(x = diff_size)) + geom_histogram() + scale_y_log10()
+```
+
+
+ **Conclusions:**
+
+- there are few large discrepencies tat need to be explored further.
+
+### print the 10 smallest and biggest values:
+written in discrep.csv
+```{r}
+## 
+sort_diff <- python_bash_res[order(python_bash_res$diff_size),]
+smallest <- head(sort_diff, 10)
+biggest <- tail(sort_diff, 10)
+extreme <- rbind(smallest, biggest)
+discrep <- extreme[, c(1, 5, 6, 12, 13, 14)]
+discrep
+write.csv(discrep,"~/Documents/DUBii/Projet/results/Telomere_length/discrep.csv", row.names = FALSE)
+```
+

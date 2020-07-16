@@ -18,5 +18,7 @@
 # References
 
 ## Text Editor
+
 https://code.visualstudio.com/
+
 https://www.jetbrains.com/pycharm/

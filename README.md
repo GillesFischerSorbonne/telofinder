@@ -1,6 +1,6 @@
 #### dubii_project
 
-###DATA
+### DATA
 ## Organism: Saccharomyces cerevisiae
 ## Genome dataset is composed of:
   - 99 de novo genome assemblies from novel Oxford Nanopore sequencing data

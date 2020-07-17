@@ -8,14 +8,14 @@ import os.path
 
 ## command to launch the script: $python 00_analyze_telom_length.py file.fasta
 # TODO: To be added in the documentation of the command line interface (CLI)
-# (using argparse for example)
+# (using argparse for example, (see test_argparse.py))
 
 ## define the genme fasta file
 if len(sys.argv) != 2:
     sys.exit(
         "ERROR: you must specify the name of genome fasta file or its path as the first argument"
     )
-# TODO: To be added in doc/setup of argparse
+# TODO: To be added in doc/setup of argparse (see test_argparse.py)
 
 ## function#1: return the strain name, each chromosome name and their telomere length on each side
 def chr_start_end(genome_fasta):

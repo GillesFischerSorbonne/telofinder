@@ -1,39 +1,43 @@
 import sys
-from Bio.Seq import Seq
 from Bio import SeqIO
 import os.path
+import argparse
+from pathlib import Path
 
-## !!! MAKE SURE TO DELETE THE OUTPUT FILE "telom_length.csv" FROM YOUR DIRECTORY BEFORE RUNNING THE SCRIPT !!!
-# TODO: Add a function testing if the file exists and exits program if it does.
 
-## command to launch the script: $python 00_analyze_telom_length.py file.fasta
-# TODO: To be added in the documentation of the command line interface (CLI)
-# (using argparse for example, (see test_argparse.py))
+# function to test if the output file already exists and exit program if it does
+def output_exists():
+    file_exists = os.path.isfile("telom_length.csv")
+    if file_exists:
+        sys.exit(
+            print(
+                "\n",
+                "Warning!!! A file called 'telom_length.csv' already exists.",
+                "\n",
+                "delete this file before running the script",
+                "\n",
+            )
+        )
 
-## define the genme fasta file
-if len(sys.argv) != 2:
-    sys.exit(
-        "ERROR: you must specify the name of genome fasta file or its path as the first argument"
+
+# function to define the fasta file as the positional argument
+def parse_args():
+    parser = argparse.ArgumentParser(
+        description="This program determines telomere length at all sequence ends from a (multi)fasta file\
+        and outputs a csv file called 'telom_length.csv'"
     )
-# TODO: To be added in doc/setup of argparse (see test_argparse.py)
+    parser.add_argument("fasta_file", help="Path to the fasta file")
+    return parser.parse_args()
 
-## function#1: return the strain name, each chromosome name and their telomere length on each side
+
+# function to get the strain name from the path to the fasta file
+def get_strain_name(filename):
+    filepath = Path(filename)
+    return filepath.stem
+
+
+## function to calculate telomere length at all contig ends
 def chr_start_end(genome_fasta):
-
-    ## get strain name from fasta files either from a path or in the src directory
-    ## from a path
-    # TODO: This can be a function get_strain_name, which will only extract the
-    # strain name from the filename and return it. You can also use python
-    # module pathlib to improve this part
-
-    if "/" in genome_fasta:
-        file_name = genome_fasta.split("/")
-        assembly = file_name[-1].split(".")
-        strain = assembly[0]
-    ## from the src directory
-    else:
-        file_name = genome_fasta.split(".")
-        strain = file_name[0]
 
     print(
         "\n",
@@ -159,4 +163,7 @@ def chr_start_end(genome_fasta):
 
 
 if __name__ == "__main__":
-    chr_start_end(sys.argv[1])
+    output_exists()
+    args = parse_args()
+    strain = get_strain_name(args.fasta_file)
+    chr_start_end(args.fasta_file)

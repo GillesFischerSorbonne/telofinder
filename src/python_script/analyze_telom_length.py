@@ -182,14 +182,13 @@ def chr_start_end(genome_fasta, strain):
 def run_single_or_iterative(fasta_path):
 
     if Path(fasta_path).is_file():
-        print("f{fasta_path)} is a file. Running in single mode.")
+        print(f"'{fasta_path}' is a file. Running in single mode.")
         strain = get_strain_name(fasta_path)
         chr_start_end(fasta_path, strain)
 
     if Path(fasta_path).is_dir():
-        print("f{fasta_path)} is a directory. Running in iterative mode.")
+        print(f"'{fasta_path}' is a directory. Running in iterative mode.")
 
-        # FIXME: Find nicer glob solution to get all extensions
         for ext in ["*.fasta", "*.fas", "*.fa"]:
             for fasta in Path(fasta_path).glob(ext):
 

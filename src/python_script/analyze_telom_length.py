@@ -5,9 +5,7 @@ import argparse
 from pathlib import Path
 
 
-# function to test if the output file already exists and exit program if it does
-
-
+# function to test if the output file already exists, force overwriting or exit program
 def output_exists(force):
     file_exists = os.path.isfile("telom_length.csv")
     if file_exists:
@@ -25,14 +23,15 @@ def output_exists(force):
             )
 
 
-# function to define the fasta file as the positional argument
+# function to use arguments of the command line
 def parse_arguments():
     parser = argparse.ArgumentParser(
-        description="This program determines telomere length at all sequence ends from a (multi)fasta file\
+        description="This program determines telomere length at all sequence ends from a single or multiple (multi)fasta file(s)\
         and outputs a csv file called 'telom_length.csv'"
     )
     parser.add_argument(
-        "fasta_path", help="Path to the fasta file or directory with fasta files."
+        "fasta_path",
+        help="Path to a single fasta file or to a directory containing multiple fasta files.",
     )
     parser.add_argument(
         "-f",
@@ -49,7 +48,7 @@ def get_strain_name(filename):
     return filepath.stem
 
 
-## function to calculate telomere length at all contig ends
+# function to calculate telomere length at all contig ends
 def chr_start_end(genome_fasta, strain):
 
     print(
@@ -77,15 +76,15 @@ def chr_start_end(genome_fasta, strain):
         else:
             limit = 1500
 
-        ### LEFT TELOMERE
-        ## estimate the size of the offset sequence before the telomere sequence
+        ## LEFT TELOMERE
+        ### estimate the size of the offset sequence before the telomere sequence
         for i in range(0, limit):
             mot = str(seq_record.seq[i : i + 20] + "\n")
             if mot.count("C") + mot.count("A") < 19:
                 offset += 1
             else:
                 break
-        ## estimate the size of the telomere sequence
+        ### estimate the size of the telomere sequence
         for j in range(offset, len(seq_record.seq) - 19):
             mot = str(seq_record.seq[j : j + 20] + "\n")
             if (
@@ -98,15 +97,15 @@ def chr_start_end(genome_fasta, strain):
             else:
                 break
 
-        ### RIGHT TELOMERE
-        ## estimate the size of the offset sequence before the telomere sequence
+        ## RIGHT TELOMERE
+        ### estimate the size of the offset sequence before the telomere sequence
         for i in range(0, limit):
             revmot = str(revcomp.seq[i : i + 20] + "\n")
             if revmot.count("C") + revmot.count("A") < 19:
                 revoffset += 1
             else:
                 break
-        ## estimate the size of the telomere sequence
+        ### estimate the size of the telomere sequence
         for j in range(revoffset, len(seq_record.seq) - 19):
             revmot = str(revcomp.seq[j : j + 20] + "\n")
             if (
@@ -175,6 +174,7 @@ def chr_start_end(genome_fasta, strain):
                 )  # file doesn't exist yet, write a header
 
 
+# function to test if program is run ona single or multiple fasta files
 def run_single_or_iterative(fasta_path):
 
     if Path(fasta_path).is_file():
@@ -194,8 +194,8 @@ def run_single_or_iterative(fasta_path):
                 chr_start_end(fasta, strain)
 
 
+# Main program
 if __name__ == "__main__":
     args = parse_arguments()
-
     output_exists(args.force)
     run_single_or_iterative(args.fasta_path)

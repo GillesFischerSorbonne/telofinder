@@ -6,6 +6,8 @@ from pathlib import Path
 
 
 # function to test if the output file already exists and exit program if it does
+
+
 def output_exists(force):
     file_exists = os.path.isfile("telom_length.csv")
     if file_exists:
@@ -29,7 +31,9 @@ def parse_arguments():
         description="This program determines telomere length at all sequence ends from a (multi)fasta file\
         and outputs a csv file called 'telom_length.csv'"
     )
-    parser.add_argument("fasta_file", help="Path to the fasta file")
+    parser.add_argument(
+        "fasta_path", help="Path to the fasta file or directory with fasta files."
+    )
     parser.add_argument(
         "-f",
         "--force",
@@ -46,7 +50,7 @@ def get_strain_name(filename):
 
 
 ## function to calculate telomere length at all contig ends
-def chr_start_end(genome_fasta):
+def chr_start_end(genome_fasta, strain):
 
     print(
         "\n",
@@ -171,8 +175,27 @@ def chr_start_end(genome_fasta):
                 )  # file doesn't exist yet, write a header
 
 
+def run_single_or_iterative(fasta_path):
+
+    if Path(fasta_path).is_file():
+        print("f{fasta_path)} is a file. Running in single mode.")
+        strain = get_strain_name(fasta_path)
+        chr_start_end(fasta_path, strain)
+
+    if Path(fasta_path).is_dir():
+        print("f{fasta_path)} is a directory. Running in iterative mode.")
+
+        # FIXME: Find nicer glob solution to get all extensions
+        for ext in ["*.fasta", "*.fas", "*.fa"]:
+            for fasta in Path(fasta_path).glob(ext):
+
+                print(fasta)
+                strain = get_strain_name(fasta)
+                chr_start_end(fasta, strain)
+
+
 if __name__ == "__main__":
     args = parse_arguments()
+
     output_exists(args.force)
-    strain = get_strain_name(args.fasta_file)
-    chr_start_end(args.fasta_file)
+    run_single_or_iterative(args.fasta_path)

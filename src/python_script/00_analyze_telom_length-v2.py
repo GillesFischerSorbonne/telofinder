@@ -21,7 +21,7 @@ def output_exists():
 
 
 # function to define the fasta file as the positional argument
-def parse_args():
+def parse_arguments():
     parser = argparse.ArgumentParser(
         description="This program determines telomere length at all sequence ends from a (multi)fasta file\
         and outputs a csv file called 'telom_length.csv'"
@@ -58,7 +58,7 @@ def chr_start_end(genome_fasta):
         offset = 0
         revoffset = 0
 
-        ## set up a limit of 1000 nt at contig ends to browse until we find a telomere sequence
+        ## set up a limit of 1500 nt at contig ends to browse until we find a telomere sequence
         if len(seq_record.seq) < 1500:
             limit = len(seq_record.seq) - 9
         else:
@@ -164,6 +164,6 @@ def chr_start_end(genome_fasta):
 
 if __name__ == "__main__":
     output_exists()
-    args = parse_args()
+    args = parse_arguments()
     strain = get_strain_name(args.fasta_file)
     chr_start_end(args.fasta_file)

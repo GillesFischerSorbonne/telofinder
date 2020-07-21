@@ -5,8 +5,12 @@ import argparse
 from pathlib import Path
 
 
-# function to test if the output file already exists, force overwriting or exit program
+# TODO: Now that those are function, these comments describing the functions can
+# go in the doc string of the function, like so:
 def output_exists(force):
+    """Function to test if the output file already exists, force overwriting or
+    exit program.
+    """
     file_exists = os.path.isfile("telom_length.csv")
     if file_exists:
         if force:

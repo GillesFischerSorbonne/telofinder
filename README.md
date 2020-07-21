@@ -40,6 +40,8 @@
 - algorithm study/improvements
 - tests
 
+if time:
+- logging in python
 
 ## References
 

@@ -6,18 +6,21 @@ from pathlib import Path
 
 
 # function to test if the output file already exists and exit program if it does
-def output_exists():
+def output_exists(force):
     file_exists = os.path.isfile("telom_length.csv")
     if file_exists:
-        sys.exit(
-            print(
-                "\n",
-                "Warning!!! A file called 'telom_length.csv' already exists.",
-                "\n",
-                "delete this file before running the script",
-                "\n",
+        if force:
+            print("Replacing the existing file.")
+        else:
+            sys.exit(
+                print(
+                    "\n",
+                    "Warning!!! A file called 'telom_length.csv' already exists.",
+                    "\n",
+                    "delete this file before running the script or use the option --force",
+                    "\n",
+                )
             )
-        )
 
 
 # function to define the fasta file as the positional argument
@@ -27,6 +30,12 @@ def parse_arguments():
         and outputs a csv file called 'telom_length.csv'"
     )
     parser.add_argument("fasta_file", help="Path to the fasta file")
+    parser.add_argument(
+        "-f",
+        "--force",
+        action="store_true",
+        help="Automatically replace the csv file if present.",
+    )
     return parser.parse_args()
 
 
@@ -163,7 +172,7 @@ def chr_start_end(genome_fasta):
 
 
 if __name__ == "__main__":
-    output_exists()
     args = parse_arguments()
+    output_exists(args.force)
     strain = get_strain_name(args.fasta_file)
     chr_start_end(args.fasta_file)

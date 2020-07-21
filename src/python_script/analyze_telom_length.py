@@ -74,6 +74,7 @@ def chr_start_end(genome_fasta, strain):
         offset = 0
         revoffset = 0
 
+        # TODO: the min function can be of help here
         ## set up a limit of 1500 nt at contig ends to browse until we find a telomere sequence
         if len(seq_record.seq) < 1500:
             limit = len(seq_record.seq) - 9
@@ -101,6 +102,9 @@ def chr_start_end(genome_fasta, strain):
             else:
                 break
 
+        # TODO: Introduction to the DRY principle. These instructions are the
+        # same than for the left telomere, we should so put them in a function
+        # and call this function for the left and the right telomere
         ## RIGHT TELOMERE
         ### estimate the size of the offset sequence before the telomere sequence
         for i in range(0, limit):
@@ -122,6 +126,7 @@ def chr_start_end(genome_fasta, strain):
             else:
                 break
 
+        # FIXME: The elif expressions are redundant
         ## definition of telomere and offset lengths
         if count == 0:
             left_tel = 0
@@ -141,6 +146,7 @@ def chr_start_end(genome_fasta, strain):
         elif revcount != 0 and revoffset == 0:
             right_tel = 20 + revcount - 3
 
+        # TODO: Could use fstrings here
         ## stdout
         chrom = seq_record.id
         print(chrom)
@@ -151,6 +157,7 @@ def chr_start_end(genome_fasta, strain):
         print("right offset = ", revoffset)
         print("\n", "-------------------------------", "\n")
 
+        # TODO: Could use pandas DataFrames here
         ## save the results in a csv file
         file_exists = os.path.isfile("telom_length.csv")
         with open("telom_length.csv", "a") as filout:

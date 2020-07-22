@@ -15,15 +15,43 @@
 ### tRNA gene families
 ### Retrotransposons (Ty)
 
-# References
+## Programming
 
-## Text Editor
+### Refactoring
+
+#### In progress / Done
+
+- Setting up a good developping environment (SublimeText + plugins)
+
+- Improved CLI:
+  - Replacing sys.argv by argparse.
+  - Argparse help.
+  - See Different types of arguments/options.
+  
+- Refactoring spaghetti code into specialized functions + docstrings.
+
+- Accepting single fasta file or recursively applied to fasta files in a
+  directory.
+  
+- Usage of pathlib.
+
+#### To do
+
+- algorithm study/improvements
+- tests
+
+if time:
+- logging in python
+
+## References
+
+### Text Editor
 
 https://code.visualstudio.com/
 
 https://www.jetbrains.com/pycharm/
 
-## Formating
+### Formating
 
 https://github.com/jgirardet/sublack
 

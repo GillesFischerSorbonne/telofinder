@@ -5,8 +5,12 @@ import argparse
 from pathlib import Path
 
 
-# function to test if the output file already exists, force overwriting or exit program
+# TODO: Now that those are function, these comments describing the functions can
+# go in the doc string of the function, like so:
 def output_exists(force):
+    """Function to test if the output file already exists, force overwriting or
+    exit program.
+    """
     file_exists = os.path.isfile("telom_length.csv")
     if file_exists:
         if force:
@@ -70,6 +74,7 @@ def chr_start_end(genome_fasta, strain):
         offset = 0
         revoffset = 0
 
+        # TODO: the min function can be of help here
         ## set up a limit of 1500 nt at contig ends to browse until we find a telomere sequence
         if len(seq_record.seq) < 1500:
             limit = len(seq_record.seq) - 9
@@ -97,6 +102,9 @@ def chr_start_end(genome_fasta, strain):
             else:
                 break
 
+        # TODO: Introduction to the DRY principle. These instructions are the
+        # same than for the left telomere, we should so put them in a function
+        # and call this function for the left and the right telomere
         ## RIGHT TELOMERE
         ### estimate the size of the offset sequence before the telomere sequence
         for i in range(0, limit):
@@ -118,6 +126,7 @@ def chr_start_end(genome_fasta, strain):
             else:
                 break
 
+        # FIXME: The elif expressions are redundant
         ## definition of telomere and offset lengths
         if count == 0:
             left_tel = 0
@@ -137,6 +146,7 @@ def chr_start_end(genome_fasta, strain):
         elif revcount != 0 and revoffset == 0:
             right_tel = 20 + revcount - 3
 
+        # TODO: Could use fstrings here
         ## stdout
         chrom = seq_record.id
         print(chrom)
@@ -147,6 +157,7 @@ def chr_start_end(genome_fasta, strain):
         print("right offset = ", revoffset)
         print("\n", "-------------------------------", "\n")
 
+        # TODO: Could use pandas DataFrames here
         ## save the results in a csv file
         file_exists = os.path.isfile("telom_length.csv")
         with open("telom_length.csv", "a") as filout:
@@ -178,14 +189,13 @@ def chr_start_end(genome_fasta, strain):
 def run_single_or_iterative(fasta_path):
 
     if Path(fasta_path).is_file():
-        print("f{fasta_path)} is a file. Running in single mode.")
+        print(f"'{fasta_path}' is a file. Running in single mode.")
         strain = get_strain_name(fasta_path)
         chr_start_end(fasta_path, strain)
 
     if Path(fasta_path).is_dir():
-        print("f{fasta_path)} is a directory. Running in iterative mode.")
+        print(f"'{fasta_path}' is a directory. Running in iterative mode.")
 
-        # FIXME: Find nicer glob solution to get all extensions
         for ext in ["*.fasta", "*.fas", "*.fa"]:
             for fasta in Path(fasta_path).glob(ext):
 

@@ -37,7 +37,7 @@ def parse_arguments():
         "-f",
         "--force",
         action="store_true",
-        help="Automatically replace the csv file if present.",
+        help="Automatically replace the output csv file if present.",
     )
     return parser.parse_args()
 

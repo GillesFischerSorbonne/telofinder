@@ -5,10 +5,8 @@ import argparse
 from pathlib import Path
 
 
-# TODO: Now that those are function, these comments describing the functions can
-# go in the doc string of the function, like so:
 def output_exists(force):
-    """Function to test if the output file already exists, force overwriting or
+    """Function to test if the output file already exists, force overwriting the output file or
     exit program.
     """
     file_exists = os.path.isfile("telom_length.csv")
@@ -27,8 +25,8 @@ def output_exists(force):
             )
 
 
-# function to use arguments of the command line
 def parse_arguments():
+    """Function to parse and reuse the arguments of the command line"""
     parser = argparse.ArgumentParser(
         description="This program determines telomere length at all sequence ends from a single or multiple (multi)fasta file(s)\
         and outputs a csv file called 'telom_length.csv'"
@@ -46,15 +44,14 @@ def parse_arguments():
     return parser.parse_args()
 
 
-# function to get the strain name from the path to the fasta file
 def get_strain_name(filename):
+    """Function to get the strain name from the path to the fasta file"""
     filepath = Path(filename)
     return filepath.stem
 
 
-# function to calculate telomere length at all contig ends
 def chr_start_end(genome_fasta, strain):
-
+    """Function to calculate telomere length at all contig ends"""
     print(
         "\n",
         "=================================",

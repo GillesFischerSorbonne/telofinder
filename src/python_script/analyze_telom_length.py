@@ -55,7 +55,7 @@ def get_strain_name(filename):
 def get_offset(sequence):
     """estimate the size of the offset sequence before the telomere sequence"""
     offset = 0
-    limit = min(1500, len(sequence) - 9)
+    limit = min(1500, len(sequence) - 19)
     for i in range(0, limit):
         mot = str(sequence[i : i + 20])
         # TODO: Should this be equal to set(seq) = {"A", "T"} ? ie all As or Cs ?
@@ -70,10 +70,18 @@ def get_offset(sequence):
     return offset
 
 
-def get_telom_size(sequence, offset):
+# TODO: Maybe integrate offset directly in serach for telomere
+def get_telom_size(sequence):
     """Function to calculate telomere length at all contig ends"""
     tel_size = 0
-    for i in range(offset, len(sequence) - 19):
+    offset = 0
+    limit = min(1500, len(sequence) - 20)
+    for i in range(0, len(sequence) - 19):
+        if i == limit and tel_size == 0:
+            offset = 0
+            tel_size = 0
+            return offset, tel_size
+
         mot = str(sequence[i : i + 20])
         if (
             mot.count("C") >= 8
@@ -85,8 +93,9 @@ def get_telom_size(sequence, offset):
         else:
             if tel_size != 0:
                 tel_size = 20 + tel_size - 3
+                return offset, tel_size
 
-            return tel_size
+            offset += 1
 
 
 # FIXME: missing docstring
@@ -150,10 +159,11 @@ def run_single_or_iterative(fasta_path):
             # TODO: This should be incorporated in a function (1)
             print(seq_record.id)
             revcomp = seq_record.reverse_complement()
-            left_offset = get_offset(seq_record.seq)
-            left_tel = get_telom_size(seq_record.seq, left_offset)
-            right_offset = get_offset(revcomp)
-            right_tel = get_telom_size(revcomp, right_offset)
+            # left_offset = get_offset(seq_record.seq)
+            left_offset, left_tel = get_telom_size(seq_record.seq)
+            # right_offset = get_offset(revcomp)
+            print(revcomp)
+            right_offset, right_tel = get_telom_size(revcomp)
             generate_output(
                 strain,
                 seq_record.id,

@@ -45,6 +45,16 @@ if time:
 
 ## References
 
+### Other Telomere efforts
+
+TelSeq: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4027178/
+
+Telomere to Telomere consortium (human): https://sites.google.com/ucsc.edu/t2tworkinggroup/
+
+Telomere motif identification: https://www.future-science.com/doi/10.2144/btn-2018-0057
+
+TelomereHunter (cancer related telomere variants): https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-019-2851-0
+
 ### Text Editor
 
 https://code.visualstudio.com/

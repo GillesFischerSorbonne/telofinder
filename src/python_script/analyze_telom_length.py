@@ -3,6 +3,7 @@ from Bio import SeqIO
 import os.path
 import argparse
 from pathlib import Path
+import pandas as pd
 
 
 def output_exists(force):
@@ -98,6 +99,37 @@ def get_telom_size(sequence):
             offset += 1
 
 
+def get_nucleotide_proportions(sequence):
+    """ Get nucleotide proportion along the sliding window
+    """
+    from collections import Counter
+
+    nucleotide_proportions = {}
+
+    for i in range(0, len(sequence.seq) - 19):
+        mot = str(sequence[i : i + 20])
+        if (
+            mot.count("C") >= 8
+            and mot.count("A") >= 3
+            and mot.count("C") + mot.count("A") >= 17
+            and "AAAA" not in mot
+        ):
+            nucleotide_proportions[i] = 1
+        else:
+            nucleotide_proportions[i] = 0
+
+    # for i in range(0, len(sequence.seq) - 1):
+
+    #     mot = str(sequence.seq[i : i + 2])
+    #     if mot in ["AC", "CA", "CC"]:
+    #         nucleotide_proportions[i] = 1
+    #     else:
+    #         nucleotide_proportions[i] = 0
+
+    nucleotide_df = pd.DataFrame(nucleotide_proportions, index=[sequence.name])
+    return nucleotide_df
+
+
 # FIXME: missing docstring
 def generate_output(
     strain, chrom, left_tel, right_tel, left_offset, right_offset, output_file
@@ -155,24 +187,25 @@ def run_single_or_iterative(fasta_path):
         print(f"'{fasta_path}' is a file. Running in single mode.")
         strain = get_strain_name(fasta_path)
 
+        dinucleotide_df_list = []
         for seq_record in SeqIO.parse(fasta_path, "fasta"):
             # TODO: This should be incorporated in a function (1)
-            print(seq_record.id)
             revcomp = seq_record.reverse_complement()
+            dinucleotide_df_list.append(get_nucleotide_proportions(seq_record))
             # left_offset = get_offset(seq_record.seq)
-            left_offset, left_tel = get_telom_size(seq_record.seq)
+            # left_offset, left_tel = get_telom_size(seq_record.seq)
             # right_offset = get_offset(revcomp)
-            print(revcomp)
-            right_offset, right_tel = get_telom_size(revcomp)
-            generate_output(
-                strain,
-                seq_record.id,
-                left_tel,
-                right_tel,
-                left_offset,
-                right_offset,
-                "telom_length.csv",
-            )
+            # right_offset, right_tel = get_telom_size(revcomp)
+            # generate_output(
+            #     strain,
+            #     seq_record.id,
+            #     left_tel,
+            #     right_tel,
+            #     left_offset,
+            #     right_offset,
+            #     "telom_length.csv",
+            # )
+        return pd.concat(dinucleotide_df_list)
 
     if Path(fasta_path).is_dir():
         print(f"'{fasta_path}' is a directory. Running in iterative mode.")

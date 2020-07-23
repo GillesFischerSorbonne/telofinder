@@ -57,6 +57,7 @@ def get_offset(sequence):
     limit = min(1500, len(sequence) - 9)
     for i in range(0, limit):
         mot = str(sequence[i : i + 20])
+        # TODO: Should this be equal to set(seq) = {"A", "T"} ? ie all As or Cs ?
         if mot.count("C") + mot.count("A") < 19:
             print("OKKK")
             offset = i + 1

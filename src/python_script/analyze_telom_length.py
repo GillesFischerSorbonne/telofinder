@@ -50,8 +50,46 @@ def get_strain_name(filename):
     return filepath.stem
 
 
-def chr_start_end(genome_fasta, strain):
+# FIXME: verify that offset can be equal to i+1
+def get_offset(sequence):
+    """estimate the size of the offset sequence before the telomere sequence"""
+    offset = 0
+    limit = min(1500, len(sequence) - 9)
+    for i in range(0, limit):
+        mot = str(sequence[i : i + 20])
+        if mot.count("C") + mot.count("A") < 19:
+            print("OKKK")
+            offset = i + 1
+            if offset == limit:
+                offset = 0
+
+        else:
+            break
+    return offset
+
+
+def get_telom_size(sequence, offset):
     """Function to calculate telomere length at all contig ends"""
+    tel_size = 0
+    for i in range(offset, len(sequence) - 19):
+        mot = str(sequence[i : i + 20])
+        if (
+            mot.count("C") >= 8
+            and mot.count("A") >= 3
+            and mot.count("C") + mot.count("A") >= 17
+            and "AAAA" not in mot
+        ):
+            tel_size += 1
+        else:
+            if tel_size != 0:
+                tel_size = 20 + tel_size - 3
+
+            return tel_size
+
+
+def generate_output(
+    strain, chrom, left_tel, right_tel, left_offset, right_offset, output_file,
+):
     print(
         "\n",
         "=================================",
@@ -61,134 +99,71 @@ def chr_start_end(genome_fasta, strain):
         "=================================",
         "\n",
     )
+    print(chrom)
+    print("---------------------")
+    print("left telom length = ", left_tel)
+    print("left offset = ", left_offset)
+    print("right telom length = ", right_tel)
+    print("right offset = ", right_offset)
+    print("\n", "-------------------------------", "\n")
 
-    ## parse the multifasta file and reverse complement each sequence
-    for seq_record in SeqIO.parse(genome_fasta, "fasta"):
-        revcomp = seq_record.reverse_complement()
-
-        count = 0
-        revcount = 0
-        offset = 0
-        revoffset = 0
-
-        # TODO: the min function can be of help here
-        ## set up a limit of 1500 nt at contig ends to browse until we find a telomere sequence
-        if len(seq_record.seq) < 1500:
-            limit = len(seq_record.seq) - 9
-        else:
-            limit = 1500
-
-        ## LEFT TELOMERE
-        ### estimate the size of the offset sequence before the telomere sequence
-        for i in range(0, limit):
-            mot = str(seq_record.seq[i : i + 20] + "\n")
-            if mot.count("C") + mot.count("A") < 19:
-                offset += 1
-            else:
-                break
-        ### estimate the size of the telomere sequence
-        for j in range(offset, len(seq_record.seq) - 19):
-            mot = str(seq_record.seq[j : j + 20] + "\n")
-            if (
-                mot.count("C") >= 8
-                and mot.count("A") >= 3
-                and mot.count("C") + mot.count("A") >= 17
-                and "AAAA" not in mot
-            ):
-                count += 1
-            else:
-                break
-
-        # TODO: Introduction to the DRY principle. These instructions are the
-        # same than for the left telomere, we should so put them in a function
-        # and call this function for the left and the right telomere
-        ## RIGHT TELOMERE
-        ### estimate the size of the offset sequence before the telomere sequence
-        for i in range(0, limit):
-            revmot = str(revcomp.seq[i : i + 20] + "\n")
-            if revmot.count("C") + revmot.count("A") < 19:
-                revoffset += 1
-            else:
-                break
-        ### estimate the size of the telomere sequence
-        for j in range(revoffset, len(seq_record.seq) - 19):
-            revmot = str(revcomp.seq[j : j + 20] + "\n")
-            if (
-                revmot.count("C") >= 8
-                and revmot.count("A") >= 3
-                and revmot.count("C") + revmot.count("A") >= 17
-                and "AAAA" not in revmot
-            ):
-                revcount += 1
-            else:
-                break
-
-        # FIXME: The elif expressions are redundant
-        ## definition of telomere and offset lengths
-        if count == 0:
-            left_tel = 0
-            offset = 0
-        elif count != 0 and offset != 0:
-            left_tel = 20 + count - 3
-            offset = offset + 1
-        elif count != 0 and offset == 0:
-            left_tel = 20 + count - 3
-
-        if revcount == 0:
-            right_tel = 0
-            revoffset = 0
-        elif revcount != 0 and revoffset != 0:
-            right_tel = 20 + revcount - 3
-            revoffset = revoffset + 1
-        elif revcount != 0 and revoffset == 0:
-            right_tel = 20 + revcount - 3
-
-        # TODO: Could use fstrings here
-        ## stdout
-        chrom = seq_record.id
-        print(chrom)
-        print("---------------------")
-        print("left telom length = ", left_tel)
-        print("left offset = ", offset)
-        print("right telom length = ", right_tel)
-        print("right offset = ", revoffset)
-        print("\n", "-------------------------------", "\n")
-
-        # TODO: Could use pandas DataFrames here
-        ## save the results in a csv file
-        file_exists = os.path.isfile("telom_length.csv")
-        with open("telom_length.csv", "a") as filout:
-            if file_exists:
-                filout.write(
-                    "{0}\t{1}\tL\t{2}\t{4}\n{0}\t{1}\tR\t{3}\t{5}\n".format(
-                        strain, chrom, left_tel, right_tel, offset, revoffset
-                    )
+    # TODO: Could use pandas DataFrames here
+    ## save the results in a csv file
+    file_exists = os.path.isfile(output_file)
+    with open("telom_length.csv", "a") as filout:
+        if file_exists:
+            filout.write(
+                "{0}\t{1}\tL\t{2}\t{4}\n{0}\t{1}\tR\t{3}\t{5}\n".format(
+                    strain,
+                    chrom,
+                    left_tel,
+                    right_tel,
+                    left_offset,
+                    right_offset,
                 )
-            else:
-                filout.write(
-                    "{0}\t{1}\t{2}\t{3}\t{4}\n{5}\t{6}\tL\t{7}\t{9}\n{5}\t{6}\tR\t{8}\t{10}\n".format(
-                        "Strain",
-                        "Chromosome",
-                        "Contig_side",
-                        "Telom_length",
-                        "Offset",
-                        strain,
-                        chrom,
-                        left_tel,
-                        right_tel,
-                        offset,
-                        revoffset,
-                    )
-                )  # file doesn't exist yet, write a header
+            )
+        else:
+            filout.write(
+                "{0}\t{1}\t{2}\t{3}\t{4}\n{5}\t{6}\tL\t{7}\t{9}\n{5}\t{6}\tR\t{8}\t{10}\n".format(
+                    "Strain",
+                    "Chromosome",
+                    "Contig_side",
+                    "Telom_length",
+                    "Offset",
+                    strain,
+                    chrom,
+                    left_tel,
+                    right_tel,
+                    left_offset,
+                    right_offset,
+                )
+            )  # file doesn't exist yet, write a header
 
 
-# function to test if program is run ona single or multiple fasta files
 def run_single_or_iterative(fasta_path):
+    """function to test if program is run ona single or multiple fasta files"""
 
     if Path(fasta_path).is_file():
         print(f"'{fasta_path}' is a file. Running in single mode.")
         strain = get_strain_name(fasta_path)
-        chr_start_end(fasta_path, strain)
+
+        for seq_record in SeqIO.parse(fasta_path, "fasta"):
+            print(seq_record.id)
+            revcomp = seq_record.reverse_complement()
+            limit = min(1500, len(seq_record.seq) - 9)
+            left_offset = get_offset(seq_record.seq)
+            left_tel = get_telom_size(seq_record.seq, left_offset)
+            right_offset = get_offset(revcomp)
+            right_tel = get_telom_size(revcomp, right_offset)
+            generate_output(
+                strain,
+                seq_record.id,
+                left_tel,
+                right_tel,
+                left_offset,
+                right_offset,
+                "telom_length.csv",
+            )
 
     if Path(fasta_path).is_dir():
         print(f"'{fasta_path}' is a directory. Running in iterative mode.")
@@ -198,7 +173,23 @@ def run_single_or_iterative(fasta_path):
 
                 print(fasta)
                 strain = get_strain_name(fasta)
-                chr_start_end(fasta, strain)
+
+                for seq_record in SeqIO.parse(fasta_path, "fasta"):
+                    revcomp = seq_record.reverse_complement()
+                    limit = min(1500, len(seq_record.seq) - 9)
+                    left_offset = get_offset(seq_record.seq)
+                    left_tel = get_telom_size(seq_record.seq, left_offset)
+                    right_offset = get_offset(revcomp)
+                    right_tel = get_telom_size(revcomp, right_offset)
+                    generate_output(
+                        strain,
+                        seq_record.id,
+                        left_tel,
+                        right_tel,
+                        left_offset,
+                        right_offset,
+                        "telom_length.csv",
+                    )
 
 
 # Main program

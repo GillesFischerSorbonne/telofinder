@@ -38,6 +38,11 @@
 #### To do
 
 - algorithm study/improvements
+  - GC/AT skewness
+  - Entropy/complexity by window
+  - window size as a parameter
+  - number of consecutive failures in pattern matching
+
 - tests
 
 if time:

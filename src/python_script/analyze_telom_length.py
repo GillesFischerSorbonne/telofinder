@@ -88,7 +88,7 @@ def get_telom_size(sequence, offset):
 
 
 def generate_output(
-    strain, chrom, left_tel, right_tel, left_offset, right_offset, output_file,
+    strain, chrom, left_tel, right_tel, left_offset, right_offset, output_file
 ):
     print(
         "\n",
@@ -114,12 +114,7 @@ def generate_output(
         if file_exists:
             filout.write(
                 "{0}\t{1}\tL\t{2}\t{4}\n{0}\t{1}\tR\t{3}\t{5}\n".format(
-                    strain,
-                    chrom,
-                    left_tel,
-                    right_tel,
-                    left_offset,
-                    right_offset,
+                    strain, chrom, left_tel, right_tel, left_offset, right_offset
                 )
             )
         else:
@@ -150,7 +145,6 @@ def run_single_or_iterative(fasta_path):
         for seq_record in SeqIO.parse(fasta_path, "fasta"):
             print(seq_record.id)
             revcomp = seq_record.reverse_complement()
-            limit = min(1500, len(seq_record.seq) - 9)
             left_offset = get_offset(seq_record.seq)
             left_tel = get_telom_size(seq_record.seq, left_offset)
             right_offset = get_offset(revcomp)
@@ -176,7 +170,6 @@ def run_single_or_iterative(fasta_path):
 
                 for seq_record in SeqIO.parse(fasta_path, "fasta"):
                     revcomp = seq_record.reverse_complement()
-                    limit = min(1500, len(seq_record.seq) - 9)
                     left_offset = get_offset(seq_record.seq)
                     left_tel = get_telom_size(seq_record.seq, left_offset)
                     right_offset = get_offset(revcomp)

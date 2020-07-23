@@ -87,6 +87,7 @@ def get_telom_size(sequence, offset):
             return tel_size
 
 
+# FIXME: missing docstring
 def generate_output(
     strain, chrom, left_tel, right_tel, left_offset, right_offset, output_file
 ):
@@ -136,13 +137,15 @@ def generate_output(
 
 
 def run_single_or_iterative(fasta_path):
-    """function to test if program is run ona single or multiple fasta files"""
+    """Check if fasta_path is a single file or a directory and run the telomere
+    detection sequence accordingly."""
 
     if Path(fasta_path).is_file():
         print(f"'{fasta_path}' is a file. Running in single mode.")
         strain = get_strain_name(fasta_path)
 
         for seq_record in SeqIO.parse(fasta_path, "fasta"):
+            # TODO: This should be incorporated in a function
             print(seq_record.id)
             revcomp = seq_record.reverse_complement()
             left_offset = get_offset(seq_record.seq)

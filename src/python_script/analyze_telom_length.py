@@ -25,6 +25,7 @@ def output_exists(force):
             )
 
 
+# TODO: Add a parameter for output file name
 def parse_arguments():
     """Function to parse and reuse the arguments of the command line"""
     parser = argparse.ArgumentParser(
@@ -146,7 +147,7 @@ def run_single_or_iterative(fasta_path):
         strain = get_strain_name(fasta_path)
 
         for seq_record in SeqIO.parse(fasta_path, "fasta"):
-            # TODO: This should be incorporated in a function
+            # TODO: This should be incorporated in a function (1)
             print(seq_record.id)
             revcomp = seq_record.reverse_complement()
             left_offset = get_offset(seq_record.seq)
@@ -173,6 +174,7 @@ def run_single_or_iterative(fasta_path):
                 strain = get_strain_name(fasta)
 
                 for seq_record in SeqIO.parse(fasta_path, "fasta"):
+                    # TODO: This should be incorporated in a function, see TODO (1)
                     revcomp = seq_record.reverse_complement()
                     left_offset = get_offset(seq_record.seq)
                     left_tel = get_telom_size(seq_record.seq, left_offset)

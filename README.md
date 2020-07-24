@@ -37,6 +37,8 @@
 
 #### To do
 
+- shared conda environment 
+
 - algorithm study/improvements
   - GC/AT skewness
   - Entropy/complexity by window

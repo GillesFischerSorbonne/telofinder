@@ -52,7 +52,6 @@ def get_strain_name(filename):
     return filepath.stem
 
 
-# TODO: Maybe integrate offset directly in serach for telomere
 def get_telom_size(sequence):
     """Function to calculate telomere length at all contig ends"""
     tel_size = 0
@@ -80,14 +79,12 @@ def get_telom_size(sequence):
             offset += 1
 
 
-def get_nucleotide_proportions(sequence):
-    """ Get nucleotide proportion along the sliding window
-    """
-    from collections import Counter
+def get_pattern_occurences(sequence):
+    "Presence/absence coding of the telomere pattern in a sliding window"
 
-    nucleotide_proportions = {}
+    pattern_occurence = {}
 
-    for i in range(0, len(sequence.seq) - 19):
+    for i in range(0, len(sequence) - 19):
         mot = str(sequence[i : i + 20])
         if (
             mot.count("C") >= 8
@@ -95,20 +92,31 @@ def get_nucleotide_proportions(sequence):
             and mot.count("C") + mot.count("A") >= 17
             and "AAAA" not in mot
         ):
-            nucleotide_proportions[i] = 1
+            pattern_occurence[i] = 1
         else:
-            nucleotide_proportions[i] = 0
+            pattern_occurence[i] = 0
 
-    # for i in range(0, len(sequence.seq) - 1):
+    return pattern_occurence
 
-    #     mot = str(sequence.seq[i : i + 2])
-    #     if mot in ["AC", "CA", "CC"]:
-    #         nucleotide_proportions[i] = 1
-    #     else:
-    #         nucleotide_proportions[i] = 0
 
-    nucleotide_df = pd.DataFrame(nucleotide_proportions, index=[sequence.name])
-    return nucleotide_df
+# TODO: idea for later have a sliding window checking match for polynucleotide
+# of various sizes and get a score from that: ie AC: 1 ACC: 1.5, ACCA: 2 etc ...
+def get_polynuc_occurence(sequence, polynucleotide_list):
+    """ Get polynucleotide proportion along the sliding window
+    All polynucleotide should be of the same size.
+    """
+
+    polynucleotide_occurence = {}
+
+    for i in range(0, len(sequence) - 1):
+
+        mot = str(sequence[i : i + 2])
+        if mot in polynucleotide_list:
+            polynucleotide_occurence[i] = 1
+        else:
+            polynucleotide_occurence[i] = 0
+
+    return polynucleotide_occurence
 
 
 # FIXME: missing docstring
@@ -168,11 +176,13 @@ def run_single_or_iterative(fasta_path):
         print(f"'{fasta_path}' is a file. Running in single mode.")
         strain = get_strain_name(fasta_path)
 
-        dinucleotide_df_list = []
+        polynucleotide_dict = {}
         for seq_record in SeqIO.parse(fasta_path, "fasta"):
             # TODO: This should be incorporated in a function (1)
             revcomp = seq_record.reverse_complement()
-            dinucleotide_df_list.append(get_nucleotide_proportions(seq_record))
+            polynucleotide_dict[seq_record.name] = get_polynuc_occurence(
+                seq_record.seq, ["AC", "CA", "CC"]
+            )
             # left_offset = get_offset(seq_record.seq)
             # left_offset, left_tel = get_telom_size(seq_record.seq)
             # right_offset = get_offset(revcomp)
@@ -186,7 +196,7 @@ def run_single_or_iterative(fasta_path):
             #     right_offset,
             #     "telom_length.csv",
             # )
-        return pd.concat(dinucleotide_df_list)
+        return pd.DataFrame(polynucleotide_dict)
 
     if Path(fasta_path).is_dir():
         print(f"'{fasta_path}' is a directory. Running in iterative mode.")

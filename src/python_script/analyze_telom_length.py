@@ -52,25 +52,6 @@ def get_strain_name(filename):
     return filepath.stem
 
 
-# FIXME: verify that offset can be equal to i+1
-def get_offset(sequence):
-    """estimate the size of the offset sequence before the telomere sequence"""
-    offset = 0
-    limit = min(1500, len(sequence) - 19)
-    for i in range(0, limit):
-        mot = str(sequence[i : i + 20])
-        # TODO: Should this be equal to set(seq) = {"A", "T"} ? ie all As or Cs ?
-        if mot.count("C") + mot.count("A") < 19:
-            print("OKKK")
-            offset = i + 1
-            if offset == limit:
-                offset = 0
-
-        else:
-            break
-    return offset
-
-
 # TODO: Maybe integrate offset directly in serach for telomere
 def get_telom_size(sequence):
     """Function to calculate telomere length at all contig ends"""

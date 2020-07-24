@@ -177,29 +177,35 @@ def run_single_or_iterative(fasta_path):
         strain = get_strain_name(fasta_path)
 
         polynucleotide_dict = {}
+        pattern_dict = {}
         for seq_record in SeqIO.parse(fasta_path, "fasta"):
             # TODO: This should be incorporated in a function (1)
-            revcomp = seq_record.reverse_complement()
             polynucleotide_dict[seq_record.name] = get_polynuc_occurence(
                 seq_record.seq, ["AC", "CA", "CC"]
             )
-            # left_offset = get_offset(seq_record.seq)
-            # left_offset, left_tel = get_telom_size(seq_record.seq)
-            # right_offset = get_offset(revcomp)
-            # right_offset, right_tel = get_telom_size(revcomp)
-            # generate_output(
-            #     strain,
-            #     seq_record.id,
-            #     left_tel,
-            #     right_tel,
-            #     left_offset,
-            #     right_offset,
-            #     "telom_length.csv",
-            # )
-        return pd.DataFrame(polynucleotide_dict)
+            pattern_dict[seq_record.name] = get_pattern_occurences(seq_record.seq)
+            revcomp = seq_record.reverse_complement()
+            left_offset, left_tel = get_telom_size(seq_record.seq)
+            right_offset, right_tel = get_telom_size(revcomp)
+            generate_output(
+                strain,
+                seq_record.id,
+                left_tel,
+                right_tel,
+                left_offset,
+                right_offset,
+                "telom_length.csv",
+            )
+        return (
+            pd.DataFrame(polynucleotide_dict).transpose(),
+            pd.DataFrame(pattern_dict).transpose(),
+        )
 
     if Path(fasta_path).is_dir():
         print(f"'{fasta_path}' is a directory. Running in iterative mode.")
+
+        polynucleotide_dict = {}
+        pattern_dict = {}
 
         for ext in ["*.fasta", "*.fas", "*.fa"]:
             for fasta in Path(fasta_path).glob(ext):
@@ -207,13 +213,17 @@ def run_single_or_iterative(fasta_path):
                 print(fasta)
                 strain = get_strain_name(fasta)
 
-                for seq_record in SeqIO.parse(fasta_path, "fasta"):
+                for seq_record in SeqIO.parse(fasta, "fasta"):
                     # TODO: This should be incorporated in a function, see TODO (1)
+                    polynucleotide_dict[
+                        fasta.stem, seq_record.name
+                    ] = get_polynuc_occurence(seq_record.seq, ["AC", "CA", "CC"])
+                    pattern_dict[fasta.stem, seq_record.name] = get_pattern_occurences(
+                        seq_record.seq
+                    )
                     revcomp = seq_record.reverse_complement()
-                    left_offset = get_offset(seq_record.seq)
-                    left_tel = get_telom_size(seq_record.seq, left_offset)
-                    right_offset = get_offset(revcomp)
-                    right_tel = get_telom_size(revcomp, right_offset)
+                    left_offset, left_tel = get_telom_size(seq_record.seq)
+                    right_offset, right_tel = get_telom_size(revcomp)
                     generate_output(
                         strain,
                         seq_record.id,
@@ -223,6 +233,10 @@ def run_single_or_iterative(fasta_path):
                         right_offset,
                         "telom_length.csv",
                     )
+        return (
+            pd.DataFrame(polynucleotide_dict).transpose(),
+            pd.DataFrame(pattern_dict).transpose(),
+        )
 
 
 # Main program

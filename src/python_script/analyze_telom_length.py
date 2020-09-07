@@ -4,6 +4,7 @@ import os.path
 import argparse
 from pathlib import Path
 import pandas as pd
+from sequana.sequence import DNA
 
 
 def output_exists(force):
@@ -119,6 +120,44 @@ def get_polynuc_occurence(sequence, polynucleotide_list):
     return polynucleotide_occurence
 
 
+def get_skewness(sequence):
+    """ Get AT, GC skewness from a sequence
+    """
+
+    skewness_stats = {}
+
+    for i in range(0, len(sequence) - 19):
+        mot = str(sequence[i : i + 20])
+
+        a = mot.count("A")
+        t = mot.count("T")
+        g = mot.count("G")
+        c = mot.count("C")
+
+        if (a + t) == 0:
+            at_skew = None
+        else:
+            at_skew = (a - t) / (a + t)
+
+        if (g + c) == 0:
+            gc_skew = None
+        else:
+            gc_skew = (g - c) / (g + c)
+
+        if at_skew is None or gc_skew is None:
+            skewness = None
+        else:
+            skewness = at_skew - gc_skew
+
+        skewness_stats[i] = {
+            # "at_skew": at_skew,
+            # "gc_skew": gc_skew,
+            "skewness": skewness,
+        }
+
+    return skewness_stats
+
+
 # FIXME: missing docstring
 def generate_output(
     strain, chrom, left_tel, right_tel, left_offset, right_offset, output_file
@@ -196,9 +235,13 @@ def run_single_or_iterative(fasta_path):
                 right_offset,
                 "telom_length.csv",
             )
+
+            skewness_stats = get_skewness(seq_record.seq)
+
         return (
             pd.DataFrame(polynucleotide_dict).transpose(),
             pd.DataFrame(pattern_dict).transpose(),
+            pd.DataFrame(skewness_stats).tranpose(),
         )
 
     if Path(fasta_path).is_dir():
@@ -206,6 +249,7 @@ def run_single_or_iterative(fasta_path):
 
         polynucleotide_dict = {}
         pattern_dict = {}
+        skewness_stats = {}
 
         for ext in ["*.fasta", "*.fas", "*.fa"]:
             for fasta in Path(fasta_path).glob(ext):
@@ -233,9 +277,14 @@ def run_single_or_iterative(fasta_path):
                         right_offset,
                         "telom_length.csv",
                     )
+                    skewness_stats[fasta.stem, seq_record.name] = get_skewness(
+                        seq_record.seq
+                    )
+
         return (
             pd.DataFrame(polynucleotide_dict).transpose(),
             pd.DataFrame(pattern_dict).transpose(),
+            pd.DataFrame(skewness_stats).transpose(),
         )
 
 

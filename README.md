@@ -31,7 +31,7 @@ sequence of tRNAs accross strains.
 
 - Setting up a good developping environment (SublimeText + plugins)
 
-- Improved CLI:
+- Improved CLI (command line interface):
   - Replacing sys.argv by argparse.
   - Argparse help.
   - See Different types of arguments/options.

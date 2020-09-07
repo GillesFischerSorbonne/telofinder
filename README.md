@@ -13,6 +13,14 @@
 ## Analyses
 ### Telomere sequence length
 ### tRNA gene families
+
+Using output from tRNAscan http://lowelab.ucsc.edu/tRNAscan-SE/
+- to improve gff3 annotation 
+- build a dataframe with statistics for each tRNA familes (total number accross genome, positions, etc...)
+
+Study genomic dynamic of tRNAscan by comparing genomic locations, codon, and
+sequence of tRNAs accross strains.
+
 ### Retrotransposons (Ty)
 
 ## Programming

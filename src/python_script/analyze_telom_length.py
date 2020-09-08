@@ -4,6 +4,7 @@ import os.path
 import argparse
 from pathlib import Path
 import pandas as pd
+import numpy as np
 
 
 def output_exists(force):
@@ -178,8 +179,22 @@ def get_skewness(window):
     # "at_skew": at_skew,
     # "gc_skew": gc_skew,
 
+    return at_skew, gc_skew, skewness
 
-return at_skew, gc_skew, skewness
+
+def get_entropy(window):
+    """ Calculate frequency (probability) of nt in window.
+    """
+    pA = window.count("A") / len(window)
+    pT = window.count("T") / len(window)
+    pG = window.count("G") / len(window)
+    pC = window.count("C") / len(window)
+
+    entropy = (
+        pA * np.log(pA) + pT * np.log(pT) + pG * np.log(pG) + pC * np.log(pC)
+    )
+
+    return entropy
 
 
 # def get_skewness(sequence):

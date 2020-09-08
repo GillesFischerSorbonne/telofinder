@@ -79,44 +79,45 @@ def get_telom_size(sequence):
             offset += 1
 
 
-def get_pattern_occurences(sequence):
-    "Presence/absence coding of the telomere pattern in a sliding window"
+# def get_pattern_occurences(sequence):
+#     "Presence/absence coding of the telomere pattern in a sliding window"
 
-    pattern_occurence = {}
+#     pattern_occurence = {}
 
-    for i in range(0, len(sequence) - 19):
-        mot = str(sequence[i : i + 20])
-        if (
-            mot.count("C") >= 8
-            and mot.count("A") >= 3
-            and mot.count("C") + mot.count("A") >= 17
-            and "AAAA" not in mot
-        ):
-            pattern_occurence[i] = 1
-        else:
-            pattern_occurence[i] = 0
+#     for i in range(0, len(sequence) - 19):
+#         mot = str(sequence[i : i + 20])
+#         if (
+#             mot.count("C") >= 8
+#             and mot.count("A") >= 3
+#             and mot.count("C") + mot.count("A") >= 17
+#             and "AAAA" not in mot
+#         ):
+#             pattern_occurence[i] = 1
+#         else:
+#             pattern_occurence[i] = 0
 
-    return pattern_occurence
+#     return pattern_occurence
 
 
 # TODO: idea for later have a sliding window checking match for polynucleotide
 # of various sizes and get a score from that: ie AC: 1 ACC: 1.5, ACCA: 2 etc ...
-def get_polynuc_occurence(sequence, polynucleotide_list):
-    """ Get polynucleotide proportion along the sliding window
-    All polynucleotide should be of the same size.
-    """
 
-    polynucleotide_occurence = {}
+# def get_polynuc_occurence(sequence, polynucleotide_list):
+#     """ Get polynucleotide proportion along the sliding window
+#     All polynucleotide should be of the same size.
+#     """
 
-    for i in range(0, len(sequence) - 1):
+#     polynucleotide_occurence = {}
 
-        mot = str(sequence[i : i + 2])
-        if mot in polynucleotide_list:
-            polynucleotide_occurence[i] = 1
-        else:
-            polynucleotide_occurence[i] = 0
+#     for i in range(0, len(sequence) - 1):
 
-    return polynucleotide_occurence
+#         mot = str(sequence[i : i + 2])
+#         if mot in polynucleotide_list:
+#             polynucleotide_occurence[i] = 1
+#         else:
+#             polynucleotide_occurence[i] = 0
+
+#     return polynucleotide_occurence
 
 
 def sliding_window(sequence, start, end, size):
@@ -127,40 +128,94 @@ def sliding_window(sequence, start, end, size):
         yield window
 
 
-def get_skewness(sequence):
+def get_pattern_occurences(window):
+    """Presence/absence of the telomere pattern in a sliding window"""
+    if (
+        window.count("C") >= 8
+        and window.count("A") >= 3
+        and window.count("C") + window.count("A") >= 17
+        and "AAAA" not in window
+    ):
+        return 1
+    else:
+        return 0
+
+
+def get_polynuc_occurence(window, polynucleotide_list):
+    """ Get polynucleotide proportion along the sliding window
+    All polynucleotide should be of the same size.
+    """
+    if window in polynucleotide_list:
+        return 1
+    else:
+        return 0
+
+
+def get_skewness(window):
     """ Get AT, GC skewness from a sequence
     """
+    a = window.count("A")
+    t = window.count("T")
+    g = window.count("G")
+    c = window.count("C")
 
-    skewness_stats = {}
+    if (a + t) == 0:
+        at_skew = None
+    else:
+        at_skew = (a - t) / (a + t)
 
-    for i in range(0, len(sequence) - 19):
-        mot = str(sequence[i : i + 20])
+    if (g + c) == 0:
+        gc_skew = None
+    else:
+        gc_skew = (g - c) / (g + c)
 
-        a = mot.count("A")
-        t = mot.count("T")
-        g = mot.count("G")
-        c = mot.count("C")
+    if at_skew is None or gc_skew is None:
+        skewness = None
+    else:
+        skewness = ((a - t) - (g - c)) / len(window)
 
-        if (a + t) == 0:
-            at_skew = None
-        else:
-            at_skew = (a - t) / (a + t)
+    skewness_stats[i] = skewness
+    # "at_skew": at_skew,
+    # "gc_skew": gc_skew,
 
-        if (g + c) == 0:
-            gc_skew = None
-        else:
-            gc_skew = (g - c) / (g + c)
 
-        if at_skew is None or gc_skew is None:
-            skewness = None
-        else:
-            skewness = ((a - t) - (g - c)) / len(mot)
+return at_skew, gc_skew, skewness
 
-        skewness_stats[i] = skewness
-        # "at_skew": at_skew,
-        # "gc_skew": gc_skew,
 
-    return skewness_stats
+# def get_skewness(sequence):
+#     """ Get AT, GC skewness from a sequence
+#     """
+
+#     skewness_stats = {}
+
+#     for i in range(0, len(sequence) - 19):
+#         mot = str(sequence[i : i + 20])
+
+#         a = mot.count("A")
+#         t = mot.count("T")
+#         g = mot.count("G")
+#         c = mot.count("C")
+
+#         if (a + t) == 0:
+#             at_skew = None
+#         else:
+#             at_skew = (a - t) / (a + t)
+
+#         if (g + c) == 0:
+#             gc_skew = None
+#         else:
+#             gc_skew = (g - c) / (g + c)
+
+#         if at_skew is None or gc_skew is None:
+#             skewness = None
+#         else:
+#             skewness = ((a - t) - (g - c)) / len(mot)
+
+#         skewness_stats[i] = skewness
+#         # "at_skew": at_skew,
+#         # "gc_skew": gc_skew,
+
+#     return skewness_stats
 
 
 # FIXME: missing docstring

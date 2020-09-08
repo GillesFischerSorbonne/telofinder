@@ -80,26 +80,6 @@ def get_telom_size(sequence):
             offset += 1
 
 
-# def get_pattern_occurences(sequence):
-#     "Presence/absence coding of the telomere pattern in a sliding window"
-
-#     pattern_occurence = {}
-
-#     for i in range(0, len(sequence) - 19):
-#         mot = str(sequence[i : i + 20])
-#         if (
-#             mot.count("C") >= 8
-#             and mot.count("A") >= 3
-#             and mot.count("C") + mot.count("A") >= 17
-#             and "AAAA" not in mot
-#         ):
-#             pattern_occurence[i] = 1
-#         else:
-#             pattern_occurence[i] = 0
-
-#     return pattern_occurence
-
-
 # TODO: idea for later have a sliding window checking match for polynucleotide
 # of various sizes and get a score from that: ie AC: 1 ACC: 1.5, ACCA: 2 etc ...
 
@@ -175,62 +155,27 @@ def get_skewness(window):
     else:
         skewness = ((a - t) - (g - c)) / len(window)
 
-    skewness_stats[i] = skewness
     # "at_skew": at_skew,
     # "gc_skew": gc_skew,
 
-    return at_skew, gc_skew, skewness
+    return skewness
 
 
 def get_entropy(window):
     """ Calculate frequency (probability) of nt in window.
     """
-    pA = window.count("A") / len(window)
-    pT = window.count("T") / len(window)
-    pG = window.count("G") / len(window)
-    pC = window.count("C") / len(window)
+    entropy = 0
 
-    entropy = (
-        pA * np.log(pA) + pT * np.log(pT) + pG * np.log(pG) + pC * np.log(pC)
-    )
+    for base in ["A", "T", "G", "C"]:
+        if window.count(base) == 0:
+            proba_base = 0
+        else:
+            freq_base = window.count(base) / len(window)
+            proba_base = -(freq_base * np.log(freq_base))
+
+        entropy += proba_base
 
     return entropy
-
-
-# def get_skewness(sequence):
-#     """ Get AT, GC skewness from a sequence
-#     """
-
-#     skewness_stats = {}
-
-#     for i in range(0, len(sequence) - 19):
-#         mot = str(sequence[i : i + 20])
-
-#         a = mot.count("A")
-#         t = mot.count("T")
-#         g = mot.count("G")
-#         c = mot.count("C")
-
-#         if (a + t) == 0:
-#             at_skew = None
-#         else:
-#             at_skew = (a - t) / (a + t)
-
-#         if (g + c) == 0:
-#             gc_skew = None
-#         else:
-#             gc_skew = (g - c) / (g + c)
-
-#         if at_skew is None or gc_skew is None:
-#             skewness = None
-#         else:
-#             skewness = ((a - t) - (g - c)) / len(mot)
-
-#         skewness_stats[i] = skewness
-#         # "at_skew": at_skew,
-#         # "gc_skew": gc_skew,
-
-#     return skewness_stats
 
 
 # FIXME: missing docstring
@@ -296,15 +241,27 @@ def run_single_or_iterative(fasta_path):
         strain = get_strain_name(fasta_path)
 
         polynucleotide_dict = {}
-        pattern_dict = {}
+
+        seq_dict = {}
+
         for seq_record in SeqIO.parse(fasta_path, "fasta"):
-            # TODO: This should be incorporated in a function (1)
+            # TODO: make parameters for window's start, end and size
+            # TODO: add a 'start' value if program reads the sequence not from its beginning
+
+            for i, window in enumerate(
+                sliding_window(seq_record.seq, 0, 20000, 20)
+            ):
+
+                seq_dict[(strain, seq_record.name, i)] = {
+                    "pattern": get_pattern_occurences(window),
+                    "skew": get_skewness(window),
+                    "entropy": get_entropy(window),
+                }
+
             polynucleotide_dict[seq_record.name] = get_polynuc_occurence(
                 seq_record.seq, ["AC", "CA", "CC"]
             )
-            pattern_dict[seq_record.name] = get_pattern_occurences(
-                seq_record.seq
-            )
+
             revcomp = seq_record.reverse_complement()
             left_offset, left_tel = get_telom_size(seq_record.seq)
             right_offset, right_tel = get_telom_size(revcomp)
@@ -318,13 +275,7 @@ def run_single_or_iterative(fasta_path):
                 "telom_length.csv",
             )
 
-            skewness_stats = get_skewness(seq_record.seq)
-
-        return (
-            pd.DataFrame(polynucleotide_dict).transpose(),
-            pd.DataFrame(pattern_dict).transpose(),
-            pd.DataFrame(skewness_stats).tranpose(),
-        )
+        return pd.DataFrame(seq_dict).transpose()
 
     if Path(fasta_path).is_dir():
         print(f"'{fasta_path}' is a directory. Running in iterative mode.")

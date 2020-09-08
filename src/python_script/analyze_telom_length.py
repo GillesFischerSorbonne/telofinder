@@ -119,6 +119,14 @@ def get_polynuc_occurence(sequence, polynucleotide_list):
     return polynucleotide_occurence
 
 
+def sliding_window(sequence, start, end, size):
+    if size > len(sequence):
+        sys.exit("The window size must be smaller than the sequence")
+    for i in range(start, end - (size - 1)):
+        window = str(sequence[i : i + size])
+        yield window
+
+
 def get_skewness(sequence):
     """ Get AT, GC skewness from a sequence
     """
@@ -146,13 +154,11 @@ def get_skewness(sequence):
         if at_skew is None or gc_skew is None:
             skewness = None
         else:
-            skewness = at_skew - gc_skew
+            skewness = ((a - t) - (g - c)) / len(mot)
 
-        skewness_stats[i] = {
-            # "at_skew": at_skew,
-            # "gc_skew": gc_skew,
-            "skewness": skewness,
-        }
+        skewness_stats[i] = skewness
+        # "at_skew": at_skew,
+        # "gc_skew": gc_skew,
 
     return skewness_stats
 

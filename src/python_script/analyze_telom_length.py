@@ -4,7 +4,6 @@ import os.path
 import argparse
 from pathlib import Path
 import pandas as pd
-from sequana.sequence import DNA
 
 
 def output_exists(force):
@@ -186,7 +185,12 @@ def generate_output(
         if file_exists:
             filout.write(
                 "{0}\t{1}\tL\t{2}\t{4}\n{0}\t{1}\tR\t{3}\t{5}\n".format(
-                    strain, chrom, left_tel, right_tel, left_offset, right_offset
+                    strain,
+                    chrom,
+                    left_tel,
+                    right_tel,
+                    left_offset,
+                    right_offset,
                 )
             )
         else:
@@ -222,7 +226,9 @@ def run_single_or_iterative(fasta_path):
             polynucleotide_dict[seq_record.name] = get_polynuc_occurence(
                 seq_record.seq, ["AC", "CA", "CC"]
             )
-            pattern_dict[seq_record.name] = get_pattern_occurences(seq_record.seq)
+            pattern_dict[seq_record.name] = get_pattern_occurences(
+                seq_record.seq
+            )
             revcomp = seq_record.reverse_complement()
             left_offset, left_tel = get_telom_size(seq_record.seq)
             right_offset, right_tel = get_telom_size(revcomp)
@@ -261,10 +267,12 @@ def run_single_or_iterative(fasta_path):
                     # TODO: This should be incorporated in a function, see TODO (1)
                     polynucleotide_dict[
                         fasta.stem, seq_record.name
-                    ] = get_polynuc_occurence(seq_record.seq, ["AC", "CA", "CC"])
-                    pattern_dict[fasta.stem, seq_record.name] = get_pattern_occurences(
-                        seq_record.seq
+                    ] = get_polynuc_occurence(
+                        seq_record.seq, ["AC", "CA", "CC"]
                     )
+                    pattern_dict[
+                        fasta.stem, seq_record.name
+                    ] = get_pattern_occurences(seq_record.seq)
                     revcomp = seq_record.reverse_complement()
                     left_offset, left_tel = get_telom_size(seq_record.seq)
                     right_offset, right_tel = get_telom_size(revcomp)

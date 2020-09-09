@@ -58,6 +58,12 @@ sequence of tRNAs accross strains.
 if time:
 - logging in python
 
+#### To ask to TC
+
+- Signal integration (reducing noise in sequence coverage for CNV detection ?)
+- Which rolling median to choose
+
+
 ## References
 
 ### Other Telomere efforts

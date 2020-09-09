@@ -178,6 +178,22 @@ def get_skewness(window):
     return skewness
 
 
+def get_cg_skew(window):
+    """ Get CG skewn from a sequence
+    """
+
+    base_compos = Counter(window)
+    g = base_compos["G"]
+    c = base_compos["C"]
+
+    if (g + c) == 0:
+        cg_skew = None
+    else:
+        cg_skew = (c - g) / (g + c)
+
+    return cg_skew
+
+
 def get_entropy(window):
     """ Calculate frequency (probability) of nt in window.
     """
@@ -298,6 +314,7 @@ def run_on_single_fasta(fasta_path):
             seq_dict[(strain, seq_record.name, i)] = {
                 "pattern": get_pattern_occurences(window),
                 "skew": get_skewness(window),
+                "cg_skew": get_cg_skew(window),
                 "entropy": get_entropy(window),
                 "polynuc": get_polynuc(window, ["AC", "CA", "CC"]),
                 "chi2": get_norm_freq_base(window),

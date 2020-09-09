@@ -132,6 +132,15 @@ def get_polynuc_occurence(window, polynucleotide_list):
         return 0
 
 
+def count_polynuc(window, dinuc_list):
+    sum_dinuc = 0
+    # print(window)
+    for sub_window in sliding_window(window, 0, len(window), 2):
+        sum_dinuc += get_polynuc_occurence(sub_window, dinuc_list)
+    freq_dinuc = sum_dinuc / (len(window) - 1)
+    return freq_dinuc
+
+
 def get_skewness(window):
     """ Get AT, GC skewness from a sequence
     """
@@ -206,7 +215,12 @@ def generate_output(
         if file_exists:
             filout.write(
                 "{0}\t{1}\tL\t{2}\t{4}\n{0}\t{1}\tR\t{3}\t{5}\n".format(
-                    strain, chrom, left_tel, right_tel, left_offset, right_offset,
+                    strain,
+                    chrom,
+                    left_tel,
+                    right_tel,
+                    left_offset,
+                    right_offset,
                 )
             )
         else:
@@ -240,18 +254,18 @@ def run_on_single_fasta(fasta_path):
     for seq_record in SeqIO.parse(fasta_path, "fasta"):
         # TODO: make parameters for window's start, end and size
         # TODO: add a 'start' value if program reads the sequence not from its beginning
-
-        for i, window in enumerate(sliding_window(seq_record.seq, 0, 20000, 20)):
+        print(strain)
+        print(seq_record.name)
+        for i, window in enumerate(
+            sliding_window(seq_record.seq, 0, 20000, 20)
+        ):
 
             seq_dict[(strain, seq_record.name, i)] = {
                 "pattern": get_pattern_occurences(window),
                 "skew": get_skewness(window),
                 "entropy": get_entropy(window),
+                "polynuc": count_polynuc(window, ["AC", "CA", "CC"]),
             }
-
-        polynucleotide_dict[seq_record.name] = get_polynuc_occurence(
-            seq_record.seq, ["AC", "CA", "CC"]
-        )
 
         revcomp = seq_record.reverse_complement()
         left_offset, left_tel = get_telom_size(seq_record.seq)
@@ -291,12 +305,12 @@ def run_telofinder(fasta_path):
 
     fasta_path = Path(fasta_path)
 
-    if fasta_path.is_dir:
+    if fasta_path.is_dir():
         print(
             f"Running in iterative mode on all '*.fasta', '*.fas', '*.fa' files in '{fasta_path}'"
         )
         return run_on_fasta_dir(fasta_path)
-    elif fasta_path.is_file:
+    elif fasta_path.is_file():
         print(f"Running in single fasta mode on '{fasta_path}'")
         return run_on_single_fasta(fasta_path)
     else:

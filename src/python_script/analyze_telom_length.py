@@ -206,12 +206,7 @@ def generate_output(
         if file_exists:
             filout.write(
                 "{0}\t{1}\tL\t{2}\t{4}\n{0}\t{1}\tR\t{3}\t{5}\n".format(
-                    strain,
-                    chrom,
-                    left_tel,
-                    right_tel,
-                    left_offset,
-                    right_offset,
+                    strain, chrom, left_tel, right_tel, left_offset, right_offset,
                 )
             )
         else:
@@ -232,99 +227,84 @@ def generate_output(
             )  # file doesn't exist yet, write a header
 
 
-def run_single_or_iterative(fasta_path):
-    """Check if fasta_path is a single file or a directory and run the telomere
-    detection sequence accordingly."""
+def run_on_single_fasta(fasta_path):
+    """Run the telomere detection algorithm on a single fasta file.
+    """
 
-    if Path(fasta_path).is_file():
-        print(f"'{fasta_path}' is a file. Running in single mode.")
-        strain = get_strain_name(fasta_path)
+    strain = get_strain_name(fasta_path)
 
-        polynucleotide_dict = {}
+    polynucleotide_dict = {}
 
-        seq_dict = {}
+    seq_dict = {}
 
-        for seq_record in SeqIO.parse(fasta_path, "fasta"):
-            # TODO: make parameters for window's start, end and size
-            # TODO: add a 'start' value if program reads the sequence not from its beginning
+    for seq_record in SeqIO.parse(fasta_path, "fasta"):
+        # TODO: make parameters for window's start, end and size
+        # TODO: add a 'start' value if program reads the sequence not from its beginning
 
-            for i, window in enumerate(
-                sliding_window(seq_record.seq, 0, 20000, 20)
-            ):
+        for i, window in enumerate(sliding_window(seq_record.seq, 0, 20000, 20)):
 
-                seq_dict[(strain, seq_record.name, i)] = {
-                    "pattern": get_pattern_occurences(window),
-                    "skew": get_skewness(window),
-                    "entropy": get_entropy(window),
-                }
+            seq_dict[(strain, seq_record.name, i)] = {
+                "pattern": get_pattern_occurences(window),
+                "skew": get_skewness(window),
+                "entropy": get_entropy(window),
+            }
 
-            polynucleotide_dict[seq_record.name] = get_polynuc_occurence(
-                seq_record.seq, ["AC", "CA", "CC"]
-            )
-
-            revcomp = seq_record.reverse_complement()
-            left_offset, left_tel = get_telom_size(seq_record.seq)
-            right_offset, right_tel = get_telom_size(revcomp)
-            generate_output(
-                strain,
-                seq_record.id,
-                left_tel,
-                right_tel,
-                left_offset,
-                right_offset,
-                "telom_length.csv",
-            )
-
-        return pd.DataFrame(seq_dict).transpose()
-
-    if Path(fasta_path).is_dir():
-        print(f"'{fasta_path}' is a directory. Running in iterative mode.")
-
-        polynucleotide_dict = {}
-        pattern_dict = {}
-        skewness_stats = {}
-
-        for ext in ["*.fasta", "*.fas", "*.fa"]:
-            for fasta in Path(fasta_path).glob(ext):
-
-                print(fasta)
-                strain = get_strain_name(fasta)
-
-                for seq_record in SeqIO.parse(fasta, "fasta"):
-                    # TODO: This should be incorporated in a function, see TODO (1)
-                    polynucleotide_dict[
-                        fasta.stem, seq_record.name
-                    ] = get_polynuc_occurence(
-                        seq_record.seq, ["AC", "CA", "CC"]
-                    )
-                    pattern_dict[
-                        fasta.stem, seq_record.name
-                    ] = get_pattern_occurences(seq_record.seq)
-                    revcomp = seq_record.reverse_complement()
-                    left_offset, left_tel = get_telom_size(seq_record.seq)
-                    right_offset, right_tel = get_telom_size(revcomp)
-                    generate_output(
-                        strain,
-                        seq_record.id,
-                        left_tel,
-                        right_tel,
-                        left_offset,
-                        right_offset,
-                        "telom_length.csv",
-                    )
-                    skewness_stats[fasta.stem, seq_record.name] = get_skewness(
-                        seq_record.seq
-                    )
-
-        return (
-            pd.DataFrame(polynucleotide_dict).transpose(),
-            pd.DataFrame(pattern_dict).transpose(),
-            pd.DataFrame(skewness_stats).transpose(),
+        polynucleotide_dict[seq_record.name] = get_polynuc_occurence(
+            seq_record.seq, ["AC", "CA", "CC"]
         )
+
+        revcomp = seq_record.reverse_complement()
+        left_offset, left_tel = get_telom_size(seq_record.seq)
+        right_offset, right_tel = get_telom_size(revcomp)
+        generate_output(
+            strain,
+            seq_record.id,
+            left_tel,
+            right_tel,
+            left_offset,
+            right_offset,
+            "telom_length.csv",
+        )
+
+    return pd.DataFrame(seq_dict).transpose()
+
+
+def run_on_fasta_dir(fasta_dir_path):
+    """Run iteratively the telemore detection algorithm on all fasta files in a
+    directory
+    """
+    telom_dfs = []
+
+    for ext in ["*.fasta", "*.fas", "*.fa"]:
+        for fasta in fasta_dir_path.glob(ext):
+
+            telom_dfs.append(run_on_single_fasta(fasta))
+
+    total_telom_df = pd.concat(telom_dfs)
+
+    return total_telom_df
+
+
+def run_telofinder(fasta_path):
+    """ Run telofinder on a single fasta file or on a fasta directory
+    """
+
+    fasta_path = Path(fasta_path)
+
+    if fasta_path.is_dir:
+        print(
+            f"Running in iterative mode on all '*.fasta', '*.fas', '*.fa' files in '{fasta_path}'"
+        )
+        return run_on_fasta_dir(fasta_path)
+    elif fasta_path.is_file:
+        print(f"Running in single fasta mode on '{fasta_path}'")
+        return run_on_single_fasta(fasta_path)
+    else:
+        raise IOError(f"'{fasta_path}' is not a directory or a file.")
 
 
 # Main program
 if __name__ == "__main__":
     args = parse_arguments()
     output_exists(args.force)
-    run_single_or_iterative(args.fasta_path)
+    run_telofinder(args.fasta_path)

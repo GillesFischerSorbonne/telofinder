@@ -5,6 +5,7 @@ import argparse
 from pathlib import Path
 import pandas as pd
 import numpy as np
+from collections import Counter
 
 
 def output_exists(force):
@@ -122,7 +123,7 @@ def get_pattern_occurences(window):
         return 0
 
 
-def get_polynuc_occurence(window, polynucleotide_list):
+def count_polynuc_occurence(window, polynucleotide_list):
     """ Get polynucleotide proportion along the sliding window
     All polynucleotide should be of the same size.
     """
@@ -132,11 +133,11 @@ def get_polynuc_occurence(window, polynucleotide_list):
         return 0
 
 
-def count_polynuc(window, dinuc_list):
+def get_polynuc(window, dinuc_list):
     sum_dinuc = 0
     # print(window)
     for sub_window in sliding_window(window, 0, len(window), 2):
-        sum_dinuc += get_polynuc_occurence(sub_window, dinuc_list)
+        sum_dinuc += count_polynuc_occurence(sub_window, dinuc_list)
     freq_dinuc = sum_dinuc / (len(window) - 1)
     return freq_dinuc
 
@@ -144,10 +145,17 @@ def count_polynuc(window, dinuc_list):
 def get_skewness(window):
     """ Get AT, GC skewness from a sequence
     """
-    a = window.count("A")
-    t = window.count("T")
-    g = window.count("G")
-    c = window.count("C")
+
+    base_compos = Counter(window)
+    a = base_compos["A"]
+    t = base_compos["T"]
+    g = base_compos["G"]
+    c = base_compos["C"]
+
+    # a = window.count("A")
+    # t = window.count("T")
+    # g = window.count("G")
+    # c = window.count("C")
 
     if (a + t) == 0:
         at_skew = None
@@ -185,6 +193,34 @@ def get_entropy(window):
         entropy += proba_base
 
     return entropy
+
+
+# FIXME return chi2 or skew_norm?
+def get_norm_freq_base(window):
+    """ Calculate the difference between observed and expected base composition of the window"""
+
+    base_compos = Counter(window)
+
+    fexp_A_T = 0.617
+    fexp_G_C = 0.383
+
+    sum_freq = 0
+
+    for base in ["A", "T"]:
+        sum_freq += (fexp_A_T - (base_compos[base] / len(window))) ** 2
+    for base in ["G", "C"]:
+        sum_freq += (fexp_G_C - (base_compos[base] / len(window))) ** 2
+
+    skew_norm = (
+        (fexp_A_T - (base_compos["A"] / len(window))) ** 2
+        - (fexp_A_T - (base_compos["T"] / len(window))) ** 2
+        - (fexp_G_C - (base_compos["G"] / len(window))) ** 2
+        + (fexp_G_C - (base_compos["C"] / len(window))) ** 2
+    )
+
+    chi2 = sum_freq / 3
+
+    return skew_norm
 
 
 # FIXME: missing docstring
@@ -254,17 +290,17 @@ def run_on_single_fasta(fasta_path):
     for seq_record in SeqIO.parse(fasta_path, "fasta"):
         # TODO: make parameters for window's start, end and size
         # TODO: add a 'start' value if program reads the sequence not from its beginning
-        print(strain)
-        print(seq_record.name)
+        limit_seq = min(20000, len(seq_record.seq))
         for i, window in enumerate(
-            sliding_window(seq_record.seq, 0, 20000, 20)
+            sliding_window(seq_record.seq, 0, limit_seq, 20)
         ):
 
             seq_dict[(strain, seq_record.name, i)] = {
                 "pattern": get_pattern_occurences(window),
                 "skew": get_skewness(window),
                 "entropy": get_entropy(window),
-                "polynuc": count_polynuc(window, ["AC", "CA", "CC"]),
+                "polynuc": get_polynuc(window, ["AC", "CA", "CC"]),
+                "chi2": get_norm_freq_base(window),
             }
 
         revcomp = seq_record.reverse_complement()
@@ -280,7 +316,16 @@ def run_on_single_fasta(fasta_path):
             "telom_length.csv",
         )
 
-    return pd.DataFrame(seq_dict).transpose()
+    df = pd.DataFrame(seq_dict).transpose()
+    df.loc[:, "combined"] = (
+        df.loc[:, "chi2"]
+        + df.loc[:, "skew"]
+        + df.loc[:, "polynuc"]
+        - df.loc[:, "entropy"]
+    )
+    df.loc[:, "skew-ent"] = df.loc[:, "skew"] - df.loc[:, "entropy"]
+
+    return df
 
 
 def run_on_fasta_dir(fasta_dir_path):

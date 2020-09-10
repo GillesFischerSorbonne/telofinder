@@ -81,27 +81,6 @@ def get_telom_size(sequence):
             offset += 1
 
 
-# TODO: idea for later have a sliding window checking match for polynucleotide
-# of various sizes and get a score from that: ie AC: 1 ACC: 1.5, ACCA: 2 etc ...
-
-# def get_polynuc_occurence(sequence, polynucleotide_list):
-#     """ Get polynucleotide proportion along the sliding window
-#     All polynucleotide should be of the same size.
-#     """
-
-#     polynucleotide_occurence = {}
-
-#     for i in range(0, len(sequence) - 1):
-
-#         mot = str(sequence[i : i + 2])
-#         if mot in polynucleotide_list:
-#             polynucleotide_occurence[i] = 1
-#         else:
-#             polynucleotide_occurence[i] = 0
-
-#     return polynucleotide_occurence
-
-
 def sliding_window(sequence, start, end, size):
     """Apply a sliding window of length = size to a sequence from start to end"""
     if size > len(sequence):
@@ -134,7 +113,7 @@ def get_pattern_occurences(window):
 
 
 def count_polynuc_occurence(window, polynucleotide_list):
-    """ Get polynucleotide proportion along the sliding window
+    """Get polynucleotide proportion along the sliding window. 
     All polynucleotide should be of the same size.
     """
     if window in polynucleotide_list:
@@ -145,7 +124,6 @@ def count_polynuc_occurence(window, polynucleotide_list):
 
 def get_polynuc(window, dinuc_list):
     sum_dinuc = 0
-    # print(window)
     for sub_window in sliding_window(window, 0, len(window), 2):
         sum_dinuc += count_polynuc_occurence(sub_window, dinuc_list)
     freq_dinuc = sum_dinuc / (len(window) - 1)
@@ -153,19 +131,12 @@ def get_polynuc(window, dinuc_list):
 
 
 def get_skewness(window):
-    """ Get AT, GC skewness from a sequence
-    """
-
+    """Get AT, GC skewness from a sequence"""
     base_compos = Counter(window)
     a = base_compos["A"]
     t = base_compos["T"]
     g = base_compos["G"]
     c = base_compos["C"]
-
-    # a = window.count("A")
-    # t = window.count("T")
-    # g = window.count("G")
-    # c = window.count("C")
 
     if (a + t) == 0:
         at_skew = None
@@ -182,16 +153,11 @@ def get_skewness(window):
     else:
         skewness = ((a - t) - (g - c)) / len(window)
 
-    # "at_skew": at_skew,
-    # "gc_skew": gc_skew,
-
     return skewness
 
 
 def get_cg_skew(window):
-    """ Get CG skewn from a sequence
-    """
-
+    """Get CG skewn from a sequence"""
     base_compos = Counter(window)
     g = base_compos["G"]
     c = base_compos["C"]
@@ -205,8 +171,7 @@ def get_cg_skew(window):
 
 
 def get_entropy(window):
-    """ Calculate frequency (probability) of nt in window.
-    """
+    """Calculate frequency (probability) of nt in window"""
     entropy = 0
 
     for base in ["A", "T", "G", "C"]:
@@ -223,8 +188,7 @@ def get_entropy(window):
 
 # FIXME return chi2 or skew_norm?
 def get_norm_freq_base(window):
-    """ Calculate the difference between observed and expected base composition of the window"""
-
+    """Calculate the difference between observed and expected base composition of the window"""
     base_compos = Counter(window)
 
     fexp_A_T = 0.617
@@ -304,9 +268,7 @@ def generate_output(
 
 
 def run_on_single_fasta(fasta_path):
-    """Run the telomere detection algorithm on a single fasta file.
-    """
-
+    """Run the telomere detection algorithm on a single fasta file"""
     strain = get_strain_name(fasta_path)
 
     polynucleotide_dict = {}
@@ -314,7 +276,6 @@ def run_on_single_fasta(fasta_path):
     seq_dict = {}
 
     for seq_record in SeqIO.parse(fasta_path, "fasta"):
-        # TODO: make parameters for window's start, end and size
         # TODO: add a 'start' value if program reads the sequence not from its beginning
         limit_seq = min(20000, len(seq_record.seq))
         for i, window in enumerate(
@@ -356,9 +317,7 @@ def run_on_single_fasta(fasta_path):
 
 
 def run_on_fasta_dir(fasta_dir_path):
-    """Run iteratively the telemore detection algorithm on all fasta files in a
-    directory
-    """
+    """Run iteratively the telemore detection algorithm on all fasta files in a directory"""
     telom_dfs = []
 
     for ext in ["*.fasta", "*.fas", "*.fa"]:
@@ -372,9 +331,7 @@ def run_on_fasta_dir(fasta_dir_path):
 
 
 def run_telofinder(fasta_path):
-    """ Run telofinder on a single fasta file or on a fasta directory
-    """
-
+    """Run telofinder on a single fasta file or on a fasta directory"""
     fasta_path = Path(fasta_path)
 
     if fasta_path.is_dir():

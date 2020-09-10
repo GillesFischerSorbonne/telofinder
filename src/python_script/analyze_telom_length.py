@@ -103,11 +103,21 @@ def get_telom_size(sequence):
 
 
 def sliding_window(sequence, start, end, size):
+    """Apply a sliding window of length = size to a sequence from start to end"""
     if size > len(sequence):
         sys.exit("The window size must be smaller than the sequence")
     for i in range(start, end - (size - 1)):
         window = str(sequence[i : i + size])
         yield window
+
+
+def base_compos(sequence):
+    """Return the number of A, T, G and C in the sequence"""
+    a = Counter(window)["A"]
+    t = Counter(window)["T"]
+    g = Counter(window)["G"]
+    c = Counter(window)["C"]
+    return a, t, g, c
 
 
 def get_pattern_occurences(window):

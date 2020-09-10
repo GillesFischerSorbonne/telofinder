@@ -186,8 +186,63 @@ def get_entropy(window):
     return entropy
 
 
-# FIXME return chi2 or skew_norm?
 def get_norm_freq_base(window):
+    """Calculate the difference between observed and expected base composition of the window"""
+    base_compos = Counter(window)
+
+    fexp_A_T = 0.617
+    fexp_G_C = 0.383
+
+    skew_norm = (
+        (fexp_A_T - (base_compos["A"] / len(window))) ** 2
+        - (fexp_A_T - (base_compos["T"] / len(window))) ** 2
+        - (fexp_G_C - (base_compos["G"] / len(window))) ** 2
+        + (fexp_G_C - (base_compos["C"] / len(window))) ** 2
+    )
+
+    return skew_norm
+
+
+def get_add_freq_diff(window):
+    """Calculate the difference between observed and expected base composition of the window"""
+    base_compos = Counter(window)
+
+    fexp_A_T = 0.617
+    fexp_G_C = 0.383
+
+    max_diff = (
+        (fexp_A_T - (base_compos["A"] / len(window))) ** 2
+        + (fexp_A_T - (base_compos["T"] / len(window))) ** 2
+        + (fexp_G_C - (base_compos["G"] / len(window))) ** 2
+        - (fexp_G_C - (base_compos["C"] / len(window))) ** 2
+    )
+
+    return max_diff
+
+
+def get_freq_norm_C(window):
+    """Calculate the difference between observed and expected frequence of C in the window"""
+    base_compos = Counter(window)
+
+    fexp_G_C = 0.383
+
+    freq_norm_C = fexp_G_C - (base_compos["C"] / len(window))
+
+    return freq_norm_C
+
+
+def get_freq_norm_T(window):
+    """Calculate the difference between observed and expected frequence of T in the window"""
+    base_compos = Counter(window)
+
+    fexp_A_T = 0.617
+
+    freq_norm_T = fexp_A_T - (base_compos["A"] / len(window))
+
+    return freq_norm_T
+
+
+def get_chi2(window):
     """Calculate the difference between observed and expected base composition of the window"""
     base_compos = Counter(window)
 
@@ -201,16 +256,9 @@ def get_norm_freq_base(window):
     for base in ["G", "C"]:
         sum_freq += (fexp_G_C - (base_compos[base] / len(window))) ** 2
 
-    skew_norm = (
-        (fexp_A_T - (base_compos["A"] / len(window))) ** 2
-        - (fexp_A_T - (base_compos["T"] / len(window))) ** 2
-        - (fexp_G_C - (base_compos["G"] / len(window))) ** 2
-        + (fexp_G_C - (base_compos["C"] / len(window))) ** 2
-    )
-
     chi2 = sum_freq / 3
 
-    return skew_norm
+    return chi2
 
 
 # FIXME: missing docstring
@@ -274,21 +322,27 @@ def run_on_single_fasta(fasta_path):
     polynucleotide_dict = {}
 
     seq_dict = {}
-
+    seq_index = 0
     for seq_record in SeqIO.parse(fasta_path, "fasta"):
         # TODO: add a 'start' value if program reads the sequence not from its beginning
         limit_seq = min(20000, len(seq_record.seq))
+        seq_index += 1
         for i, window in enumerate(
             sliding_window(seq_record.seq, 0, limit_seq, 20)
         ):
 
             seq_dict[(strain, seq_record.name, i)] = {
                 "pattern": get_pattern_occurences(window),
-                "skew": get_skewness(window),
-                "cg_skew": get_cg_skew(window),
+                # "skew": get_skewness(window),
+                # "cg_skew": get_cg_skew(window),
                 "entropy": get_entropy(window),
                 "polynuc": get_polynuc(window, ["AC", "CA", "CC"]),
-                "chi2": get_norm_freq_base(window),
+                "chr_index": seq_index
+                # "skew_norm": get_norm_freq_base(window),
+                # "chi2": get_chi2(window),
+                # "freq_norm_T": get_freq_norm_T(window),
+                # "freq_norm_C": get_freq_norm_C(window),
+                # "max_diff": get_add_freq_diff(window),
             }
 
         revcomp = seq_record.reverse_complement()
@@ -305,13 +359,28 @@ def run_on_single_fasta(fasta_path):
         )
 
     df = pd.DataFrame(seq_dict).transpose()
-    df.loc[:, "combined"] = (
-        df.loc[:, "chi2"]
-        + df.loc[:, "skew"]
-        + df.loc[:, "polynuc"]
-        - df.loc[:, "entropy"]
+
+    ## Apply a rolling median on the entropy and polynuc metrics
+    df["entropy_med"] = (
+        df[["entropy"]].rolling(100, min_periods=1).median(axis=1)
     )
-    df.loc[:, "skew-ent"] = df.loc[:, "skew"] - df.loc[:, "entropy"]
+
+    df["polynuc_med"] = (
+        df[["polynuc"]].rolling(100, min_periods=1).median(axis=1)
+    )
+
+    # df["entropy_med"] = (
+    # df.groupby("chr_index").rolling(100, min_periods=1).entropy.median()
+    # )
+
+    ## Conditions to detect telomere repeats
+    df.loc[
+        (df["entropy_med"] < 1.0) & (df["polynuc_med"] > 0.7), "predict_telom"
+    ] = 1.0
+
+    df.loc[
+        (df["entropy_med"] >= 1.0) & (df["polynuc_med"] <= 0.7), "predict_telom"
+    ] = 0.0
 
     return df
 

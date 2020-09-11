@@ -90,13 +90,10 @@ def sliding_window(sequence, start, end, size):
         yield window
 
 
-def base_compos(sequence):
-    """Return the number of A, T, G and C in the sequence"""
-    a = Counter(window)["A"]
-    t = Counter(window)["T"]
-    g = Counter(window)["G"]
-    c = Counter(window)["C"]
-    return a, t, g, c
+def base_compos(sequence, base):
+    """Return the number of base in the sequence"""
+    count = Counter(sequence)[base]
+    return count
 
 
 def get_pattern_occurences(window):
@@ -132,26 +129,51 @@ def get_polynuc(window, dinuc_list):
 
 def get_skewness(window):
     """Get AT, GC skewness from a sequence"""
-    base_compos = Counter(window)
-    a = base_compos["A"]
-    t = base_compos["T"]
-    g = base_compos["G"]
-    c = base_compos["C"]
+    # base_compos = Counter(window)
+    # a = base_compos["A"]
+    # t = base_compos["T"]
+    # g = base_compos["G"]
+    # c = base_compos["C"]
 
-    if (a + t) == 0:
+    # if (a + t) == 0:
+    #     at_skew = None
+    # else:
+    #     at_skew = (a - t) / (a + t)
+
+    # if (g + c) == 0:
+    #     gc_skew = None
+    # else:
+    #     gc_skew = (g - c) / (g + c)
+
+    # if at_skew is None or gc_skew is None:
+    #     skewness = None
+    # else:
+    #     skewness = ((a - t) - (g - c)) / len(window)
+
+    # return skewness
+
+    ### using the base_compos function
+    if base_compos(window, "A") + base_compos(window, "T") == 0:
         at_skew = None
     else:
-        at_skew = (a - t) / (a + t)
+        at_skew = (base_compos(window, "A") - base_compos(window, "T")) / (
+            base_compos(window, "A") + base_compos(window, "T")
+        )
 
-    if (g + c) == 0:
+    if base_compos(window, "G") + base_compos(window, "C") == 0:
         gc_skew = None
     else:
-        gc_skew = (g - c) / (g + c)
+        gc_skew = (base_compos(window, "G") - base_compos(window, "C")) / (
+            base_compos(window, "G") + base_compos(window, "C")
+        )
 
     if at_skew is None or gc_skew is None:
         skewness = None
     else:
-        skewness = ((a - t) - (g - c)) / len(window)
+        skewness = (
+            (base_compos(window, "A") - base_compos(window, "T"))
+            - (base_compos(window, "G") - base_compos(window, "C"))
+        ) / len(window)
 
     return skewness
 
@@ -237,7 +259,7 @@ def get_freq_norm_T(window):
 
     fexp_A_T = 0.617
 
-    freq_norm_T = fexp_A_T - (base_compos["A"] / len(window))
+    freq_norm_T = fexp_A_T - (base_compos["T"] / len(window))
 
     return freq_norm_T
 
@@ -333,15 +355,15 @@ def run_on_single_fasta(fasta_path):
 
             seq_dict[(strain, seq_record.name, i)] = {
                 "pattern": get_pattern_occurences(window),
-                # "skew": get_skewness(window),
+                "skew": get_skewness(window),
                 # "cg_skew": get_cg_skew(window),
                 "entropy": get_entropy(window),
                 "polynuc": get_polynuc(window, ["AC", "CA", "CC"]),
-                "chr_index": seq_index
+                "chr_index": seq_index,
                 # "skew_norm": get_norm_freq_base(window),
                 # "chi2": get_chi2(window),
-                # "freq_norm_T": get_freq_norm_T(window),
-                # "freq_norm_C": get_freq_norm_C(window),
+                "freq_norm_T": get_freq_norm_T(window),
+                "freq_norm_C": get_freq_norm_C(window),
                 # "max_diff": get_add_freq_diff(window),
             }
 

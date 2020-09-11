@@ -45,6 +45,21 @@ def parse_arguments():
         action="store_true",
         help="Automatically replace the output csv file if present.",
     )
+    parser.add_argument(
+        "-e",
+        "--entropy_threshold",
+        default=1.1,
+        type=float,
+        help="Entropy threshold for telomere prediction.",
+    )
+    parser.add_argument(
+        "-n",
+        "--polynuc_threshold",
+        default=0.7,
+        type=float,
+        help="Poly-nucleotide threshold for telomere prediction.",
+    )
+
     return parser.parse_args()
 
 
@@ -332,7 +347,7 @@ def generate_output(
             )  # file doesn't exist yet, write a header
 
 
-def run_on_single_fasta(fasta_path):
+def run_on_single_fasta(fasta_path, polynuc_thres, entropy_thres):
     """Run the telomere detection algorithm on a single fasta file"""
     strain = get_strain_name(fasta_path)
 
@@ -396,31 +411,32 @@ def run_on_single_fasta(fasta_path):
     df["entropy_med"] = entropy_med
     df["polynuc_med"] = polynuc_med
 
+    # TODO: EK: Find the better way to do this
     ## Conditions to detect telomere repeats
-    df.loc[(df["entropy_med"] < 1.0) & (df["polynuc_med"] > 0.7), "predict_telom"] = 1.0
-
     df.loc[
-        (df["entropy_med"] >= 1.0) & (df["polynuc_med"] <= 0.7), "predict_telom"
-    ] = 0.0
+        (df["entropy_med"] < entropy_thres) & (df["polynuc_med"] > polynuc_thres),
+        "predict_telom",
+    ] = 1.0
+    df["predict_telom"].fillna(0, inplace=True)
 
     return df
 
 
-def run_on_fasta_dir(fasta_dir_path):
+def run_on_fasta_dir(fasta_dir_path, polynuc_thres, entropy_thres):
     """Run iteratively the telemore detection algorithm on all fasta files in a directory"""
     telom_dfs = []
 
     for ext in ["*.fasta", "*.fas", "*.fa"]:
         for fasta in fasta_dir_path.glob(ext):
 
-            telom_dfs.append(run_on_single_fasta(fasta))
+            telom_dfs.append(run_on_single_fasta(fasta, polynuc_thres, entropy_thres))
 
     total_telom_df = pd.concat(telom_dfs)
 
     return total_telom_df
 
 
-def run_telofinder(fasta_path):
+def run_telofinder(fasta_path, polynuc_thres, entropy_thres):
     """Run telofinder on a single fasta file or on a fasta directory"""
     fasta_path = Path(fasta_path)
 
@@ -428,10 +444,10 @@ def run_telofinder(fasta_path):
         print(
             f"Running in iterative mode on all '*.fasta', '*.fas', '*.fa' files in '{fasta_path}'"
         )
-        return run_on_fasta_dir(fasta_path)
+        return run_on_fasta_dir(fasta_path, polynuc_thres, entropy_thres)
     elif fasta_path.is_file():
         print(f"Running in single fasta mode on '{fasta_path}'")
-        return run_on_single_fasta(fasta_path)
+        return run_on_single_fasta(fasta_path, polynuc_thres, entropy_thres)
     else:
         raise IOError(f"'{fasta_path}' is not a directory or a file.")
 
@@ -440,4 +456,4 @@ def run_telofinder(fasta_path):
 if __name__ == "__main__":
     args = parse_arguments()
     output_exists(args.force)
-    run_telofinder(args.fasta_path)
+    run_telofinder(args.fasta_path, args.polynuc_threshold, args.entropy_threshold)

@@ -311,12 +311,7 @@ def generate_output(
         if file_exists:
             filout.write(
                 "{0}\t{1}\tL\t{2}\t{4}\n{0}\t{1}\tR\t{3}\t{5}\n".format(
-                    strain,
-                    chrom,
-                    left_tel,
-                    right_tel,
-                    left_offset,
-                    right_offset,
+                    strain, chrom, left_tel, right_tel, left_offset, right_offset,
                 )
             )
         else:
@@ -349,9 +344,7 @@ def run_on_single_fasta(fasta_path):
         # TODO: add a 'start' value if program reads the sequence not from its beginning
         limit_seq = min(20000, len(seq_record.seq))
         seq_index += 1
-        for i, window in enumerate(
-            sliding_window(seq_record.seq, 0, limit_seq, 20)
-        ):
+        for i, window in enumerate(sliding_window(seq_record.seq, 0, limit_seq, 20)):
 
             seq_dict[(strain, seq_record.name, i)] = {
                 "pattern": get_pattern_occurences(window),
@@ -383,22 +376,28 @@ def run_on_single_fasta(fasta_path):
     df = pd.DataFrame(seq_dict).transpose()
 
     ## Apply a rolling median on the entropy and polynuc metrics
-    df["entropy_med"] = (
-        df[["entropy"]].rolling(100, min_periods=1).median(axis=1)
+    entropy_med = (
+        df.groupby("chr_index")
+        .rolling(100, min_periods=1)
+        .entropy.median()
+        .reset_index()
+        .set_index(["level_1", "level_2", "level_3"])
+        .drop(["chr_index"], axis=1)
+    )
+    polynuc_med = (
+        df.groupby("chr_index")
+        .rolling(100, min_periods=1)
+        .polynuc.median()
+        .reset_index()
+        .set_index(["level_1", "level_2", "level_3"])
+        .drop(["chr_index"], axis=1)
     )
 
-    df["polynuc_med"] = (
-        df[["polynuc"]].rolling(100, min_periods=1).median(axis=1)
-    )
-
-    # df["entropy_med"] = (
-    # df.groupby("chr_index").rolling(100, min_periods=1).entropy.median()
-    # )
+    df["entropy_med"] = entropy_med
+    df["polynuc_med"] = polynuc_med
 
     ## Conditions to detect telomere repeats
-    df.loc[
-        (df["entropy_med"] < 1.0) & (df["polynuc_med"] > 0.7), "predict_telom"
-    ] = 1.0
+    df.loc[(df["entropy_med"] < 1.0) & (df["polynuc_med"] > 0.7), "predict_telom"] = 1.0
 
     df.loc[
         (df["entropy_med"] >= 1.0) & (df["polynuc_med"] <= 0.7), "predict_telom"

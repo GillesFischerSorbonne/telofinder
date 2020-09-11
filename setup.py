@@ -58,10 +58,12 @@ setup(
     classifiers      = metainfo['classifiers'],
 
     # package installation
-    package_dir = {'telofinder': 'src/python_script'},
-    packages = ['telofinder'],
-    #install_requires = ["pylab", "Bio"],
-
+    #package_dir = {'telofinder': 'src/python_script'},
+    packages = find_packages(),
+    install_requires = ["matplotlib", "Bio", "easydev"],
+    package_data = {
+        'telofinder.data' : ['*.*'],
+        },
 
     zip_safe=False,
     #entry_points = {

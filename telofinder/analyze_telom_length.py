@@ -32,7 +32,8 @@ def output_exists(force):
 def parse_arguments():
     """Function to parse and reuse the arguments of the command line"""
     parser = argparse.ArgumentParser(
-        description="This program determines telomere length at all sequence ends from a single or multiple (multi)fasta file(s)\
+        description="This program determines the location and the size of telomeric repeats\
+        from genome assemblies. It runs both on single and multiple (multi)fasta file(s)\
         and outputs a csv file called 'telom_length.csv'"
     )
     parser.add_argument(
@@ -340,20 +341,39 @@ def run_on_single_fasta(fasta_path, polynuc_thres, entropy_thres):
         ):
 
             seq_dict[(strain, seq_record.name, i)] = {
+                "strand": "W",
                 "pattern": get_pattern_occurences(window),
-                "skew": get_skewness(window),
-                "cg_skew": get_cg_skew(window),
+                # "skew": get_skewness(window),
+                # "cg_skew": get_cg_skew(window),
                 "entropy": get_entropy(window),
                 "polynuc": get_polynuc(window, ["AC", "CA", "CC"]),
                 "chr_index": seq_index,
-                "skew_norm": get_norm_freq_base(window),
-                "chi2": get_chi2(window),
-                "freq_norm_T": get_freq_norm_T(window),
-                "freq_norm_C": get_freq_norm_C(window),
-                "max_diff": get_add_freq_diff(window),
+                # "skew_norm": get_norm_freq_base(window),
+                # "chi2": get_chi2(window),
+                # "freq_norm_T": get_freq_norm_T(window),
+                # "freq_norm_C": get_freq_norm_C(window),
+                # "max_diff": get_add_freq_diff(window),
             }
 
         revcomp = seq_record.reverse_complement()
+        for i, window in enumerate(
+            sliding_window(revcomp.seq, 0, limit_seq, 20)
+        ):
+            seq_dict[(strain, seq_record.name, i)] = {
+                "strand": "C",
+                "pattern": get_pattern_occurences(window),
+                # "skew": get_skewness(window),
+                # "cg_skew": get_cg_skew(window),
+                "entropy": get_entropy(window),
+                "polynuc": get_polynuc(window, ["AC", "CA", "CC"]),
+                "chr_index": seq_index,
+                # "skew_norm": get_norm_freq_base(window),
+                # "chi2": get_chi2(window),
+                # "freq_norm_T": get_freq_norm_T(window),
+                # "freq_norm_C": get_freq_norm_C(window),
+                # "max_diff": get_add_freq_diff(window),
+            }
+
         left_offset, left_tel = get_telom_size(seq_record.seq)
         right_offset, right_tel = get_telom_size(revcomp)
         generate_output(

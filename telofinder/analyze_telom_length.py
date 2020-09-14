@@ -103,7 +103,7 @@ def sliding_window(sequence, start, end, size):
         sys.exit("The window size must be smaller than the sequence")
     for i in range(start, end - (size - 1)):
         window = str(sequence[i : i + size])
-        yield window
+        yield i, window
 
 
 def base_compos(sequence, base):
@@ -137,7 +137,7 @@ def count_polynuc_occurence(window, polynucleotide_list):
 
 def get_polynuc(window, dinuc_list):
     sum_dinuc = 0
-    for sub_window in sliding_window(window, 0, len(window), 2):
+    for _, sub_window in sliding_window(window, 0, len(window), 2):
         sum_dinuc += count_polynuc_occurence(sub_window, dinuc_list)
     freq_dinuc = sum_dinuc / (len(window) - 1)
     return freq_dinuc
@@ -324,55 +324,47 @@ def generate_output(
             )  # file doesn't exist yet, write a header
 
 
+# FIXME: remove seq_index from parameters when groupby is fixed
+def compute_metrics(window, seq_index, dinuc_list=["AC", "CA", "CC"]):
+
+    metrics = {
+        "pattern": get_pattern_occurences(window),
+        # "skew": get_skewness(window),
+        # "cg_skew": get_cg_skew(window),
+        "entropy": get_entropy(window),
+        "polynuc": get_polynuc(window, dinuc_list),
+        "chr_index": seq_index,
+        # "skew_norm": get_norm_freq_base(window),
+        # "chi2": get_chi2(window),
+        # "freq_norm_T": get_freq_norm_T(window),
+        # "freq_norm_C": get_freq_norm_C(window),
+        # "max_diff": get_add_freq_diff(window),
+    }
+
+    return metrics
+
+
 def run_on_single_fasta(fasta_path, polynuc_thres, entropy_thres):
     """Run the telomere detection algorithm on a single fasta file"""
     strain = get_strain_name(fasta_path)
-
     polynucleotide_dict = {}
-
     seq_dict = {}
     seq_index = 0
     for seq_record in SeqIO.parse(fasta_path, "fasta"):
         # TODO: add a 'start' value if program reads the sequence not from its beginning
         limit_seq = min(20000, len(seq_record.seq))
         seq_index += 1
-        for i, window in enumerate(
-            sliding_window(seq_record.seq, 0, limit_seq, 20)
-        ):
 
-            seq_dict[(strain, seq_record.name, i)] = {
-                "strand": "W",
-                "pattern": get_pattern_occurences(window),
-                # "skew": get_skewness(window),
-                # "cg_skew": get_cg_skew(window),
-                "entropy": get_entropy(window),
-                "polynuc": get_polynuc(window, ["AC", "CA", "CC"]),
-                "chr_index": seq_index,
-                # "skew_norm": get_norm_freq_base(window),
-                # "chi2": get_chi2(window),
-                # "freq_norm_T": get_freq_norm_T(window),
-                # "freq_norm_C": get_freq_norm_C(window),
-                # "max_diff": get_add_freq_diff(window),
-            }
+        for i, window in sliding_window(seq_record.seq, 0, limit_seq, 20):
+            seq_dict[(strain, seq_record.name, i, "C")] = compute_metrics(
+                window, seq_index
+            )
 
         revcomp = seq_record.reverse_complement()
-        for i, window in enumerate(
-            sliding_window(revcomp.seq, 0, limit_seq, 20)
-        ):
-            seq_dict[(strain, seq_record.name, (len(seq_record.seq) - i))] = {
-                "strand": "C",
-                "pattern": get_pattern_occurences(window),
-                # "skew": get_skewness(window),
-                # "cg_skew": get_cg_skew(window),
-                "entropy": get_entropy(window),
-                "polynuc": get_polynuc(window, ["AC", "CA", "CC"]),
-                "chr_index": seq_index,
-                # "skew_norm": get_norm_freq_base(window),
-                # "chi2": get_chi2(window),
-                # "freq_norm_T": get_freq_norm_T(window),
-                # "freq_norm_C": get_freq_norm_C(window),
-                # "max_diff": get_add_freq_diff(window),
-            }
+        for i, window in sliding_window(revcomp, 0, limit_seq, 20):
+            seq_dict[
+                (strain, seq_record.name, (len(seq_record.seq) - i), "W")
+            ] = compute_metrics(window, seq_index)
 
         left_offset, left_tel = get_telom_size(seq_record.seq)
         right_offset, right_tel = get_telom_size(revcomp)

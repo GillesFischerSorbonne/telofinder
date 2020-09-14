@@ -359,7 +359,7 @@ def run_on_single_fasta(fasta_path, polynuc_thres, entropy_thres):
         for i, window in enumerate(
             sliding_window(revcomp.seq, 0, limit_seq, 20)
         ):
-            seq_dict[(strain, seq_record.name, i)] = {
+            seq_dict[(strain, seq_record.name, (len(seq_record.seq) - i))] = {
                 "strand": "C",
                 "pattern": get_pattern_occurences(window),
                 # "skew": get_skewness(window),

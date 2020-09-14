@@ -298,12 +298,7 @@ def generate_output(
         if file_exists:
             filout.write(
                 "{0}\t{1}\tL\t{2}\t{4}\n{0}\t{1}\tR\t{3}\t{5}\n".format(
-                    strain,
-                    chrom,
-                    left_tel,
-                    right_tel,
-                    left_offset,
-                    right_offset,
+                    strain, chrom, left_tel, right_tel, left_offset, right_offset,
                 )
             )
         else:
@@ -324,8 +319,7 @@ def generate_output(
             )  # file doesn't exist yet, write a header
 
 
-# FIXME: remove seq_index from parameters when groupby is fixed
-def compute_metrics(window, seq_index, dinuc_list=["AC", "CA", "CC"]):
+def compute_metrics(window, dinuc_list=["AC", "CA", "CC"]):
 
     metrics = {
         "pattern": get_pattern_occurences(window),
@@ -333,7 +327,6 @@ def compute_metrics(window, seq_index, dinuc_list=["AC", "CA", "CC"]):
         # "cg_skew": get_cg_skew(window),
         "entropy": get_entropy(window),
         "polynuc": get_polynuc(window, dinuc_list),
-        "chr_index": seq_index,
         # "skew_norm": get_norm_freq_base(window),
         # "chi2": get_chi2(window),
         # "freq_norm_T": get_freq_norm_T(window),
@@ -344,12 +337,21 @@ def compute_metrics(window, seq_index, dinuc_list=["AC", "CA", "CC"]):
     return metrics
 
 
+def plot_telom(telom_df, strand):
+    """Visualization of the watson and crick strand telomere location
+    """
+    df = telom_df.reset_index()
+    df.query("level_3==@strand").loc[
+        :, ["polynuc_med", "entropy_med", "predict_telom"]
+    ].plot().legend(loc="center left", bbox_to_anchor=(1, 0.5))
+
+
 def run_on_single_fasta(fasta_path, polynuc_thres, entropy_thres):
     """Run the telomere detection algorithm on a single fasta file"""
     strain = get_strain_name(fasta_path)
-    polynucleotide_dict = {}
-    seq_dict = {}
-    seq_index = 0
+
+    df_list = []
+
     for seq_record in SeqIO.parse(fasta_path, "fasta"):
         seqW = str(seq_record.seq)
         revcomp = seq_record.reverse_complement()
@@ -357,17 +359,25 @@ def run_on_single_fasta(fasta_path, polynuc_thres, entropy_thres):
 
         # TODO: add a 'start' value if program reads the sequence not from its beginning
         limit_seq = min(20000, len(seqW))
-        seq_index += 1
+
+        seq_dict_W = {}
+        seq_dict_C = {}
 
         for i, window in sliding_window(seqW, 0, limit_seq, 20):
-            seq_dict[(strain, seq_record.name, i, "Left")] = compute_metrics(
-                window, seq_index
-            )
+            seq_dict_W[(strain, seq_record.name, i, "Left")] = compute_metrics(window)
+
+        df_W = pd.DataFrame(seq_dict_W).transpose()
+        df_W["entropy_med"] = df_W.rolling(100, min_periods=1).entropy.median()
+        df_W["polynuc_med"] = df_W.rolling(100, min_periods=1).polynuc.median()
 
         for i, window in sliding_window(seqC, 0, limit_seq, 20):
-            seq_dict[
+            seq_dict_C[
                 (strain, seq_record.name, (len(seqC) - i), "Right")
-            ] = compute_metrics(window, seq_index)
+            ] = compute_metrics(window)
+
+        df_C = pd.DataFrame(seq_dict_C).transpose()
+        df_C["entropy_med"] = df_C.rolling(100, min_periods=1).entropy.median()
+        df_C["polynuc_med"] = df_C.rolling(100, min_periods=1).polynuc.median()
 
         # revcomp = seq_record.reverse_complement()
         left_offset, left_tel = get_telom_size(seq_record.seq)
@@ -382,34 +392,15 @@ def run_on_single_fasta(fasta_path, polynuc_thres, entropy_thres):
             "telom_length.csv",
         )
 
-    df = pd.DataFrame(seq_dict).transpose()
+        df_chro = pd.concat([df_W, df_C])
+        df_list.append(df_chro)
 
-    ## Apply a rolling median on the entropy and polynuc metrics
-    entropy_med = (
-        df.groupby("chr_index")
-        .rolling(100, min_periods=1)
-        .entropy.median()
-        .reset_index()
-        .set_index(["level_1", "level_2", "level_3", "level_4"])
-        .drop(["chr_index"], axis=1)
-    )
-    polynuc_med = (
-        df.groupby("chr_index")
-        .rolling(100, min_periods=1)
-        .polynuc.median()
-        .reset_index()
-        .set_index(["level_1", "level_2", "level_3", "level_4"])
-        .drop(["chr_index"], axis=1)
-    )
-
-    df["entropy_med"] = entropy_med
-    df["polynuc_med"] = polynuc_med
+    df = pd.concat(df_list)
 
     # TODO: EK: Find the better way to do this
     ## Conditions to detect telomere repeats
     df.loc[
-        (df["entropy_med"] < entropy_thres)
-        & (df["polynuc_med"] > polynuc_thres),
+        (df["entropy_med"] < entropy_thres) & (df["polynuc_med"] > polynuc_thres),
         "predict_telom",
     ] = 1.0
     df["predict_telom"].fillna(0, inplace=True)
@@ -424,9 +415,7 @@ def run_on_fasta_dir(fasta_dir_path, polynuc_thres, entropy_thres):
     for ext in ["*.fasta", "*.fas", "*.fa"]:
         for fasta in fasta_dir_path.glob(ext):
 
-            telom_dfs.append(
-                run_on_single_fasta(fasta, polynuc_thres, entropy_thres)
-            )
+            telom_dfs.append(run_on_single_fasta(fasta, polynuc_thres, entropy_thres))
 
     total_telom_df = pd.concat(telom_dfs)
 
@@ -453,6 +442,4 @@ def run_telofinder(fasta_path, polynuc_thres, entropy_thres):
 if __name__ == "__main__":
     args = parse_arguments()
     output_exists(args.force)
-    run_telofinder(
-        args.fasta_path, args.polynuc_threshold, args.entropy_threshold
-    )
+    run_telofinder(args.fasta_path, args.polynuc_threshold, args.entropy_threshold)

@@ -351,23 +351,27 @@ def run_on_single_fasta(fasta_path, polynuc_thres, entropy_thres):
     seq_dict = {}
     seq_index = 0
     for seq_record in SeqIO.parse(fasta_path, "fasta"):
+        seqW = str(seq_record.seq)
+        revcomp = seq_record.reverse_complement()
+        seqC = str(revcomp.seq)
+
         # TODO: add a 'start' value if program reads the sequence not from its beginning
-        limit_seq = min(20000, len(seq_record.seq))
+        limit_seq = min(20000, len(seqW))
         seq_index += 1
 
-        for i, window in sliding_window(seq_record.seq, 0, limit_seq, 20):
-            seq_dict[(strain, seq_record.name, i, "C")] = compute_metrics(
+        for i, window in sliding_window(seqW, 0, limit_seq, 20):
+            seq_dict[(strain, seq_record.name, i, "Left")] = compute_metrics(
                 window, seq_index
             )
 
-        revcomp = seq_record.reverse_complement()
-        for i, window in sliding_window(revcomp, 0, limit_seq, 20):
+        for i, window in sliding_window(seqC, 0, limit_seq, 20):
             seq_dict[
-                (strain, seq_record.name, (len(seq_record.seq) - i), "W")
+                (strain, seq_record.name, (len(seqC) - i), "Right")
             ] = compute_metrics(window, seq_index)
 
+        # revcomp = seq_record.reverse_complement()
         left_offset, left_tel = get_telom_size(seq_record.seq)
-        right_offset, right_tel = get_telom_size(revcomp)
+        right_offset, right_tel = get_telom_size(revcomp.seq)
         generate_output(
             strain,
             seq_record.id,
@@ -386,7 +390,7 @@ def run_on_single_fasta(fasta_path, polynuc_thres, entropy_thres):
         .rolling(100, min_periods=1)
         .entropy.median()
         .reset_index()
-        .set_index(["level_1", "level_2", "level_3"])
+        .set_index(["level_1", "level_2", "level_3", "level_4"])
         .drop(["chr_index"], axis=1)
     )
     polynuc_med = (
@@ -394,7 +398,7 @@ def run_on_single_fasta(fasta_path, polynuc_thres, entropy_thres):
         .rolling(100, min_periods=1)
         .polynuc.median()
         .reset_index()
-        .set_index(["level_1", "level_2", "level_3"])
+        .set_index(["level_1", "level_2", "level_3", "level_4"])
         .drop(["chr_index"], axis=1)
     )
 

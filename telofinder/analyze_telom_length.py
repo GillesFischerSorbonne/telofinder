@@ -32,7 +32,8 @@ def output_exists(force):
 def parse_arguments():
     """Function to parse and reuse the arguments of the command line"""
     parser = argparse.ArgumentParser(
-        description="This program determines telomere length at all sequence ends from a single or multiple (multi)fasta file(s)\
+        description="This program determines the location and the size of telomeric repeats\
+        from genome assemblies. It runs both on single and multiple (multi)fasta file(s)\
         and outputs a csv file called 'telom_length.csv'"
     )
     parser.add_argument(
@@ -144,30 +145,7 @@ def get_polynuc(window, dinuc_list):
 
 def get_skewness(window):
     """Get AT, GC skewness from a sequence"""
-    # base_compos = Counter(window)
-    # a = base_compos["A"]
-    # t = base_compos["T"]
-    # g = base_compos["G"]
-    # c = base_compos["C"]
 
-    # if (a + t) == 0:
-    #     at_skew = None
-    # else:
-    #     at_skew = (a - t) / (a + t)
-
-    # if (g + c) == 0:
-    #     gc_skew = None
-    # else:
-    #     gc_skew = (g - c) / (g + c)
-
-    # if at_skew is None or gc_skew is None:
-    #     skewness = None
-    # else:
-    #     skewness = ((a - t) - (g - c)) / len(window)
-
-    # return skewness
-
-    ### using the base_compos function
     if base_compos(window, "A") + base_compos(window, "T") == 0:
         at_skew = None
     else:
@@ -195,14 +173,13 @@ def get_skewness(window):
 
 def get_cg_skew(window):
     """Get CG skewn from a sequence"""
-    base_compos = Counter(window)
-    g = base_compos["G"]
-    c = base_compos["C"]
 
-    if (g + c) == 0:
+    if base_compos(window, "G") + base_compos(window, "C") == 0:
         cg_skew = None
     else:
-        cg_skew = (c - g) / (g + c)
+        cg_skew = (base_compos(window, "C") - base_compos(window, "G")) / (
+            base_compos(window, "G") + base_compos(window, "C")
+        )
 
     return cg_skew
 
@@ -225,16 +202,15 @@ def get_entropy(window):
 
 def get_norm_freq_base(window):
     """Calculate the difference between observed and expected base composition of the window"""
-    base_compos = Counter(window)
 
     fexp_A_T = 0.617
     fexp_G_C = 0.383
 
     skew_norm = (
-        (fexp_A_T - (base_compos["A"] / len(window))) ** 2
-        - (fexp_A_T - (base_compos["T"] / len(window))) ** 2
-        - (fexp_G_C - (base_compos["G"] / len(window))) ** 2
-        + (fexp_G_C - (base_compos["C"] / len(window))) ** 2
+        (fexp_A_T - (base_compos(window, "A") / len(window))) ** 2
+        - (fexp_A_T - (base_compos(window, "T") / len(window))) ** 2
+        - (fexp_G_C - (base_compos(window, "G") / len(window))) ** 2
+        + (fexp_G_C - (base_compos(window, "C") / len(window))) ** 2
     )
 
     return skew_norm
@@ -242,16 +218,15 @@ def get_norm_freq_base(window):
 
 def get_add_freq_diff(window):
     """Calculate the difference between observed and expected base composition of the window"""
-    base_compos = Counter(window)
 
     fexp_A_T = 0.617
     fexp_G_C = 0.383
 
     max_diff = (
-        (fexp_A_T - (base_compos["A"] / len(window))) ** 2
-        + (fexp_A_T - (base_compos["T"] / len(window))) ** 2
-        + (fexp_G_C - (base_compos["G"] / len(window))) ** 2
-        - (fexp_G_C - (base_compos["C"] / len(window))) ** 2
+        (fexp_A_T - (base_compos(window, "A") / len(window))) ** 2
+        + (fexp_A_T - (base_compos(window, "T") / len(window))) ** 2
+        + (fexp_G_C - (base_compos(window, "G") / len(window))) ** 2
+        - (fexp_G_C - (base_compos(window, "C") / len(window))) ** 2
     )
 
     return max_diff
@@ -259,29 +234,26 @@ def get_add_freq_diff(window):
 
 def get_freq_norm_C(window):
     """Calculate the difference between observed and expected frequence of C in the window"""
-    base_compos = Counter(window)
 
     fexp_G_C = 0.383
 
-    freq_norm_C = fexp_G_C - (base_compos["C"] / len(window))
+    freq_norm_C = fexp_G_C - (base_compos(window, "C") / len(window))
 
     return freq_norm_C
 
 
 def get_freq_norm_T(window):
     """Calculate the difference between observed and expected frequence of T in the window"""
-    base_compos = Counter(window)
 
     fexp_A_T = 0.617
 
-    freq_norm_T = fexp_A_T - (base_compos["T"] / len(window))
+    freq_norm_T = fexp_A_T - (base_compos(window, "T") / len(window))
 
     return freq_norm_T
 
 
 def get_chi2(window):
     """Calculate the difference between observed and expected base composition of the window"""
-    base_compos = Counter(window)
 
     fexp_A_T = 0.617
     fexp_G_C = 0.383
@@ -289,9 +261,9 @@ def get_chi2(window):
     sum_freq = 0
 
     for base in ["A", "T"]:
-        sum_freq += (fexp_A_T - (base_compos[base] / len(window))) ** 2
+        sum_freq += (fexp_A_T - (window.count(base) / len(window))) ** 2
     for base in ["G", "C"]:
-        sum_freq += (fexp_G_C - (base_compos[base] / len(window))) ** 2
+        sum_freq += (fexp_G_C - (window.count(base) / len(window))) ** 2
 
     chi2 = sum_freq / 3
 
@@ -326,7 +298,12 @@ def generate_output(
         if file_exists:
             filout.write(
                 "{0}\t{1}\tL\t{2}\t{4}\n{0}\t{1}\tR\t{3}\t{5}\n".format(
-                    strain, chrom, left_tel, right_tel, left_offset, right_offset,
+                    strain,
+                    chrom,
+                    left_tel,
+                    right_tel,
+                    left_offset,
+                    right_offset,
                 )
             )
         else:
@@ -359,23 +336,44 @@ def run_on_single_fasta(fasta_path, polynuc_thres, entropy_thres):
         # TODO: add a 'start' value if program reads the sequence not from its beginning
         limit_seq = min(20000, len(seq_record.seq))
         seq_index += 1
-        for i, window in enumerate(sliding_window(seq_record.seq, 0, limit_seq, 20)):
+        for i, window in enumerate(
+            sliding_window(seq_record.seq, 0, limit_seq, 20)
+        ):
 
             seq_dict[(strain, seq_record.name, i)] = {
+                "strand": "W",
                 "pattern": get_pattern_occurences(window),
-                "skew": get_skewness(window),
+                # "skew": get_skewness(window),
                 # "cg_skew": get_cg_skew(window),
                 "entropy": get_entropy(window),
                 "polynuc": get_polynuc(window, ["AC", "CA", "CC"]),
                 "chr_index": seq_index,
                 # "skew_norm": get_norm_freq_base(window),
                 # "chi2": get_chi2(window),
-                "freq_norm_T": get_freq_norm_T(window),
-                "freq_norm_C": get_freq_norm_C(window),
+                # "freq_norm_T": get_freq_norm_T(window),
+                # "freq_norm_C": get_freq_norm_C(window),
                 # "max_diff": get_add_freq_diff(window),
             }
 
         revcomp = seq_record.reverse_complement()
+        for i, window in enumerate(
+            sliding_window(revcomp.seq, 0, limit_seq, 20)
+        ):
+            seq_dict[(strain, seq_record.name, (len(seq_record.seq) - i))] = {
+                "strand": "C",
+                "pattern": get_pattern_occurences(window),
+                # "skew": get_skewness(window),
+                # "cg_skew": get_cg_skew(window),
+                "entropy": get_entropy(window),
+                "polynuc": get_polynuc(window, ["AC", "CA", "CC"]),
+                "chr_index": seq_index,
+                # "skew_norm": get_norm_freq_base(window),
+                # "chi2": get_chi2(window),
+                # "freq_norm_T": get_freq_norm_T(window),
+                # "freq_norm_C": get_freq_norm_C(window),
+                # "max_diff": get_add_freq_diff(window),
+            }
+
         left_offset, left_tel = get_telom_size(seq_record.seq)
         right_offset, right_tel = get_telom_size(revcomp)
         generate_output(
@@ -414,7 +412,8 @@ def run_on_single_fasta(fasta_path, polynuc_thres, entropy_thres):
     # TODO: EK: Find the better way to do this
     ## Conditions to detect telomere repeats
     df.loc[
-        (df["entropy_med"] < entropy_thres) & (df["polynuc_med"] > polynuc_thres),
+        (df["entropy_med"] < entropy_thres)
+        & (df["polynuc_med"] > polynuc_thres),
         "predict_telom",
     ] = 1.0
     df["predict_telom"].fillna(0, inplace=True)
@@ -429,7 +428,9 @@ def run_on_fasta_dir(fasta_dir_path, polynuc_thres, entropy_thres):
     for ext in ["*.fasta", "*.fas", "*.fa"]:
         for fasta in fasta_dir_path.glob(ext):
 
-            telom_dfs.append(run_on_single_fasta(fasta, polynuc_thres, entropy_thres))
+            telom_dfs.append(
+                run_on_single_fasta(fasta, polynuc_thres, entropy_thres)
+            )
 
     total_telom_df = pd.concat(telom_dfs)
 
@@ -456,4 +457,6 @@ def run_telofinder(fasta_path, polynuc_thres, entropy_thres):
 if __name__ == "__main__":
     args = parse_arguments()
     output_exists(args.force)
-    run_telofinder(args.fasta_path, args.polynuc_threshold, args.entropy_threshold)
+    run_telofinder(
+        args.fasta_path, args.polynuc_threshold, args.entropy_threshold
+    )

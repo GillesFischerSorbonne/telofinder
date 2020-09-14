@@ -337,13 +337,45 @@ def compute_metrics(window, dinuc_list=["AC", "CA", "CC"]):
     return metrics
 
 
-def plot_telom(telom_df, strand):
+def get_consecutive_groups(position_list):
+    """From a list of integers get start and end of each consecutive groups.
+    Applied to detect start and end of telomere in nucleotide positions.
+    """
+    pass
+
+
+# FIXME
+def classify_telomere(interval_list, strand):
+    """From a list of tuples obtained from get_consecutive_groups, identify if
+    interval corresponds to terminal or interal telomere
+
+    FIXME: Add Crick case
+    """
+    classif_dict = {}
+
+    if strand == "W":
+        if min(interval_list)[0] == 0:
+            classif_dict["term"] = min(interval_list)
+            interval_list.remove(min(interval_list))
+            classif_dict["intern"] = interval_list
+        else:
+            classif_dict["intern"] = interval_list
+
+    return classif_dict
+
+
+def plot_telom(telom_df):
     """Visualization of the watson and crick strand telomere location
     """
     df = telom_df.reset_index()
-    df.query("level_3==@strand").loc[
-        :, ["polynuc_med", "entropy_med", "predict_telom"]
-    ].plot().legend(loc="center left", bbox_to_anchor=(1, 0.5))
+    for strand in ["Left", "Right"]:
+        ax = (
+            df.query("level_3==@strand")
+            .loc[:, ["polynuc_med", "entropy_med", "predict_telom"]]
+            .plot()
+            .legend(loc="center left", bbox_to_anchor=(1, 0.5))
+        )
+        ax.set_title(strand)
 
 
 def run_on_single_fasta(fasta_path, polynuc_thres, entropy_thres):

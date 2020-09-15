@@ -298,7 +298,12 @@ def generate_output(
         if file_exists:
             filout.write(
                 "{0}\t{1}\tL\t{2}\t{4}\n{0}\t{1}\tR\t{3}\t{5}\n".format(
-                    strain, chrom, left_tel, right_tel, left_offset, right_offset,
+                    strain,
+                    chrom,
+                    left_tel,
+                    right_tel,
+                    left_offset,
+                    right_offset,
                 )
             )
         else:
@@ -337,15 +342,27 @@ def compute_metrics(window, dinuc_list=["AC", "CA", "CC"]):
     return metrics
 
 
-def get_consecutive_groups(position_list):
+# FIXME: works only for 1 chromosome
+def get_consecutive_groups(df_chrom):
     """From a list of integers get start and end of each consecutive groups.
     Applied to detect start and end of telomere in nucleotide positions.
     """
-    pass
+    df = df_chrom.reset_index()
+    chrom_groups = {}
+    for strand in ["W", "C"]:
+        nums = list(
+            df.query("(level_3==@strand) and (predict_telom==1)").level_2
+        )
+        nums = sorted(set(nums))
+        gaps = [[s, e] for s, e in zip(nums, nums[1:]) if s + 1 < e]
+        edges = iter(nums[:1] + sum(gaps, []) + nums[-1:])
+        chrom_groups[strand] = list(zip(edges, edges))
+
+    return chrom_groups
 
 
-# FIXME
-def classify_telomere(interval_list, strand):
+# FIXME: works only for 1 chromosome
+def classify_telomere(df_chrom, interval_chrom):
     """From a list of tuples obtained from get_consecutive_groups, identify if
     interval corresponds to terminal or interal telomere
 
@@ -353,13 +370,27 @@ def classify_telomere(interval_list, strand):
     """
     classif_dict = {}
 
-    if strand == "W":
-        if min(interval_list)[0] == 0:
-            classif_dict["term"] = min(interval_list)
-            interval_list.remove(min(interval_list))
-            classif_dict["intern"] = interval_list
-        else:
-            classif_dict["intern"] = interval_list
+    interval_W = interval_chrom.get("W")
+    if interval_W == []:
+        classif_dict["Left_term"] = (0, 0)
+        classif_dict["Left_intern"] = (0, 0)
+    elif min(interval_W)[0] == 0:
+        classif_dict["Left_term"] = min(interval_W)
+        interval_W.remove(min(interval_W))
+        classif_dict["Left_intern"] = interval_W
+    else:
+        classif_dict["Left_intern"] = interval_W
+
+    interval_C = interval_chrom.get("C")
+    if interval_C == []:
+        classif_dict["Right_term"] = (0, 0)
+        classif_dict["Right_intern"] = (0, 0)
+    elif max(interval_C)[1] == max(df_chrom.reset_index().level_2):
+        classif_dict["Right_term"] = max(interval_C)
+        interval_C.remove(max(interval_C))
+        classif_dict["Right_intern"] = interval_C
+    else:
+        classif_dict["Right_intern"] = interval_chrom
 
     return classif_dict
 
@@ -368,7 +399,7 @@ def plot_telom(telom_df):
     """Visualization of the watson and crick strand telomere location
     """
     df = telom_df.reset_index()
-    for strand in ["Left", "Right"]:
+    for strand in ["W", "C"]:
         ax = (
             df.query("level_3==@strand")
             .loc[:, ["polynuc_med", "entropy_med", "predict_telom"]]
@@ -396,22 +427,23 @@ def run_on_single_fasta(fasta_path, polynuc_thres, entropy_thres):
         seq_dict_C = {}
 
         for i, window in sliding_window(seqW, 0, limit_seq, 20):
-            seq_dict_W[(strain, seq_record.name, i, "Left")] = compute_metrics(window)
+            seq_dict_W[(strain, seq_record.name, i, "W")] = compute_metrics(
+                window
+            )
 
         df_W = pd.DataFrame(seq_dict_W).transpose()
-        df_W["entropy_med"] = df_W.rolling(100, min_periods=1).entropy.median()
-        df_W["polynuc_med"] = df_W.rolling(100, min_periods=1).polynuc.median()
+        df_W["entropy_med"] = df_W.rolling(20, min_periods=1).entropy.median()
+        df_W["polynuc_med"] = df_W.rolling(20, min_periods=1).polynuc.median()
 
         for i, window in sliding_window(seqC, 0, limit_seq, 20):
             seq_dict_C[
-                (strain, seq_record.name, (len(seqC) - i), "Right")
+                (strain, seq_record.name, (len(seqC) - i), "C")
             ] = compute_metrics(window)
 
         df_C = pd.DataFrame(seq_dict_C).transpose()
-        df_C["entropy_med"] = df_C.rolling(100, min_periods=1).entropy.median()
-        df_C["polynuc_med"] = df_C.rolling(100, min_periods=1).polynuc.median()
+        df_C["entropy_med"] = df_C.rolling(20, min_periods=1).entropy.median()
+        df_C["polynuc_med"] = df_C.rolling(20, min_periods=1).polynuc.median()
 
-        # revcomp = seq_record.reverse_complement()
         left_offset, left_tel = get_telom_size(seq_record.seq)
         right_offset, right_tel = get_telom_size(revcomp.seq)
         generate_output(
@@ -432,7 +464,8 @@ def run_on_single_fasta(fasta_path, polynuc_thres, entropy_thres):
     # TODO: EK: Find the better way to do this
     ## Conditions to detect telomere repeats
     df.loc[
-        (df["entropy_med"] < entropy_thres) & (df["polynuc_med"] > polynuc_thres),
+        (df["entropy_med"] < entropy_thres)
+        & (df["polynuc_med"] > polynuc_thres),
         "predict_telom",
     ] = 1.0
     df["predict_telom"].fillna(0, inplace=True)
@@ -447,7 +480,9 @@ def run_on_fasta_dir(fasta_dir_path, polynuc_thres, entropy_thres):
     for ext in ["*.fasta", "*.fas", "*.fa"]:
         for fasta in fasta_dir_path.glob(ext):
 
-            telom_dfs.append(run_on_single_fasta(fasta, polynuc_thres, entropy_thres))
+            telom_dfs.append(
+                run_on_single_fasta(fasta, polynuc_thres, entropy_thres)
+            )
 
     total_telom_df = pd.concat(telom_dfs)
 
@@ -474,4 +509,6 @@ def run_telofinder(fasta_path, polynuc_thres, entropy_thres):
 if __name__ == "__main__":
     args = parse_arguments()
     output_exists(args.force)
-    run_telofinder(args.fasta_path, args.polynuc_threshold, args.entropy_threshold)
+    run_telofinder(
+        args.fasta_path, args.polynuc_threshold, args.entropy_threshold
+    )

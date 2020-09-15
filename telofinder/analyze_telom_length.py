@@ -358,6 +358,8 @@ def get_consecutive_groups(df_chrom):
         edges = iter(nums[:1] + sum(gaps, []) + nums[-1:])
         chrom_groups[strand] = list(zip(edges, edges))
 
+        # [{"start":x, "end":y} for x, y in b["W"]]
+
     return chrom_groups
 
 
@@ -372,9 +374,11 @@ def classify_telomere(df_chrom, interval_chrom):
 
     interval_W = interval_chrom.get("W")
     if interval_W == []:
-        classif_dict["Left_term"] = (0, 0)
-        classif_dict["Left_intern"] = (0, 0)
+        classif_dict["Left_term"] = []
+        classif_dict["Left_intern"] = []
     elif min(interval_W)[0] == 0:
+        # classif_dict["start_Left_term"] = 0
+        # classif_dict["end_Left_term"] = min(interval_W)[1]
         classif_dict["Left_term"] = min(interval_W)
         interval_W.remove(min(interval_W))
         classif_dict["Left_intern"] = interval_W
@@ -383,8 +387,8 @@ def classify_telomere(df_chrom, interval_chrom):
 
     interval_C = interval_chrom.get("C")
     if interval_C == []:
-        classif_dict["Right_term"] = (0, 0)
-        classif_dict["Right_intern"] = (0, 0)
+        classif_dict["Right_term"] = []
+        classif_dict["Right_intern"] = []
     elif max(interval_C)[1] == max(df_chrom.reset_index().level_2):
         classif_dict["Right_term"] = max(interval_C)
         interval_C.remove(max(interval_C))
@@ -402,7 +406,7 @@ def plot_telom(telom_df):
     for strand in ["W", "C"]:
         ax = (
             df.query("level_3==@strand")
-            .loc[:, ["polynuc_med", "entropy_med", "predict_telom"]]
+            .loc[:, ["polynuc", "entropy", "predict_telom"]]
             .plot()
             .legend(loc="center left", bbox_to_anchor=(1, 0.5))
         )
@@ -414,6 +418,8 @@ def run_on_single_fasta(fasta_path, polynuc_thres, entropy_thres):
     strain = get_strain_name(fasta_path)
 
     df_list = []
+
+    dico_telo = {}
 
     for seq_record in SeqIO.parse(fasta_path, "fasta"):
         seqW = str(seq_record.seq)
@@ -432,8 +438,6 @@ def run_on_single_fasta(fasta_path, polynuc_thres, entropy_thres):
             )
 
         df_W = pd.DataFrame(seq_dict_W).transpose()
-        df_W["entropy_med"] = df_W.rolling(20, min_periods=1).entropy.median()
-        df_W["polynuc_med"] = df_W.rolling(20, min_periods=1).polynuc.median()
 
         for i, window in sliding_window(seqC, 0, limit_seq, 20):
             seq_dict_C[
@@ -441,8 +445,16 @@ def run_on_single_fasta(fasta_path, polynuc_thres, entropy_thres):
             ] = compute_metrics(window)
 
         df_C = pd.DataFrame(seq_dict_C).transpose()
-        df_C["entropy_med"] = df_C.rolling(20, min_periods=1).entropy.median()
-        df_C["polynuc_med"] = df_C.rolling(20, min_periods=1).polynuc.median()
+
+        ## NOT USED ANYMORE######
+        df_W["entropy_med"] = df_W.rolling(100, min_periods=1).entropy.median()
+        df_W["polynuc_med"] = df_W.rolling(100, min_periods=1).polynuc.median()
+        ##################
+
+        ## NOT USED ANYMORE######
+        df_C["entropy_med"] = df_C.rolling(100, min_periods=1).entropy.median()
+        df_C["polynuc_med"] = df_C.rolling(100, min_periods=1).polynuc.median()
+        ##################
 
         left_offset, left_tel = get_telom_size(seq_record.seq)
         right_offset, right_tel = get_telom_size(revcomp.seq)
@@ -457,18 +469,22 @@ def run_on_single_fasta(fasta_path, polynuc_thres, entropy_thres):
         )
 
         df_chro = pd.concat([df_W, df_C])
+
+        df_chro.loc[
+            (df_chro["entropy"] < entropy_thres)
+            & (df_chro["polynuc"] > polynuc_thres),
+            "predict_telom",
+        ] = 1.0
+
+        df_chro["predict_telom"].fillna(0, inplace=True)
+
+        dico_telo[(strain, seq_record.name)] = classify_telomere(
+            df_chro, get_consecutive_groups(df_chro)
+        )
+
         df_list.append(df_chro)
 
     df = pd.concat(df_list)
-
-    # TODO: EK: Find the better way to do this
-    ## Conditions to detect telomere repeats
-    df.loc[
-        (df["entropy_med"] < entropy_thres)
-        & (df["polynuc_med"] > polynuc_thres),
-        "predict_telom",
-    ] = 1.0
-    df["predict_telom"].fillna(0, inplace=True)
 
     return df
 

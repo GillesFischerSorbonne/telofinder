@@ -410,8 +410,8 @@ def classify_telomere(interval_chrom, chrom_len):
     elif max(interval_C)[1] == (chrom_len - 1):
         classif_dict_list.append(
             {
-                "start": max(interval_C)[0] + 1,
-                "end": max(interval_C)[1] + 1 + 19,
+                "start": max(interval_C)[0] + 1 - 19,
+                "end": max(interval_C)[1] + 1,
                 "side": "Right",
                 "type": "term",
             }
@@ -420,8 +420,8 @@ def classify_telomere(interval_chrom, chrom_len):
         for interval in interval_C:
             classif_dict_list.append(
                 {
-                    "start": interval[0] + 1,
-                    "end": interval[1] + 1 + 19,
+                    "start": interval[0] + 1 - 19,
+                    "end": interval[1] + 1,
                     "side": "Right",
                     "type": "intern",
                 }
@@ -431,8 +431,8 @@ def classify_telomere(interval_chrom, chrom_len):
         for interval in interval_C:
             classif_dict_list.append(
                 {
-                    "start": interval[0] + 1,
-                    "end": interval[1] + 1 + 19,
+                    "start": interval[0] + 1 - 19,
+                    "end": interval[1] + 1,
                     "side": "Right",
                     "type": "intern",
                 }
@@ -460,14 +460,19 @@ def export_results(
     telom_df,
     raw_outfile="raw_df.csv",
     telom_outfile="telom_df.csv",
+    bed_outfile="telom.bed",
     outdir="telofinder_results",
 ):
     """ Produce output table files 
     """
     outdir = Path(outdir)
     outdir.mkdir(exist_ok=True)
-    raw_df.to_csv(outdir / raw_outfile)
-    telom_df.to_csv(outdir / telom_outfile)
+    raw_df.to_csv(outdir / raw_outfile, index=False)
+    telom_df.to_csv(outdir / telom_outfile, index=False)
+
+    bed_df = telom_df[["chrom", "start", "end", "type"]]
+    bed_df.dropna(inplace=True)
+    bed_df.to_csv(outdir / bed_outfile, sep="\t", header=None, index=False)
 
 
 def run_on_single_fasta(fasta_path, polynuc_thres, entropy_thres):

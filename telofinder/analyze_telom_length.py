@@ -455,6 +455,21 @@ def plot_telom(telom_df):
         ax.set_title(strand)
 
 
+def export_results(
+    raw_df,
+    telom_df,
+    raw_outfile="raw_df.csv",
+    telom_outfile="telom_df.csv",
+    outdir="telofinder_results",
+):
+    """ Produce output table files 
+    """
+    outdir = Path(outdir)
+    outdir.mkdir()
+    raw_df.to_csv(outdir / raw_outfile)
+    telom_df.to_csv(outdir / telom_outfile)
+
+
 def run_on_single_fasta(fasta_path, polynuc_thres, entropy_thres):
     """Run the telomere detection algorithm on a single fasta file"""
     strain = get_strain_name(fasta_path)
@@ -561,10 +576,16 @@ def run_telofinder(fasta_path, polynuc_thres, entropy_thres):
         print(
             f"Running in iterative mode on all '*.fasta', '*.fas', '*.fa' files in '{fasta_path}'"
         )
-        return run_on_fasta_dir(fasta_path, polynuc_thres, entropy_thres)
+        raw_df, telom_df = run_on_fasta_dir(fasta_path, polynuc_thres, entropy_thres)
+        export_results(raw_df, telom_df)
+        return raw_df, telom_df
+
     elif fasta_path.is_file():
         print(f"Running in single fasta mode on '{fasta_path}'")
-        return run_on_single_fasta(fasta_path, polynuc_thres, entropy_thres)
+
+        raw_df, telom_df = run_on_single_fasta(fasta_path, polynuc_thres, entropy_thres)
+        export_results(raw_df, telom_df)
+        return raw_df, telom_df
     else:
         raise IOError(f"'{fasta_path}' is not a directory or a file.")
 

@@ -70,33 +70,6 @@ def get_strain_name(filename):
     return filepath.stem
 
 
-def get_telom_size(sequence):
-    """Function to calculate telomere length at all contig ends"""
-    tel_size = 0
-    offset = 0
-    limit = min(1500, len(sequence) - 20)
-    for i in range(0, len(sequence) - 19):
-        if i == limit and tel_size == 0:
-            offset = 0
-            tel_size = 0
-            return offset, tel_size
-
-        mot = str(sequence[i : i + 20])
-        if (
-            mot.count("C") >= 8
-            and mot.count("A") >= 3
-            and mot.count("C") + mot.count("A") >= 17
-            and "AAAA" not in mot
-        ):
-            tel_size += 1
-        else:
-            if tel_size != 0:
-                tel_size = 20 + tel_size - 3
-                return offset, tel_size
-
-            offset += 1
-
-
 def sliding_window(sequence, start, end, size):
     """Apply a sliding window of length = size to a sequence from start to end"""
     if size > len(sequence):
@@ -110,19 +83,6 @@ def base_compos(sequence, base):
     """Return the number of base in the sequence"""
     count = Counter(sequence)[base]
     return count
-
-
-def get_pattern_occurences(window):
-    """Presence/absence of the telomere pattern in a sliding window"""
-    if (
-        window.count("C") >= 8
-        and window.count("A") >= 3
-        and window.count("C") + window.count("A") >= 17
-        and "AAAA" not in window
-    ):
-        return 1
-    else:
-        return 0
 
 
 def count_polynuc_occurence(window, polynucleotide_list):
@@ -270,59 +230,9 @@ def get_chi2(window):
     return chi2
 
 
-# FIXME: missing docstring
-def generate_output(
-    strain, chrom, left_tel, right_tel, left_offset, right_offset, output_file
-):
-    print(
-        "\n",
-        "=================================",
-        "\n",
-        strain,
-        "\n",
-        "=================================",
-        "\n",
-    )
-    print(chrom)
-    print("---------------------")
-    print("left telom length = ", left_tel)
-    print("left offset = ", left_offset)
-    print("right telom length = ", right_tel)
-    print("right offset = ", right_offset)
-    print("\n", "-------------------------------", "\n")
-
-    # TODO: Could use pandas DataFrames here
-    ## save the results in a csv file
-    file_exists = os.path.isfile(output_file)
-    with open("telom_length.csv", "a") as filout:
-        if file_exists:
-            filout.write(
-                "{0}\t{1}\tL\t{2}\t{4}\n{0}\t{1}\tR\t{3}\t{5}\n".format(
-                    strain, chrom, left_tel, right_tel, left_offset, right_offset,
-                )
-            )
-        else:
-            filout.write(
-                "{0}\t{1}\t{2}\t{3}\t{4}\n{5}\t{6}\tL\t{7}\t{9}\n{5}\t{6}\tR\t{8}\t{10}\n".format(
-                    "Strain",
-                    "Chromosome",
-                    "Contig_side",
-                    "Telom_length",
-                    "Offset",
-                    strain,
-                    chrom,
-                    left_tel,
-                    right_tel,
-                    left_offset,
-                    right_offset,
-                )
-            )  # file doesn't exist yet, write a header
-
-
 def compute_metrics(window, dinuc_list=["AC", "CA", "CC"]):
 
     metrics = {
-        "pattern": get_pattern_occurences(window),
         # "skew": get_skewness(window),
         # "cg_skew": get_cg_skew(window),
         "entropy": get_entropy(window),
@@ -344,7 +254,9 @@ def get_consecutive_groups(df_chrom):
     df = df_chrom.reset_index()
     chrom_groups = {}
     for strand in ["W", "C"]:
-        nums = list(df.query("(level_3==@strand) and (predict_telom==1)").level_2)
+        nums = list(
+            df.query("(level_3==@strand) and (predict_telom==1)").level_2
+        )
         nums = sorted(set(nums))
         gaps = [[s, e] for s, e in zip(nums, nums[1:]) if s + 1 < e]
         edges = iter(nums[:1] + sum(gaps, []) + nums[-1:])
@@ -473,6 +385,8 @@ def export_results(
 def run_on_single_fasta(fasta_path, polynuc_thres, entropy_thres):
     """Run the telomere detection algorithm on a single fasta file"""
     strain = get_strain_name(fasta_path)
+    print("\n", "-------------------------------", "\n")
+    print(f"file {strain} executed")
 
     df_list = []
     telo_df_list = []
@@ -489,7 +403,9 @@ def run_on_single_fasta(fasta_path, polynuc_thres, entropy_thres):
         seq_dict_C = {}
 
         for i, window in sliding_window(seqW, 0, limit_seq, 20):
-            seq_dict_W[(strain, seq_record.name, i, "W")] = compute_metrics(window)
+            seq_dict_W[(strain, seq_record.name, i, "W")] = compute_metrics(
+                window
+            )
 
         df_W = pd.DataFrame(seq_dict_W).transpose()
 
@@ -510,22 +426,11 @@ def run_on_single_fasta(fasta_path, polynuc_thres, entropy_thres):
         # df_C["polynuc_med"] = df_C.rolling(100, min_periods=1).polynuc.median()
         ##################
 
-        left_offset, left_tel = get_telom_size(seq_record.seq)
-        right_offset, right_tel = get_telom_size(revcomp.seq)
-        generate_output(
-            strain,
-            seq_record.id,
-            left_tel,
-            right_tel,
-            left_offset,
-            right_offset,
-            "telom_length.csv",
-        )
-
         df_chro = pd.concat([df_W, df_C])
 
         df_chro.loc[
-            (df_chro["entropy"] < entropy_thres) & (df_chro["polynuc"] > polynuc_thres),
+            (df_chro["entropy"] < entropy_thres)
+            & (df_chro["polynuc"] > polynuc_thres),
             "predict_telom",
         ] = 1.0
 
@@ -540,6 +445,8 @@ def run_on_single_fasta(fasta_path, polynuc_thres, entropy_thres):
 
         df_list.append(df_chro)
         telo_df_list.append(telo_df)
+
+        print(f"chromosome {seq_record.name}")
 
     df = pd.concat(df_list)
     telo_df = pd.concat(telo_df_list)
@@ -558,7 +465,9 @@ def run_on_fasta_dir(fasta_dir_path, polynuc_thres, entropy_thres):
     for ext in ["*.fasta", "*.fas", "*.fa"]:
         for fasta in fasta_dir_path.glob(ext):
 
-            raw_df, telom_df = run_on_single_fasta(fasta, polynuc_thres, entropy_thres)
+            raw_df, telom_df = run_on_single_fasta(
+                fasta, polynuc_thres, entropy_thres
+            )
             raw_dfs.append(raw_df)
             telom_dfs.append(telom_df)
 
@@ -576,14 +485,18 @@ def run_telofinder(fasta_path, polynuc_thres, entropy_thres):
         print(
             f"Running in iterative mode on all '*.fasta', '*.fas', '*.fa' files in '{fasta_path}'"
         )
-        raw_df, telom_df = run_on_fasta_dir(fasta_path, polynuc_thres, entropy_thres)
+        raw_df, telom_df = run_on_fasta_dir(
+            fasta_path, polynuc_thres, entropy_thres
+        )
         export_results(raw_df, telom_df)
         return raw_df, telom_df
 
     elif fasta_path.is_file():
         print(f"Running in single fasta mode on '{fasta_path}'")
 
-        raw_df, telom_df = run_on_single_fasta(fasta_path, polynuc_thres, entropy_thres)
+        raw_df, telom_df = run_on_single_fasta(
+            fasta_path, polynuc_thres, entropy_thres
+        )
         export_results(raw_df, telom_df)
         return raw_df, telom_df
     else:
@@ -594,4 +507,6 @@ def run_telofinder(fasta_path, polynuc_thres, entropy_thres):
 if __name__ == "__main__":
     args = parse_arguments()
     output_exists(args.force)
-    run_telofinder(args.fasta_path, args.polynuc_threshold, args.entropy_threshold)
+    run_telofinder(
+        args.fasta_path, args.polynuc_threshold, args.entropy_threshold
+    )

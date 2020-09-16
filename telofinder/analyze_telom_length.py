@@ -254,9 +254,7 @@ def get_consecutive_groups(df_chrom):
     df = df_chrom.reset_index()
     chrom_groups = {}
     for strand in ["W", "C"]:
-        nums = list(
-            df.query("(level_3==@strand) and (predict_telom==1)").level_2
-        )
+        nums = list(df.query("(level_3==@strand) and (predict_telom==1)").level_2)
         nums = sorted(set(nums))
         gaps = [[s, e] for s, e in zip(nums, nums[1:]) if s + 1 < e]
         edges = iter(nums[:1] + sum(gaps, []) + nums[-1:])
@@ -382,7 +380,7 @@ def export_results(
     raw_df.to_csv(outdir / raw_outfile, index=False)
     telom_df.to_csv(outdir / telom_outfile, index=False)
 
-    bed_df = telom_df[["chrom", "start", "end", "type"]]
+    bed_df = telom_df[["chrom", "start", "end", "type"]].copy()
     bed_df.dropna(inplace=True)
     bed_df.to_csv(outdir / bed_outfile, sep="\t", header=None, index=False)
 
@@ -408,9 +406,7 @@ def run_on_single_fasta(fasta_path, polynuc_thres, entropy_thres):
         seq_dict_C = {}
 
         for i, window in sliding_window(seqW, 0, limit_seq, 20):
-            seq_dict_W[(strain, seq_record.name, i, "W")] = compute_metrics(
-                window
-            )
+            seq_dict_W[(strain, seq_record.name, i, "W")] = compute_metrics(window)
 
         df_W = pd.DataFrame(seq_dict_W).transpose()
 
@@ -434,8 +430,7 @@ def run_on_single_fasta(fasta_path, polynuc_thres, entropy_thres):
         df_chro = pd.concat([df_W, df_C])
 
         df_chro.loc[
-            (df_chro["entropy"] < entropy_thres)
-            & (df_chro["polynuc"] > polynuc_thres),
+            (df_chro["entropy"] < entropy_thres) & (df_chro["polynuc"] > polynuc_thres),
             "predict_telom",
         ] = 1.0
 
@@ -470,9 +465,7 @@ def run_on_fasta_dir(fasta_dir_path, polynuc_thres, entropy_thres):
     for ext in ["*.fasta", "*.fas", "*.fa"]:
         for fasta in fasta_dir_path.glob(ext):
 
-            raw_df, telom_df = run_on_single_fasta(
-                fasta, polynuc_thres, entropy_thres
-            )
+            raw_df, telom_df = run_on_single_fasta(fasta, polynuc_thres, entropy_thres)
             raw_dfs.append(raw_df)
             telom_dfs.append(telom_df)
 
@@ -490,18 +483,14 @@ def run_telofinder(fasta_path, polynuc_thres, entropy_thres):
         print(
             f"Running in iterative mode on all '*.fasta', '*.fas', '*.fa' files in '{fasta_path}'"
         )
-        raw_df, telom_df = run_on_fasta_dir(
-            fasta_path, polynuc_thres, entropy_thres
-        )
+        raw_df, telom_df = run_on_fasta_dir(fasta_path, polynuc_thres, entropy_thres)
         export_results(raw_df, telom_df)
         return raw_df, telom_df
 
     elif fasta_path.is_file():
         print(f"Running in single fasta mode on '{fasta_path}'")
 
-        raw_df, telom_df = run_on_single_fasta(
-            fasta_path, polynuc_thres, entropy_thres
-        )
+        raw_df, telom_df = run_on_single_fasta(fasta_path, polynuc_thres, entropy_thres)
         export_results(raw_df, telom_df)
         return raw_df, telom_df
     else:
@@ -512,6 +501,4 @@ def run_telofinder(fasta_path, polynuc_thres, entropy_thres):
 if __name__ == "__main__":
     args = parse_arguments()
     output_exists(args.force)
-    run_telofinder(
-        args.fasta_path, args.polynuc_threshold, args.entropy_threshold
-    )
+    run_telofinder(args.fasta_path, args.polynuc_threshold, args.entropy_threshold)

@@ -60,6 +60,14 @@ def parse_arguments():
         type=float,
         help="Poly-nucleotide threshold for telomere prediction.",
     )
+    parser.add_argument(
+        "-s",
+        "--nb_scanned_nt",
+        default=20000,
+        type=int,
+        help="Number of nucleotides scanned in sliding window starting from each sequence\
+    extrimity. If set to -1, the whole sequence will be scanned.",
+    )
 
     return parser.parse_args()
 
@@ -385,7 +393,7 @@ def export_results(
     bed_df.to_csv(outdir / bed_outfile, sep="\t", header=None, index=False)
 
 
-def run_on_single_fasta(fasta_path, polynuc_thres, entropy_thres):
+def run_on_single_fasta(fasta_path, polynuc_thres, entropy_thres, nb_scanned_nt):
     """Run the telomere detection algorithm on a single fasta file"""
     strain = get_strain_name(fasta_path)
     print("\n", "-------------------------------", "\n")
@@ -399,8 +407,10 @@ def run_on_single_fasta(fasta_path, polynuc_thres, entropy_thres):
         revcomp = seq_record.reverse_complement()
         seqC = str(revcomp.seq)
 
-        # TODO: add a 'start' value if program reads the sequence not from its beginning
-        limit_seq = min(20000, len(seqW))
+        if nb_scanned_nt == -1:
+            limit_seq = len(seqW)
+        else:
+            limit_seq = min(nb_scanned_nt, len(seqW))
 
         seq_dict_W = {}
         seq_dict_C = {}
@@ -457,7 +467,7 @@ def run_on_single_fasta(fasta_path, polynuc_thres, entropy_thres):
     return df, telo_df
 
 
-def run_on_fasta_dir(fasta_dir_path, polynuc_thres, entropy_thres):
+def run_on_fasta_dir(fasta_dir_path, polynuc_thres, entropy_thres, nb_scanned_nt):
     """Run iteratively the telemore detection algorithm on all fasta files in a directory"""
     raw_dfs = []
     telom_dfs = []
@@ -465,7 +475,9 @@ def run_on_fasta_dir(fasta_dir_path, polynuc_thres, entropy_thres):
     for ext in ["*.fasta", "*.fas", "*.fa"]:
         for fasta in fasta_dir_path.glob(ext):
 
-            raw_df, telom_df = run_on_single_fasta(fasta, polynuc_thres, entropy_thres)
+            raw_df, telom_df = run_on_single_fasta(
+                fasta, polynuc_thres, entropy_thres, nb_scanned_nt
+            )
             raw_dfs.append(raw_df)
             telom_dfs.append(telom_df)
 
@@ -475,7 +487,7 @@ def run_on_fasta_dir(fasta_dir_path, polynuc_thres, entropy_thres):
     return total_raw_df, total_telom_df
 
 
-def run_telofinder(fasta_path, polynuc_thres, entropy_thres):
+def run_telofinder(fasta_path, polynuc_thres, entropy_thres, nb_scanned_nt):
     """Run telofinder on a single fasta file or on a fasta directory"""
     fasta_path = Path(fasta_path)
 
@@ -483,14 +495,18 @@ def run_telofinder(fasta_path, polynuc_thres, entropy_thres):
         print(
             f"Running in iterative mode on all '*.fasta', '*.fas', '*.fa' files in '{fasta_path}'"
         )
-        raw_df, telom_df = run_on_fasta_dir(fasta_path, polynuc_thres, entropy_thres)
+        raw_df, telom_df = run_on_fasta_dir(
+            fasta_path, polynuc_thres, entropy_thres, nb_scanned_nt
+        )
         export_results(raw_df, telom_df)
         return raw_df, telom_df
 
     elif fasta_path.is_file():
         print(f"Running in single fasta mode on '{fasta_path}'")
 
-        raw_df, telom_df = run_on_single_fasta(fasta_path, polynuc_thres, entropy_thres)
+        raw_df, telom_df = run_on_single_fasta(
+            fasta_path, polynuc_thres, entropy_thres, nb_scanned_nt
+        )
         export_results(raw_df, telom_df)
         return raw_df, telom_df
     else:
@@ -501,4 +517,9 @@ def run_telofinder(fasta_path, polynuc_thres, entropy_thres):
 if __name__ == "__main__":
     args = parse_arguments()
     output_exists(args.force)
-    run_telofinder(args.fasta_path, args.polynuc_threshold, args.entropy_threshold)
+    run_telofinder(
+        args.fasta_path,
+        args.polynuc_threshold,
+        args.entropy_threshold,
+        args.nb_scanned_nt,
+    )

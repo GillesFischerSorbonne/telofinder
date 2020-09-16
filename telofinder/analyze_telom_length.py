@@ -337,9 +337,8 @@ def compute_metrics(window, dinuc_list=["AC", "CA", "CC"]):
     return metrics
 
 
-# FIXME: works only for 1 chromosome
 def get_consecutive_groups(df_chrom):
-    """From a list of integers get start and end of each consecutive groups.
+    """From the raw dataframe get start and end of each telom==1 groups.
     Applied to detect start and end of telomere in nucleotide positions.
     """
     df = df_chrom.reset_index()
@@ -356,13 +355,9 @@ def get_consecutive_groups(df_chrom):
     return chrom_groups
 
 
-# FIXME: Maybe passing only the chormosome length instead of the whole df_chrom
-# as parameter would be sufficiant
-def classify_telomere(df_chrom, interval_chrom):
+def classify_telomere(interval_chrom, chrom_len):
     """From a list of tuples obtained from get_consecutive_groups, identify if
     interval corresponds to terminal or interal telomere
-
-    FIXME: Add Crick case
     """
     classif_dict_list = []
 
@@ -412,7 +407,7 @@ def classify_telomere(df_chrom, interval_chrom):
         classif_dict_list.append(
             {"start": None, "end": None, "side": "Right", "type": "intern"}
         )
-    elif max(interval_C)[1] == max(df_chrom.reset_index().level_2):
+    elif max(interval_C)[1] == chrom_len:
         classif_dict_list.append(
             {
                 "start": max(interval_C)[0] + 1,
@@ -522,7 +517,7 @@ def run_on_single_fasta(fasta_path, polynuc_thres, entropy_thres):
         df_chro["predict_telom"].fillna(0, inplace=True)
 
         telo_groups = get_consecutive_groups(df_chro)
-        telo_list = classify_telomere(df_chro, telo_groups)
+        telo_list = classify_telomere(telo_groups, len(seq_record.seq))
         telo_df = pd.DataFrame(telo_list)
         telo_df["strain"] = strain
         telo_df["chrom"] = seq_record.name

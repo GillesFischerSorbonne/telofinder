@@ -407,7 +407,7 @@ def classify_telomere(interval_chrom, chrom_len):
         classif_dict_list.append(
             {"start": None, "end": None, "side": "Right", "type": "intern"}
         )
-    elif max(interval_C)[1] == chrom_len:
+    elif max(interval_C)[1] == (chrom_len - 1):
         classif_dict_list.append(
             {
                 "start": max(interval_C)[0] + 1,

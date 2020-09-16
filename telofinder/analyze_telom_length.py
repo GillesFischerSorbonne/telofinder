@@ -298,12 +298,7 @@ def generate_output(
         if file_exists:
             filout.write(
                 "{0}\t{1}\tL\t{2}\t{4}\n{0}\t{1}\tR\t{3}\t{5}\n".format(
-                    strain,
-                    chrom,
-                    left_tel,
-                    right_tel,
-                    left_offset,
-                    right_offset,
+                    strain, chrom, left_tel, right_tel, left_offset, right_offset,
                 )
             )
         else:
@@ -350,9 +345,7 @@ def get_consecutive_groups(df_chrom):
     df = df_chrom.reset_index()
     chrom_groups = {}
     for strand in ["W", "C"]:
-        nums = list(
-            df.query("(level_3==@strand) and (predict_telom==1)").level_2
-        )
+        nums = list(df.query("(level_3==@strand) and (predict_telom==1)").level_2)
         nums = sorted(set(nums))
         gaps = [[s, e] for s, e in zip(nums, nums[1:]) if s + 1 < e]
         edges = iter(nums[:1] + sum(gaps, []) + nums[-1:])
@@ -363,40 +356,94 @@ def get_consecutive_groups(df_chrom):
     return chrom_groups
 
 
-# FIXME: works only for 1 chromosome
+# FIXME: Maybe passing only the chormosome length instead of the whole df_chrom
+# as parameter would be sufficiant
 def classify_telomere(df_chrom, interval_chrom):
     """From a list of tuples obtained from get_consecutive_groups, identify if
     interval corresponds to terminal or interal telomere
 
     FIXME: Add Crick case
     """
-    classif_dict = {}
+    classif_dict_list = []
 
-    interval_W = interval_chrom.get("W")
+    interval_W = interval_chrom["W"][:]
     if interval_W == []:
-        classif_dict["Left_term"] = []
-        classif_dict["Left_intern"] = []
+        classif_dict_list.append(
+            {"start": None, "end": None, "side": "Left", "type": "term"}
+        )
+        classif_dict_list.append(
+            {"start": None, "end": None, "side": "Left", "type": "intern"}
+        )
     elif min(interval_W)[0] == 0:
-        # classif_dict["start_Left_term"] = 0
-        # classif_dict["end_Left_term"] = min(interval_W)[1]
-        classif_dict["Left_term"] = min(interval_W)
+        classif_dict_list.append(
+            {
+                "start": 0 + 1,
+                "end": min(interval_W)[1] + 1 + (19 - 1),
+                "side": "Left",
+                "type": "term",
+            }
+        )
         interval_W.remove(min(interval_W))
-        classif_dict["Left_intern"] = interval_W
+        for interval in interval_W:
+            classif_dict_list.append(
+                {
+                    "start": interval[0] + 1,
+                    "end": interval[1] + 1 + (19 - 1),
+                    "side": "Left",
+                    "type": "intern",
+                }
+            )
     else:
-        classif_dict["Left_intern"] = interval_W
+        for interval in interval_W:
+            classif_dict_list.append(
+                {
+                    "start": interval[0] + 1,
+                    "end": interval[1] + 1 + (19 - 1),
+                    "side": "Left",
+                    "type": "intern",
+                }
+            )
 
-    interval_C = interval_chrom.get("C")
+    interval_C = interval_chrom["C"][:]
     if interval_C == []:
-        classif_dict["Right_term"] = []
-        classif_dict["Right_intern"] = []
+        classif_dict_list.append(
+            {"start": None, "end": None, "side": "Right", "type": "term"}
+        )
+        classif_dict_list.append(
+            {"start": None, "end": None, "side": "Right", "type": "intern"}
+        )
     elif max(interval_C)[1] == max(df_chrom.reset_index().level_2):
-        classif_dict["Right_term"] = max(interval_C)
+        classif_dict_list.append(
+            {
+                "start": max(interval_C)[0] + 1,
+                "end": max(interval_C)[1] + 1 + (19 - 1),
+                "side": "Right",
+                "type": "term",
+            }
+        )
         interval_C.remove(max(interval_C))
-        classif_dict["Right_intern"] = interval_C
-    else:
-        classif_dict["Right_intern"] = interval_chrom
+        for interval in interval_C:
+            classif_dict_list.append(
+                {
+                    "start": interval[0] + 1,
+                    "end": interval[1] + 1 + (19 - 1),
+                    "side": "Right",
+                    "type": "intern",
+                }
+            )
 
-    return classif_dict
+    else:
+        for interval in interval_C:
+            classif_dict_list.append(
+                {
+                    "start": interval[0] + 1,
+                    "end": interval[1] + 1 + (19 - 1),
+                    "side": "Right",
+                    "type": "intern",
+                }
+            )
+
+    return classif_dict_list
 
 
 def plot_telom(telom_df):
@@ -418,8 +465,7 @@ def run_on_single_fasta(fasta_path, polynuc_thres, entropy_thres):
     strain = get_strain_name(fasta_path)
 
     df_list = []
-
-    dico_telo = {}
+    telo_df_list = []
 
     for seq_record in SeqIO.parse(fasta_path, "fasta"):
         seqW = str(seq_record.seq)
@@ -433,27 +479,25 @@ def run_on_single_fasta(fasta_path, polynuc_thres, entropy_thres):
         seq_dict_C = {}
 
         for i, window in sliding_window(seqW, 0, limit_seq, 20):
-            seq_dict_W[(strain, seq_record.name, i, "W")] = compute_metrics(
-                window
-            )
+            seq_dict_W[(strain, seq_record.name, i, "W")] = compute_metrics(window)
 
         df_W = pd.DataFrame(seq_dict_W).transpose()
 
         for i, window in sliding_window(seqC, 0, limit_seq, 20):
             seq_dict_C[
-                (strain, seq_record.name, (len(seqC) - i), "C")
+                (strain, seq_record.name, (len(seqC) - i - 1), "C")
             ] = compute_metrics(window)
 
         df_C = pd.DataFrame(seq_dict_C).transpose()
 
         ## NOT USED ANYMORE######
-        df_W["entropy_med"] = df_W.rolling(100, min_periods=1).entropy.median()
-        df_W["polynuc_med"] = df_W.rolling(100, min_periods=1).polynuc.median()
-        ##################
+        # df_W["entropy_med"] = df_W.rolling(100, min_periods=1).entropy.median()
+        # df_W["polynuc_med"] = df_W.rolling(100, min_periods=1).polynuc.median()
+        # ##################
 
-        ## NOT USED ANYMORE######
-        df_C["entropy_med"] = df_C.rolling(100, min_periods=1).entropy.median()
-        df_C["polynuc_med"] = df_C.rolling(100, min_periods=1).polynuc.median()
+        # ## NOT USED ANYMORE######
+        # df_C["entropy_med"] = df_C.rolling(100, min_periods=1).entropy.median()
+        # df_C["polynuc_med"] = df_C.rolling(100, min_periods=1).polynuc.median()
         ##################
 
         left_offset, left_tel = get_telom_size(seq_record.seq)
@@ -471,22 +515,26 @@ def run_on_single_fasta(fasta_path, polynuc_thres, entropy_thres):
         df_chro = pd.concat([df_W, df_C])
 
         df_chro.loc[
-            (df_chro["entropy"] < entropy_thres)
-            & (df_chro["polynuc"] > polynuc_thres),
+            (df_chro["entropy"] < entropy_thres) & (df_chro["polynuc"] > polynuc_thres),
             "predict_telom",
         ] = 1.0
 
         df_chro["predict_telom"].fillna(0, inplace=True)
 
-        dico_telo[(strain, seq_record.name)] = classify_telomere(
-            df_chro, get_consecutive_groups(df_chro)
-        )
+        telo_groups = get_consecutive_groups(df_chro)
+        telo_list = classify_telomere(df_chro, telo_groups)
+        telo_df = pd.DataFrame(telo_list)
+        telo_df["strain"] = strain
+        telo_df["chrom"] = seq_record.name
+        telo_df = telo_df[["strain", "chrom", "side", "type", "start", "end"]]
 
         df_list.append(df_chro)
+        telo_df_list.append(telo_df)
 
     df = pd.concat(df_list)
+    telo_df = pd.concat(telo_df_list)
 
-    return df
+    return df, telo_df
 
 
 def run_on_fasta_dir(fasta_dir_path, polynuc_thres, entropy_thres):
@@ -496,9 +544,7 @@ def run_on_fasta_dir(fasta_dir_path, polynuc_thres, entropy_thres):
     for ext in ["*.fasta", "*.fas", "*.fa"]:
         for fasta in fasta_dir_path.glob(ext):
 
-            telom_dfs.append(
-                run_on_single_fasta(fasta, polynuc_thres, entropy_thres)
-            )
+            telom_dfs.append(run_on_single_fasta(fasta, polynuc_thres, entropy_thres))
 
     total_telom_df = pd.concat(telom_dfs)
 
@@ -525,6 +571,4 @@ def run_telofinder(fasta_path, polynuc_thres, entropy_thres):
 if __name__ == "__main__":
     args = parse_arguments()
     output_exists(args.force)
-    run_telofinder(
-        args.fasta_path, args.polynuc_threshold, args.entropy_threshold
-    )
+    run_telofinder(args.fasta_path, args.polynuc_threshold, args.entropy_threshold)

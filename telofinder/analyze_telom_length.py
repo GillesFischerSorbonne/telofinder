@@ -377,7 +377,7 @@ def export_results(
     """ Produce output table files 
     """
     outdir = Path(outdir)
-    outdir.mkdir()
+    outdir.mkdir(exist_ok=True)
     raw_df.to_csv(outdir / raw_outfile)
     telom_df.to_csv(outdir / telom_outfile)
 

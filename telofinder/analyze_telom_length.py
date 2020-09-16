@@ -378,7 +378,7 @@ def classify_telomere(df_chrom, interval_chrom):
         classif_dict_list.append(
             {
                 "start": 0 + 1,
-                "end": min(interval_W)[1] + 1 + (19 - 1),
+                "end": min(interval_W)[1] + 1 + 19,
                 "side": "Left",
                 "type": "term",
             }
@@ -388,7 +388,7 @@ def classify_telomere(df_chrom, interval_chrom):
             classif_dict_list.append(
                 {
                     "start": interval[0] + 1,
-                    "end": interval[1] + 1 + (19 - 1),
+                    "end": interval[1] + 1 + 19,
                     "side": "Left",
                     "type": "intern",
                 }
@@ -398,7 +398,7 @@ def classify_telomere(df_chrom, interval_chrom):
             classif_dict_list.append(
                 {
                     "start": interval[0] + 1,
-                    "end": interval[1] + 1 + (19 - 1),
+                    "end": interval[1] + 1 + 19,
                     "side": "Left",
                     "type": "intern",
                 }
@@ -416,7 +416,7 @@ def classify_telomere(df_chrom, interval_chrom):
         classif_dict_list.append(
             {
                 "start": max(interval_C)[0] + 1,
-                "end": max(interval_C)[1] + 1 + (19 - 1),
+                "end": max(interval_C)[1] + 1 + 19,
                 "side": "Right",
                 "type": "term",
             }
@@ -426,7 +426,7 @@ def classify_telomere(df_chrom, interval_chrom):
             classif_dict_list.append(
                 {
                     "start": interval[0] + 1,
-                    "end": interval[1] + 1 + (19 - 1),
+                    "end": interval[1] + 1 + 19,
                     "side": "Right",
                     "type": "intern",
                 }
@@ -437,7 +437,7 @@ def classify_telomere(df_chrom, interval_chrom):
             classif_dict_list.append(
                 {
                     "start": interval[0] + 1,
-                    "end": interval[1] + 1 + (19 - 1),
+                    "end": interval[1] + 1 + 19,
                     "side": "Right",
                     "type": "intern",
                 }
@@ -533,22 +533,29 @@ def run_on_single_fasta(fasta_path, polynuc_thres, entropy_thres):
 
     df = pd.concat(df_list)
     telo_df = pd.concat(telo_df_list)
+    telo_df["len"] = telo_df["end"] - telo_df["start"] + 1
+
+    telo_df = telo_df.astype({"start": "Int64", "end": "Int64", "len": "Int64"})
 
     return df, telo_df
 
 
 def run_on_fasta_dir(fasta_dir_path, polynuc_thres, entropy_thres):
     """Run iteratively the telemore detection algorithm on all fasta files in a directory"""
+    raw_dfs = []
     telom_dfs = []
 
     for ext in ["*.fasta", "*.fas", "*.fa"]:
         for fasta in fasta_dir_path.glob(ext):
 
-            telom_dfs.append(run_on_single_fasta(fasta, polynuc_thres, entropy_thres))
+            raw_df, telom_df = run_on_single_fasta(fasta, polynuc_thres, entropy_thres)
+            raw_dfs.append(raw_df)
+            telom_dfs.append(telom_df)
 
+    total_raw_df = pd.concat(raw_dfs)
     total_telom_df = pd.concat(telom_dfs)
 
-    return total_telom_df
+    return total_raw_df, total_telom_df
 
 
 def run_telofinder(fasta_path, polynuc_thres, entropy_thres):

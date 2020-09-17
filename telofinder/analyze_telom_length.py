@@ -8,27 +8,26 @@ import numpy as np
 from collections import Counter
 
 
-def output_exists(force):
-    """Function to test if the output file already exists, force overwriting the output file or
-    exit program.
+def output_dir_exists(force):
+    """Function to test if the output diretory already exists, force overwriting the output directory
+    or exit program.
     """
-    file_exists = os.path.isfile("telom_length.csv")
-    if file_exists:
+    dir_exists = os.path.isdir("telofinder_results")
+    if dir_exists:
         if force:
-            print("Replacing the existing file.")
+            print("Replacing the existing 'telofinder_results' directory.")
         else:
             sys.exit(
                 print(
                     "\n",
-                    "Warning!!! A file called 'telom_length.csv' already exists.",
+                    "Warning!!! A directory called 'telofinder_results' already exists.",
                     "\n",
-                    "delete this file before running the script or use the option --force",
+                    "delete this directory before running the script or use the option --force",
                     "\n",
                 )
             )
 
 
-# TODO: Add a parameter for output file name
 def parse_arguments():
     """Function to parse and reuse the arguments of the command line"""
     parser = argparse.ArgumentParser(
@@ -262,7 +261,9 @@ def get_consecutive_groups(df_chrom):
     df = df_chrom.reset_index()
     chrom_groups = {}
     for strand in ["W", "C"]:
-        nums = list(df.query("(level_3==@strand) and (predict_telom==1)").level_2)
+        nums = list(
+            df.query("(level_3==@strand) and (predict_telom==1)").level_2
+        )
         nums = sorted(set(nums))
         gaps = [[s, e] for s, e in zip(nums, nums[1:]) if s + 1 < e]
         edges = iter(nums[:1] + sum(gaps, []) + nums[-1:])
@@ -393,7 +394,9 @@ def export_results(
     bed_df.to_csv(outdir / bed_outfile, sep="\t", header=None, index=False)
 
 
-def run_on_single_fasta(fasta_path, polynuc_thres, entropy_thres, nb_scanned_nt):
+def run_on_single_fasta(
+    fasta_path, polynuc_thres, entropy_thres, nb_scanned_nt
+):
     """Run the telomere detection algorithm on a single fasta file"""
     strain = get_strain_name(fasta_path)
     print("\n", "-------------------------------", "\n")
@@ -416,7 +419,9 @@ def run_on_single_fasta(fasta_path, polynuc_thres, entropy_thres, nb_scanned_nt)
         seq_dict_C = {}
 
         for i, window in sliding_window(seqW, 0, limit_seq, 20):
-            seq_dict_W[(strain, seq_record.name, i, "W")] = compute_metrics(window)
+            seq_dict_W[(strain, seq_record.name, i, "W")] = compute_metrics(
+                window
+            )
 
         df_W = pd.DataFrame(seq_dict_W).transpose()
 
@@ -440,7 +445,8 @@ def run_on_single_fasta(fasta_path, polynuc_thres, entropy_thres, nb_scanned_nt)
         df_chro = pd.concat([df_W, df_C])
 
         df_chro.loc[
-            (df_chro["entropy"] < entropy_thres) & (df_chro["polynuc"] > polynuc_thres),
+            (df_chro["entropy"] < entropy_thres)
+            & (df_chro["polynuc"] > polynuc_thres),
             "predict_telom",
         ] = 1.0
 
@@ -467,7 +473,9 @@ def run_on_single_fasta(fasta_path, polynuc_thres, entropy_thres, nb_scanned_nt)
     return df, telo_df
 
 
-def run_on_fasta_dir(fasta_dir_path, polynuc_thres, entropy_thres, nb_scanned_nt):
+def run_on_fasta_dir(
+    fasta_dir_path, polynuc_thres, entropy_thres, nb_scanned_nt
+):
     """Run iteratively the telemore detection algorithm on all fasta files in a directory"""
     raw_dfs = []
     telom_dfs = []
@@ -516,7 +524,7 @@ def run_telofinder(fasta_path, polynuc_thres, entropy_thres, nb_scanned_nt):
 # Main program
 if __name__ == "__main__":
     args = parse_arguments()
-    output_exists(args.force)
+    output_dir_exists(args.force)
     run_telofinder(
         args.fasta_path,
         args.polynuc_threshold,

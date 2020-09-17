@@ -6,6 +6,7 @@ from pathlib import Path
 import pandas as pd
 import numpy as np
 from collections import Counter
+import pybedtools
 
 
 def output_dir_exists(force):
@@ -48,14 +49,14 @@ def parse_arguments():
     parser.add_argument(
         "-e",
         "--entropy_threshold",
-        default=1.1,
+        default=0.8,
         type=float,
         help="Entropy threshold for telomere prediction.",
     )
     parser.add_argument(
         "-n",
         "--polynuc_threshold",
-        default=0.7,
+        default=0.8,
         type=float,
         help="Poly-nucleotide threshold for telomere prediction.",
     )
@@ -380,18 +381,24 @@ def export_results(
     raw_outfile="raw_df.csv",
     telom_outfile="telom_df.csv",
     bed_outfile="telom.bed",
+    bed_merged_outfile="telom_merged.bed",
     outdir="telofinder_results",
 ):
     """ Produce output table files 
     """
     outdir = Path(outdir)
-    outdir.mkdir(exist_ok=True)
+    outdir.mkdir()
     raw_df.to_csv(outdir / raw_outfile, index=False)
     telom_df.to_csv(outdir / telom_outfile, index=False)
 
     bed_df = telom_df[["chrom", "start", "end", "type"]].copy()
     bed_df.dropna(inplace=True)
     bed_df.to_csv(outdir / bed_outfile, sep="\t", header=None, index=False)
+
+    bed_file = pybedtools.BedTool(outdir / bed_outfile)
+    sorted_bed = bed_file.sort()
+    merged_bed = sorted_bed.merge()
+    merged_bed.saveas(outdir / bed_merged_outfile)
 
 
 def run_on_single_fasta(

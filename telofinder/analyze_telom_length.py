@@ -378,10 +378,12 @@ def plot_telom(telom_df):
 def export_results(
     raw_df,
     telom_df,
+    merged_telom_df,
     raw_outfile="raw_df.csv",
     telom_outfile="telom_df.csv",
+    merged_telom_outfile="merged_telom_df.csv",
     bed_outfile="telom.bed",
-    bed_merged_outfile="telom_merged.bed",
+    merged_bed_outfile="telom_merged.bed",
     outdir="telofinder_results",
 ):
     """ Produce output table files 
@@ -390,15 +392,23 @@ def export_results(
     outdir.mkdir()
     raw_df.to_csv(outdir / raw_outfile, index=False)
     telom_df.to_csv(outdir / telom_outfile, index=False)
+    merged_telom_df.to_csv(outdir / merged_telom_outfile, index=False)
 
     bed_df = telom_df[["chrom", "start", "end", "type"]].copy()
     bed_df.dropna(inplace=True)
     bed_df.to_csv(outdir / bed_outfile, sep="\t", header=None, index=False)
 
-    bed_file = pybedtools.BedTool(outdir / bed_outfile)
-    sorted_bed = bed_file.sort()
-    merged_bed = sorted_bed.merge()
-    merged_bed.saveas(outdir / bed_merged_outfile)
+    merged_bed_df = merged_telom_df[["chrom", "start", "end", "type"]].copy()
+    merged_bed_df.dropna(inplace=True)
+    merged_bed_df.to_csv(
+        outdir / merged_bed_outfile, sep="\t", header=None, index=False
+    )
+
+    # bed_file = pybedtools.BedTool(outdir / bed_outfile)
+    # sorted_bed = bed_file.sort()
+    # merged_bed = sorted_bed.merge()
+    # merged_bed.saveas(outdir / merged_bed_outfile)
+    # merged_bed.to_dataframe()
 
 
 def run_on_single_fasta(
@@ -411,6 +421,7 @@ def run_on_single_fasta(
 
     df_list = []
     telo_df_list = []
+    telo_df_merged_list = []
 
     for seq_record in SeqIO.parse(fasta_path, "fasta"):
         seqW = str(seq_record.seq)
@@ -462,8 +473,30 @@ def run_on_single_fasta(
         telo_groups = get_consecutive_groups(df_chro)
         telo_list = classify_telomere(telo_groups, len(seq_record.seq))
         telo_df = pd.DataFrame(telo_list)
-        telo_df["strain"] = strain
         telo_df["chrom"] = seq_record.name
+
+        # test merge overlap
+        bed_df = telo_df[["chrom", "start", "end", "type"]].copy()
+        bed_df.dropna(inplace=True)
+        bed_df.to_csv("file", sep="\t", header=None, index=False)
+        bed_file = pybedtools.BedTool("file")
+        bed_sort = bed_file.sort()
+        bed_merge = bed_sort.merge()
+        bed_df_merged = bed_merge.to_dataframe()
+        telo_df_merged = pd.merge(
+            bed_df_merged,
+            telo_df.dropna()[["chrom", "side", "type", "start"]],
+            on=["chrom", "start"],
+            how="left",
+        )
+        telo_df_merged["strain"] = strain
+        telo_df_merged = telo_df_merged[
+            ["strain", "chrom", "side", "type", "start", "end"]
+        ]
+        telo_df_merged_list.append(telo_df_merged)
+
+        # suite du code
+        telo_df["strain"] = strain
         telo_df = telo_df[["strain", "chrom", "side", "type", "start", "end"]]
 
         df_list.append(df_chro)
@@ -474,10 +507,16 @@ def run_on_single_fasta(
     df = pd.concat(df_list)
     telo_df = pd.concat(telo_df_list)
     telo_df["len"] = telo_df["end"] - telo_df["start"] + 1
-
     telo_df = telo_df.astype({"start": "Int64", "end": "Int64", "len": "Int64"})
 
-    return df, telo_df
+    # test merge overlap
+    telo_df_merged = pd.concat(telo_df_merged_list)
+    telo_df_merged["len"] = telo_df_merged["end"] - telo_df_merged["start"] + 1
+    telo_df_merged = telo_df_merged.astype(
+        {"start": "Int64", "end": "Int64", "len": "Int64"}
+    )
+
+    return df, telo_df, telo_df_merged
 
 
 def run_on_fasta_dir(
@@ -486,20 +525,26 @@ def run_on_fasta_dir(
     """Run iteratively the telemore detection algorithm on all fasta files in a directory"""
     raw_dfs = []
     telom_dfs = []
+    # test merge overlap
+    merged_telom_dfs = []
 
     for ext in ["*.fasta", "*.fas", "*.fa"]:
         for fasta in fasta_dir_path.glob(ext):
 
-            raw_df, telom_df = run_on_single_fasta(
+            raw_df, telom_df, merged_telom_dfs = run_on_single_fasta(
                 fasta, polynuc_thres, entropy_thres, nb_scanned_nt
             )
             raw_dfs.append(raw_df)
             telom_dfs.append(telom_df)
+            # test merge overlap
+            merged_telom_dfs.append(merged_telom_df)
 
     total_raw_df = pd.concat(raw_dfs)
     total_telom_df = pd.concat(telom_dfs)
+    # test merge overlap
+    total_merged_telom_df = pd.concat(merged_telom_dfs)
 
-    return total_raw_df, total_telom_df
+    return total_raw_df, total_telom_df, total_merged_telom_df
 
 
 def run_telofinder(fasta_path, polynuc_thres, entropy_thres, nb_scanned_nt):
@@ -513,8 +558,8 @@ def run_telofinder(fasta_path, polynuc_thres, entropy_thres, nb_scanned_nt):
         raw_df, telom_df = run_on_fasta_dir(
             fasta_path, polynuc_thres, entropy_thres, nb_scanned_nt
         )
-        export_results(raw_df, telom_df)
-        return raw_df, telom_df
+        export_results(raw_df, telom_df, merged_telom_df)
+        return raw_df, telom_df, merged_telom_df
 
     elif fasta_path.is_file():
         print(f"Running in single fasta mode on '{fasta_path}'")
@@ -522,8 +567,8 @@ def run_telofinder(fasta_path, polynuc_thres, entropy_thres, nb_scanned_nt):
         raw_df, telom_df = run_on_single_fasta(
             fasta_path, polynuc_thres, entropy_thres, nb_scanned_nt
         )
-        export_results(raw_df, telom_df)
-        return raw_df, telom_df
+        export_results(raw_df, telom_df, merged_telom_df)
+        return raw_df, telom_df, merged_telom_df
     else:
         raise IOError(f"'{fasta_path}' is not a directory or a file.")
 

@@ -485,6 +485,8 @@ def run_on_single_fasta(
                 on=["chrom", "start"],
                 how="left",
             )
+            telo_df_merged.loc[telo_df_merged.end == len(seq_record.seq), 'type'] = "term"
+            
 
         telo_df_merged["strain"] = strain
         telo_df_merged = telo_df_merged[
@@ -510,6 +512,7 @@ def run_on_single_fasta(
     telo_df_merged = telo_df_merged.astype(
         {"start": "Int64", "end": "Int64", "len": "Int64"}
     )
+
 
     return df, telo_df, telo_df_merged
 

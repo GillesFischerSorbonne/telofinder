@@ -63,6 +63,16 @@ if time:
 - Signal integration (reducing noise in sequence coverage for CNV detection ?)
 - Which rolling median to choose
 
+## Documentation
+
+How to deal with RST: https://thomas-cokelaer.info/tutorials/sphinx/rest_syntax.html
+
+- link with https://readthedocs.org/
+
+
+## Tests
+
+- link with https://travis-ci.org/
 
 ## References
 
@@ -85,4 +95,5 @@ https://www.jetbrains.com/pycharm/
 ### Formating
 
 https://github.com/jgirardet/sublack
+
 

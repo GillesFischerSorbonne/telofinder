@@ -501,8 +501,11 @@ def run_on_single_fasta(fasta_path, polynuc_thres, entropy_thres, nb_scanned_nt)
     telo_df_merged = pd.concat(telo_df_merged_list)
     telo_df_merged["len"] = telo_df_merged["end"] - telo_df_merged["start"] + 1
     telo_df_merged = telo_df_merged.astype(
-        {"start": "Int64", "end": "Int64", "len": "Int64"}
+        {"start": "Int64", "end": "Int64", "len": "Int64", "chrom_size": "Int64"}
     )
+    telo_df_merged = telo_df_merged[
+        ["strain", "chrom", "side", "type", "start", "end", "len", "chrom_size"]
+    ]
 
     return df, telo_df, telo_df_merged
 

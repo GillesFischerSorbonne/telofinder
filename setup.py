@@ -19,10 +19,10 @@ metainfo = {
     "maintainer": {"main": ("XX", "XX")},
     "version": version,
     "license": "new BSD",
-    "download_url": "https://github.com/GillesFischerSorbonne/dubii_project".format(
+    "download_url": "https://github.com/GillesFischerSorbonne/telofinder".format(
         version
     ),
-    "url": "http://github.com/GillesFisherSoronne/dubii_project",
+    "url": "http://github.com/GillesFisherSoronne/telofinder",
     "description": "A library for telomere prediction.",
     "platforms": ["Linux", "Unix"],
     "keywords": ["NGS", "telomers"],

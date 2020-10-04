@@ -262,9 +262,7 @@ def get_consecutive_groups(df_chrom):
     df = df_chrom.reset_index()
     chrom_groups = {}
     for strand in ["W", "C"]:
-        nums = list(
-            df.query("(level_3==@strand) and (predict_telom==1)").level_2
-        )
+        nums = list(df.query("(level_3==@strand) and (predict_telom==1)").level_2)
         nums = sorted(set(nums))
         gaps = [[s, e] for s, e in zip(nums, nums[1:]) if s + 1 < e]
         edges = iter(nums[:1] + sum(gaps, []) + nums[-1:])
@@ -400,14 +398,10 @@ def export_results(
 
     merged_bed_df = merged_telom_df[["chrom", "start", "end", "type"]].copy()
     merged_bed_df.dropna(inplace=True)
-    merged_bed_df.to_csv(
-        outdir / merged_bed_outfile, sep="\t", header=None, index=False
-    )
+    merged_bed_df.to_csv(outdir / merged_bed_outfile, sep="\t", header=None, index=False)
 
 
-def run_on_single_fasta(
-    fasta_path, polynuc_thres, entropy_thres, nb_scanned_nt
-):
+def run_on_single_fasta(fasta_path, polynuc_thres, entropy_thres, nb_scanned_nt):
     """Run the telomere detection algorithm on a single fasta file"""
     strain = get_strain_name(fasta_path)
     print("\n", "-------------------------------", "\n")
@@ -431,9 +425,7 @@ def run_on_single_fasta(
         seq_dict_C = {}
 
         for i, window in sliding_window(seqW, 0, limit_seq, 20):
-            seq_dict_W[(strain, seq_record.name, i, "W")] = compute_metrics(
-                window
-            )
+            seq_dict_W[(strain, seq_record.name, i, "W")] = compute_metrics(window)
 
         df_W = pd.DataFrame(seq_dict_W).transpose()
 
@@ -457,8 +449,7 @@ def run_on_single_fasta(
         df_chro = pd.concat([df_W, df_C])
 
         df_chro.loc[
-            (df_chro["entropy"] < entropy_thres)
-            & (df_chro["polynuc"] > polynuc_thres),
+            (df_chro["entropy"] < entropy_thres) & (df_chro["polynuc"] > polynuc_thres),
             "predict_telom",
         ] = 1.0
 
@@ -468,6 +459,7 @@ def run_on_single_fasta(
         telo_list = classify_telomere(telo_groups, len(seq_record.seq))
         telo_df = pd.DataFrame(telo_list)
         telo_df["chrom"] = seq_record.name
+        telo_df["chrom_size"] = len(seq_record.seq)
 
         if telo_df["start"].isnull().sum() == 4:
             telo_df_merged = telo_df.copy()
@@ -481,16 +473,15 @@ def run_on_single_fasta(
             bed_df_merged = bed_merge.to_dataframe()
             telo_df_merged = pd.merge(
                 bed_df_merged,
-                telo_df.dropna()[["chrom", "side", "type", "start"]],
+                telo_df.dropna()[["chrom", "side", "type", "start", "chrom_size"]],
                 on=["chrom", "start"],
                 how="left",
             )
-            
-            
+            telo_df_merged.loc[telo_df_merged.end == len(seq_record.seq), "type"] = "term"
 
         telo_df_merged["strain"] = strain
         telo_df_merged = telo_df_merged[
-            ["strain", "chrom", "side", "type", "start", "end"]
+            ["strain", "chrom", "side", "type", "start", "end", "chrom_size"]
         ]
         telo_df_merged_list.append(telo_df_merged)
 
@@ -513,13 +504,10 @@ def run_on_single_fasta(
         {"start": "Int64", "end": "Int64", "len": "Int64"}
     )
 
-
     return df, telo_df, telo_df_merged
 
 
-def run_on_fasta_dir(
-    fasta_dir_path, polynuc_thres, entropy_thres, nb_scanned_nt
-):
+def run_on_fasta_dir(fasta_dir_path, polynuc_thres, entropy_thres, nb_scanned_nt):
     """Run iteratively the telemore detection algorithm on all fasta files in a directory"""
     raw_dfs = []
     telom_dfs = []

@@ -469,7 +469,7 @@ def run_on_single_fasta(fasta_path, polynuc_thres, entropy_thres, nb_scanned_nt)
             bed_df = bed_df.astype({"start": int, "end": int})
             bed_file = pybedtools.BedTool().from_dataframe(bed_df)
             bed_sort = bed_file.sort()
-            bed_merge = bed_sort.merge()
+            bed_merge = bed_sort.merge(d=20)
             bed_df_merged = bed_merge.to_dataframe()
             telo_df_merged = pd.merge(
                 bed_df_merged,
@@ -477,7 +477,10 @@ def run_on_single_fasta(fasta_path, polynuc_thres, entropy_thres, nb_scanned_nt)
                 on=["chrom", "start"],
                 how="left",
             )
-            telo_df_merged.loc[telo_df_merged.end == len(seq_record.seq), "type"] = "term"
+            telo_df_merged.loc[
+                telo_df_merged.end > len(seq_record.seq) - 20, "type"
+            ] = "term"
+            telo_df_merged.loc[telo_df_merged.start < 20, "type"] = "term"
 
         telo_df_merged["strain"] = strain
         telo_df_merged = telo_df_merged[

@@ -402,7 +402,11 @@ def export_results(
 
 
 def run_on_single_fasta(fasta_path, polynuc_thres, entropy_thres, nb_scanned_nt):
-    """Run the telomere detection algorithm on a single fasta file"""
+    """Run the telomere detection algorithm on a single fasta file
+
+    :param fasta_path: path to fasta file
+    :return: a tuple of df, telo_df and telo_df_merged
+    """
     strain = get_strain_name(fasta_path)
     print("\n", "-------------------------------", "\n")
     print(f"file {strain} executed")

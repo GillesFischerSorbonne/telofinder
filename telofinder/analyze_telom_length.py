@@ -10,8 +10,10 @@ import pybedtools
 
 
 def output_dir_exists(force):
-    """Function to test if the output diretory already exists, force overwriting the output directory
-    or exit program.
+    """Function to test if the 'telofinder_results' output diretory already exists.
+
+    :param force: overwrites the output directory otherwise exits program --force or -f
+    :return: nothing
     """
     dir_exists = os.path.isdir("telofinder_results")
     if dir_exists:
@@ -30,11 +32,20 @@ def output_dir_exists(force):
 
 
 def parse_arguments():
-    """Function to parse and reuse the arguments of the command line"""
+    """Function to parse and reuse the arguments of the command line
+
+    :param fasta_path: path to a single fasta file or to a directory containing multiple fasta files
+    :param force: force optional, overwrites the output directory otherwise exits program, optional
+    :param entropy_threshold: optional, default = 0.8 
+    :param polynuc_threshold: optional, default = 0.8
+    :param nb_scanned_nt: number of scanned nucleotides at each chromosome end, optional, default = 20 000
+    :return: parser arguments
+    """
     parser = argparse.ArgumentParser(
         description="This program determines the location and the size of telomeric repeats\
-        from genome assemblies. It runs both on single and multiple (multi)fasta file(s)\
-        and outputs a csv file called 'telom_length.csv'"
+        from genome assemblies. It runs both on single and multiple (multi)fasta file(s).\
+        It outputs 3 csv and 2 bed files containing the telomere calls and their coordinates\
+        either as raw output or after merging consecutive calls"
     )
     parser.add_argument(
         "fasta_path",
@@ -73,13 +84,24 @@ def parse_arguments():
 
 
 def get_strain_name(filename):
-    """Function to get the strain name from the path to the fasta file"""
+    """Function to get the strain name from the name of the fasta file
+
+    :param filename: path of fasta file
+    :return: sequence name
+    """
     filepath = Path(filename)
     return filepath.stem
 
 
 def sliding_window(sequence, start, end, size):
-    """Apply a sliding window of length = size to a sequence from start to end"""
+    """Apply a sliding window of length = size to a sequence from start to end
+
+    :param sequence: fasta sequence
+    :param start: starting coordinate of the sequence
+    :param end: ending coordinate of the sequence
+    :param size: size of the sliding window
+    :return: the coordinate and the sequence of the window
+    """
     if size > len(sequence):
         sys.exit("The window size must be smaller than the sequence")
     for i in range(start, end - (size - 1)):
@@ -88,72 +110,49 @@ def sliding_window(sequence, start, end, size):
 
 
 def base_compos(sequence, base):
-    """Return the number of base in the sequence"""
+    """Counts the number of a given base in a sequence
+
+    :param sequence: fasta sequence
+    :param base: base to count in the sequence
+    :return: the number of that base in the sequence
+    """
     count = Counter(sequence)[base]
     return count
 
 
-def count_polynuc_occurence(window, polynucleotide_list):
-    """Get polynucleotide proportion along the sliding window. 
-    All polynucleotide should be of the same size.
+def count_polynuc_occurence(sub_window, polynucleotide_list):
+    """Define presence of polynucleotide in the window.
+
+    :param sub_window: the sequence of a sub_window
+    :param polynuleotide_list: a list of polynucleotides. Note that all polynucleotides must be of the same size
+    :return: a boolean for the presence of the sub_window in the polynucleotide list
     """
-    if window in polynucleotide_list:
+    if sub_window in polynucleotide_list:
         return 1
     else:
         return 0
 
 
-def get_polynuc(window, dinuc_list):
+def get_polynuc(window, polynucleotide_list):
+    """ get the propbortion of polynuceotides in the window
+
+    :param window: sliding window
+    :param polynucleotide_list: a list of polynucleotides. Note that all polynucleotides must be of the same size
+    :return: total polynucleotide proportion in the sliding window
+    """
     sum_dinuc = 0
     for _, sub_window in sliding_window(window, 0, len(window), 2):
-        sum_dinuc += count_polynuc_occurence(sub_window, dinuc_list)
+        sum_dinuc += count_polynuc_occurence(sub_window, polynucleotide_list)
     freq_dinuc = sum_dinuc / (len(window) - 1)
     return freq_dinuc
 
 
-def get_skewness(window):
-    """Get AT, GC skewness from a sequence"""
-
-    if base_compos(window, "A") + base_compos(window, "T") == 0:
-        at_skew = None
-    else:
-        at_skew = (base_compos(window, "A") - base_compos(window, "T")) / (
-            base_compos(window, "A") + base_compos(window, "T")
-        )
-
-    if base_compos(window, "G") + base_compos(window, "C") == 0:
-        gc_skew = None
-    else:
-        gc_skew = (base_compos(window, "G") - base_compos(window, "C")) / (
-            base_compos(window, "G") + base_compos(window, "C")
-        )
-
-    if at_skew is None or gc_skew is None:
-        skewness = None
-    else:
-        skewness = (
-            (base_compos(window, "A") - base_compos(window, "T"))
-            - (base_compos(window, "G") - base_compos(window, "C"))
-        ) / len(window)
-
-    return skewness
-
-
-def get_cg_skew(window):
-    """Get CG skewn from a sequence"""
-
-    if base_compos(window, "G") + base_compos(window, "C") == 0:
-        cg_skew = None
-    else:
-        cg_skew = (base_compos(window, "C") - base_compos(window, "G")) / (
-            base_compos(window, "G") + base_compos(window, "C")
-        )
-
-    return cg_skew
-
-
 def get_entropy(window):
-    """Calculate frequency (probability) of nt in window"""
+    """Calculate the entropy of the window DNA sequence
+
+    :param window: sliding window
+    :return: entropy value of the sequence window
+    """
     entropy = 0
 
     for base in ["A", "T", "G", "C"]:
@@ -168,83 +167,19 @@ def get_entropy(window):
     return entropy
 
 
-def get_norm_freq_base(window):
-    """Calculate the difference between observed and expected base composition of the window"""
+def compute_metrics(window, polynucleotide_list=["AC", "CA", "CC"]):
+    """Compute entropy and polynucleotide proportion in the sequence window
 
-    fexp_A_T = 0.617
-    fexp_G_C = 0.383
-
-    skew_norm = (
-        (fexp_A_T - (base_compos(window, "A") / len(window))) ** 2
-        - (fexp_A_T - (base_compos(window, "T") / len(window))) ** 2
-        - (fexp_G_C - (base_compos(window, "G") / len(window))) ** 2
-        + (fexp_G_C - (base_compos(window, "C") / len(window))) ** 2
-    )
-
-    return skew_norm
-
-
-def get_add_freq_diff(window):
-    """Calculate the difference between observed and expected base composition of the window"""
-
-    fexp_A_T = 0.617
-    fexp_G_C = 0.383
-
-    max_diff = (
-        (fexp_A_T - (base_compos(window, "A") / len(window))) ** 2
-        + (fexp_A_T - (base_compos(window, "T") / len(window))) ** 2
-        + (fexp_G_C - (base_compos(window, "G") / len(window))) ** 2
-        - (fexp_G_C - (base_compos(window, "C") / len(window))) ** 2
-    )
-
-    return max_diff
-
-
-def get_freq_norm_C(window):
-    """Calculate the difference between observed and expected frequence of C in the window"""
-
-    fexp_G_C = 0.383
-
-    freq_norm_C = fexp_G_C - (base_compos(window, "C") / len(window))
-
-    return freq_norm_C
-
-
-def get_freq_norm_T(window):
-    """Calculate the difference between observed and expected frequence of T in the window"""
-
-    fexp_A_T = 0.617
-
-    freq_norm_T = fexp_A_T - (base_compos(window, "T") / len(window))
-
-    return freq_norm_T
-
-
-def get_chi2(window):
-    """Calculate the difference between observed and expected base composition of the window"""
-
-    fexp_A_T = 0.617
-    fexp_G_C = 0.383
-
-    sum_freq = 0
-
-    for base in ["A", "T"]:
-        sum_freq += (fexp_A_T - (window.count(base) / len(window))) ** 2
-    for base in ["G", "C"]:
-        sum_freq += (fexp_G_C - (window.count(base) / len(window))) ** 2
-
-    chi2 = sum_freq / 3
-
-    return chi2
-
-
-def compute_metrics(window, dinuc_list=["AC", "CA", "CC"]):
+    :param window: sliding window
+    :param polynucleotide_list: a list of polynucleotides, default value is ["AC", "CA", "CC"]
+    :return: a dictionary of entropy and polynucleotide proportion of the sequence window
+    """
 
     metrics = {
+        "entropy": get_entropy(window),
+        "polynuc": get_polynuc(window, polynucleotide_list),
         # "skew": get_skewness(window),
         # "cg_skew": get_cg_skew(window),
-        "entropy": get_entropy(window),
-        "polynuc": get_polynuc(window, dinuc_list),
         # "skew_norm": get_norm_freq_base(window),
         # "chi2": get_chi2(window),
         # "freq_norm_T": get_freq_norm_T(window),
@@ -256,7 +191,7 @@ def compute_metrics(window, dinuc_list=["AC", "CA", "CC"]):
 
 
 def get_consecutive_groups(df_chrom):
-    """From the raw dataframe get start and end of each telom==1 groups.
+    """From the raw dataframe get start and end of each telomere window.
     Applied to detect start and end of telomere in nucleotide positions.
     """
     df = df_chrom.reset_index()
@@ -439,16 +374,6 @@ def run_on_single_fasta(fasta_path, polynuc_thres, entropy_thres, nb_scanned_nt)
             ] = compute_metrics(window)
 
         df_C = pd.DataFrame(seq_dict_C).transpose()
-
-        ## NOT USED ANYMORE######
-        # df_W["entropy_med"] = df_W.rolling(100, min_periods=1).entropy.median()
-        # df_W["polynuc_med"] = df_W.rolling(100, min_periods=1).polynuc.median()
-        # ##################
-
-        # ## NOT USED ANYMORE######
-        # df_C["entropy_med"] = df_C.rolling(100, min_periods=1).entropy.median()
-        # df_C["polynuc_med"] = df_C.rolling(100, min_periods=1).polynuc.median()
-        ##################
 
         df_chro = pd.concat([df_W, df_C])
 

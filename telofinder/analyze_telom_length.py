@@ -322,7 +322,10 @@ def export_results(
     """ Produce output table files 
     """
     outdir = Path(outdir)
-    outdir.mkdir()
+    try:
+        outdir.mkdir()
+    except FileExistsError:
+        pass
     raw_df.to_csv(outdir / raw_outfile, index=False)
     telom_df.to_csv(outdir / telom_outfile, index=False)
     merged_telom_df.to_csv(outdir / merged_telom_outfile, index=False)

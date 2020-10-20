@@ -49,7 +49,7 @@ def parse_arguments():
     )
     parser.add_argument(
         "fasta_path",
-        help="Path to a single fasta file or to a directory containing multiple fasta files.",
+        help="Path to a single (multi)fasta file or to a directory containing multiple fasta files.",
     )
     parser.add_argument(
         "-f",
@@ -295,7 +295,7 @@ def classify_telomere(interval_chrom, chrom_len):
 
 
 def plot_telom(telom_df):
-    """Visualization of the watson and crick strand telomere location
+    """Plotting the telomere detection on both left and right chromosome ends
     """
     df = telom_df.reset_index()
     for strand in ["W", "C"]:
@@ -309,15 +309,7 @@ def plot_telom(telom_df):
 
 
 def export_results(
-    raw_df,
-    telom_df,
-    merged_telom_df,
-    raw_outfile="raw_df.csv",
-    telom_outfile="telom_df.csv",
-    merged_telom_outfile="merged_telom_df.csv",
-    bed_outfile="telom.bed",
-    merged_bed_outfile="telom_merged.bed",
-    outdir="telofinder_results",
+    raw_df, telom_df, merged_telom_df, outdir="telofinder_results",
 ):
     """ Produce output table files 
     """
@@ -326,17 +318,17 @@ def export_results(
         outdir.mkdir()
     except FileExistsError:
         pass
-    raw_df.to_csv(outdir / raw_outfile, index=False)
-    telom_df.to_csv(outdir / telom_outfile, index=False)
-    merged_telom_df.to_csv(outdir / merged_telom_outfile, index=False)
+    raw_df.to_csv(outdir / "raw_df.csv", index=False)
+    telom_df.to_csv(outdir / "telom_df.csv", index=False)
+    merged_telom_df.to_csv(outdir / "merged_telom_df.csv", index=False)
 
     bed_df = telom_df[["chrom", "start", "end", "type"]].copy()
     bed_df.dropna(inplace=True)
-    bed_df.to_csv(outdir / bed_outfile, sep="\t", header=None, index=False)
+    bed_df.to_csv(outdir / "telom.bed", sep="\t", header=None, index=False)
 
     merged_bed_df = merged_telom_df[["chrom", "start", "end", "type"]].copy()
     merged_bed_df.dropna(inplace=True)
-    merged_bed_df.to_csv(outdir / merged_bed_outfile, sep="\t", header=None, index=False)
+    merged_bed_df.to_csv(outdir / "telom_merged.bed", sep="\t", header=None, index=False)
 
 
 def run_on_single_fasta(fasta_path, polynuc_thres, entropy_thres, nb_scanned_nt):

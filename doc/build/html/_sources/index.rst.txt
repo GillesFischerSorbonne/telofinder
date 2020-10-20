@@ -6,7 +6,7 @@
 Telofinder
 ###########################
 
-A python package to determine the location and the size of telomeric repeats (both terminal and internal ones) from genome assemblies.
+A python package to determine the location and the size of telomeric repeats from genome assemblies (both terminal and internal ones). Telofinder can run either on a single (multi)fasta file or on a directory containing multiple files. It outputs 3 csv and 2 bed files containing the telomere calls and their coordinates either as raw output or after merging consecutive calls"
 
 Telomere detection is based on calculation in a sliding window of the following two metrics:
     - DNA sequence entropy < entropy_threshold (default=0.8)
@@ -18,10 +18,6 @@ Telomere detection is based on calculation in a sliding window of the following 
 .. image:: build/zoom_0_600.png
 
 .. image:: build/zoom_7000_7300.png
-
- Telofinder can run either on a single (multi)fasta file or on a directory containing multiple files.
-
- Telofinder outputs 3 csv and 2 bed files containing the telomere calls and their coordinates either as raw output or after merging consecutive calls"
 
 From a python shell:
 

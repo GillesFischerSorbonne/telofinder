@@ -55,7 +55,7 @@ def parse_arguments():
         "-f",
         "--force",
         action="store_true",
-        help="Automatically replace the output csv file if present.",
+        help="Automatically replace the output 'telofinder_results' directory if present.",
     )
     parser.add_argument(
         "-e",

@@ -1,0 +1,5 @@
+strain,chrom,side,type,start,end,len
+AFH_chrI,chrI,Left,term,1,246,246
+AFH_chrI,chrI,Left,intern,7089,7155,67
+AFH_chrI,chrI,Right,intern,217452,217708,257
+AFH_chrI,chrI,Right,intern,217692,217711,20

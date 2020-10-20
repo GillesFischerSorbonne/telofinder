@@ -197,7 +197,7 @@
     <span class="p">)</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
         <span class="s2">&quot;fasta_path&quot;</span><span class="p">,</span>
-        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Path to a single fasta file or to a directory containing multiple fasta files.&quot;</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Path to a single (multi)fasta file or to a directory containing multiple fasta files.&quot;</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
         <span class="s2">&quot;-f&quot;</span><span class="p">,</span>
@@ -443,7 +443,7 @@
 
 
 <div class="viewcode-block" id="plot_telom"><a class="viewcode-back" href="../../index.html#telofinder.analyze_telom_length.plot_telom">[docs]</a><span class="k">def</span> <span class="nf">plot_telom</span><span class="p">(</span><span class="n">telom_df</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Visualization of the watson and crick strand telomere location</span>
+    <span class="sd">&quot;&quot;&quot;Visualization of the watson and crick strand telomere detection</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">df</span> <span class="o">=</span> <span class="n">telom_df</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">strand</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;W&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">]:</span>
@@ -457,15 +457,7 @@
 
 
 <div class="viewcode-block" id="export_results"><a class="viewcode-back" href="../../index.html#telofinder.analyze_telom_length.export_results">[docs]</a><span class="k">def</span> <span class="nf">export_results</span><span class="p">(</span>
-    <span class="n">raw_df</span><span class="p">,</span>
-    <span class="n">telom_df</span><span class="p">,</span>
-    <span class="n">merged_telom_df</span><span class="p">,</span>
-    <span class="n">raw_outfile</span><span class="o">=</span><span class="s2">&quot;raw_df.csv&quot;</span><span class="p">,</span>
-    <span class="n">telom_outfile</span><span class="o">=</span><span class="s2">&quot;telom_df.csv&quot;</span><span class="p">,</span>
-    <span class="n">merged_telom_outfile</span><span class="o">=</span><span class="s2">&quot;merged_telom_df.csv&quot;</span><span class="p">,</span>
-    <span class="n">bed_outfile</span><span class="o">=</span><span class="s2">&quot;telom.bed&quot;</span><span class="p">,</span>
-    <span class="n">merged_bed_outfile</span><span class="o">=</span><span class="s2">&quot;telom_merged.bed&quot;</span><span class="p">,</span>
-    <span class="n">outdir</span><span class="o">=</span><span class="s2">&quot;telofinder_results&quot;</span><span class="p">,</span>
+    <span class="n">raw_df</span><span class="p">,</span> <span class="n">telom_df</span><span class="p">,</span> <span class="n">merged_telom_df</span><span class="p">,</span> <span class="n">outdir</span><span class="o">=</span><span class="s2">&quot;telofinder_results&quot;</span><span class="p">,</span>
 <span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Produce output table files </span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -474,17 +466,17 @@
         <span class="n">outdir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">()</span>
     <span class="k">except</span> <span class="ne">FileExistsError</span><span class="p">:</span>
         <span class="k">pass</span>
-    <span class="n">raw_df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">outdir</span> <span class="o">/</span> <span class="n">raw_outfile</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="n">telom_df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">outdir</span> <span class="o">/</span> <span class="n">telom_outfile</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="n">merged_telom_df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">outdir</span> <span class="o">/</span> <span class="n">merged_telom_outfile</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">raw_df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">outdir</span> <span class="o">/</span> <span class="s2">&quot;raw_df.csv&quot;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">telom_df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">outdir</span> <span class="o">/</span> <span class="s2">&quot;telom_df.csv&quot;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">merged_telom_df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">outdir</span> <span class="o">/</span> <span class="s2">&quot;merged_telom_df.csv&quot;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
     <span class="n">bed_df</span> <span class="o">=</span> <span class="n">telom_df</span><span class="p">[[</span><span class="s2">&quot;chrom&quot;</span><span class="p">,</span> <span class="s2">&quot;start&quot;</span><span class="p">,</span> <span class="s2">&quot;end&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
     <span class="n">bed_df</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">bed_df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">outdir</span> <span class="o">/</span> <span class="n">bed_outfile</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">bed_df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">outdir</span> <span class="o">/</span> <span class="s2">&quot;telom.bed&quot;</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
     <span class="n">merged_bed_df</span> <span class="o">=</span> <span class="n">merged_telom_df</span><span class="p">[[</span><span class="s2">&quot;chrom&quot;</span><span class="p">,</span> <span class="s2">&quot;start&quot;</span><span class="p">,</span> <span class="s2">&quot;end&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
     <span class="n">merged_bed_df</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">merged_bed_df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">outdir</span> <span class="o">/</span> <span class="n">merged_bed_outfile</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+    <span class="n">merged_bed_df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">outdir</span> <span class="o">/</span> <span class="s2">&quot;telom_merged.bed&quot;</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="run_on_single_fasta"><a class="viewcode-back" href="../../index.html#telofinder.analyze_telom_length.run_on_single_fasta">[docs]</a><span class="k">def</span> <span class="nf">run_on_single_fasta</span><span class="p">(</span><span class="n">fasta_path</span><span class="p">,</span> <span class="n">polynuc_thres</span><span class="p">,</span> <span class="n">entropy_thres</span><span class="p">,</span> <span class="n">nb_scanned_nt</span><span class="p">):</span>

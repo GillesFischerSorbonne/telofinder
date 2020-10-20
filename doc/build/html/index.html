@@ -85,13 +85,16 @@
             
               <!-- Local TOC -->
               <div class="local-toc"><ul>
-<li><a class="reference internal" href="#">Telofinder</a><ul>
+<li><a class="reference internal" href="#">Telofinder</a></li>
 <li><a class="reference internal" href="#installation">Installation</a></li>
-<li><a class="reference internal" href="#usage">Usage</a></li>
-<li><a class="reference internal" href="#module-telofinder.analyze_telom_length">Reference</a></li>
-<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+<li><a class="reference internal" href="#usage">Usage</a><ul>
+<li><a class="reference internal" href="#positional-arguments">Positional arguments</a></li>
+<li><a class="reference internal" href="#optional-arguments">Optional arguments</a></li>
+<li><a class="reference internal" href="#help">Help</a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#module-telofinder.analyze_telom_length">Reference</a></li>
+<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
 </ul>
 </div>
             
@@ -158,84 +161,20 @@
             
   <div class="section" id="telofinder">
 <h1>Telofinder<a class="headerlink" href="#telofinder" title="Permalink to this headline">¶</a></h1>
-<p>A python package to determine the location and the size of telomeric repeats from genome assemblies (both terminal and internal ones). Telofinder can run either on a single (multi)fasta file or on a directory containing multiple files. It outputs 3 csv and 2 bed files containing the telomere calls and their coordinates either as raw output or after merging consecutive calls&quot;</p>
+<p>A python package to determine the location and the size of telomeric repeats (both terminal and internal) from genome assemblies.</p>
 <dl class="simple">
-<dt>Telomere detection is based on calculation in a sliding window of the following two metrics:</dt><dd><ul class="simple">
+<dt>Telomere detection is based on calculation in a 20 bp sliding window of the following two metrics:</dt><dd><ul class="simple">
 <li><p>DNA sequence entropy &lt; entropy_threshold (default=0.8)</p></li>
 <li><p>proportion of polynucleotides (default_list = [&quot;CC&quot;, &quot;CA&quot;, &quot;AC&quot;]) &gt;  polynuc_threshold (default=0.8)</p></li>
 </ul>
 </dd>
 </dl>
 <img alt="_images/polynuc_entropy_8kb.png" src="_images/polynuc_entropy_8kb.png" />
-<img alt="_images/zoom_0_600.png" src="_images/zoom_0_600.png" />
-<img alt="_images/zoom_7000_7300.png" src="_images/zoom_7000_7300.png" />
-<p>From a python shell:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">telofinder</span> <span class="kn">import</span> <span class="n">analyze_telom_length</span> <span class="k">as</span> <span class="n">atl</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-
-<span class="n">df</span><span class="p">,</span> <span class="n">telo_df</span><span class="p">,</span> <span class="n">telo_df_merged</span>  <span class="o">=</span> <span class="n">atl</span><span class="o">.</span><span class="n">run_telofinder</span><span class="p">(</span><span class="s2">&quot;../telofinder/data/AFH_chrI.fasta&quot;</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">,</span> <span class="mi">8000</span><span class="p">)</span>
-<span class="n">df_res</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
-<span class="n">df_W</span> <span class="o">=</span> <span class="n">df_res</span><span class="p">[</span><span class="s1">&#39;level_3&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;W&quot;</span>
-
-<span class="n">ax1</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">df_res</span><span class="p">[</span><span class="n">df_W</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="p">[</span><span class="s2">&quot;polynuc&quot;</span><span class="p">,</span> <span class="s2">&quot;entropy&quot;</span><span class="p">]]</span>
-    <span class="o">.</span><span class="n">plot</span><span class="p">()</span>
-    <span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s2">&quot;center left&quot;</span><span class="p">,</span> <span class="n">bbox_to_anchor</span><span class="o">=</span><span class="p">(</span><span class="mf">0.75</span><span class="p">,</span> <span class="mf">0.15</span><span class="p">))</span>
-<span class="p">)</span>
-<span class="n">ax1</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;AFH chr1 left&quot;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="n">top</span><span class="o">=</span><span class="mf">1.6</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">hlines</span><span class="p">(</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">xmin</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">xmax</span> <span class="o">=</span> <span class="mi">8000</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s1">&#39;green&#39;</span><span class="p">,</span> <span class="n">linestyles</span><span class="o">=</span><span class="s1">&#39;dotted&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mi">3000</span><span class="p">,</span> <span class="mf">0.75</span><span class="p">,</span> <span class="s1">&#39;Threshold&#39;</span><span class="p">,</span> <span class="n">ha</span> <span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">,</span> <span class="n">va</span> <span class="o">=</span><span class="s1">&#39;top&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;green&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">hlines</span><span class="p">(</span><span class="mf">1.45</span><span class="p">,</span> <span class="n">xmin</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">xmax</span> <span class="o">=</span> <span class="mi">246</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s1">&#39;green&#39;</span><span class="p">,</span> <span class="n">linestyles</span><span class="o">=</span><span class="s1">&#39;solid&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1.55</span><span class="p">,</span> <span class="s1">&#39;Terminal Telomere&#39;</span><span class="p">,</span> <span class="n">ha</span> <span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">,</span> <span class="n">va</span> <span class="o">=</span><span class="s1">&#39;top&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;green&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">hlines</span><span class="p">(</span><span class="mf">1.45</span><span class="p">,</span> <span class="n">xmin</span> <span class="o">=</span> <span class="mi">7080</span><span class="p">,</span> <span class="n">xmax</span> <span class="o">=</span> <span class="mi">7160</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s1">&#39;green&#39;</span><span class="p">,</span> <span class="n">linestyles</span><span class="o">=</span><span class="s1">&#39;solid&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mi">6000</span><span class="p">,</span> <span class="mf">1.55</span><span class="p">,</span> <span class="s1">&#39;Internal Telomere&#39;</span><span class="p">,</span> <span class="n">ha</span> <span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">,</span> <span class="n">va</span> <span class="o">=</span><span class="s1">&#39;top&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;green&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Telomere detection in the first 8kb&quot;</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="p">)</span>
-
-<span class="n">ax2</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">df_res</span><span class="p">[</span><span class="n">df_W</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="p">[</span><span class="s2">&quot;polynuc&quot;</span><span class="p">,</span> <span class="s2">&quot;entropy&quot;</span><span class="p">]]</span>
-    <span class="o">.</span><span class="n">plot</span><span class="p">()</span>
-    <span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s2">&quot;center left&quot;</span><span class="p">,</span> <span class="n">bbox_to_anchor</span><span class="o">=</span><span class="p">(</span><span class="mf">0.75</span><span class="p">,</span> <span class="mf">0.15</span><span class="p">))</span>
-<span class="p">)</span>
-<span class="n">ax2</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;AFH chr1 left&quot;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="n">top</span><span class="o">=</span><span class="mf">1.6</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">600</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">hlines</span><span class="p">(</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">xmin</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">xmax</span> <span class="o">=</span> <span class="mi">600</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s1">&#39;green&#39;</span><span class="p">,</span> <span class="n">linestyles</span><span class="o">=</span><span class="s1">&#39;dotted&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mi">300</span><span class="p">,</span> <span class="mf">0.75</span><span class="p">,</span> <span class="s1">&#39;Threshold&#39;</span><span class="p">,</span> <span class="n">ha</span> <span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">,</span> <span class="n">va</span> <span class="o">=</span><span class="s1">&#39;top&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;green&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">hlines</span><span class="p">(</span><span class="mf">1.45</span><span class="p">,</span> <span class="n">xmin</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">xmax</span> <span class="o">=</span> <span class="mi">226</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s1">&#39;green&#39;</span><span class="p">,</span> <span class="n">linestyles</span><span class="o">=</span><span class="s1">&#39;solid&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1.55</span><span class="p">,</span> <span class="s1">&#39;Terminal Telomere&#39;</span><span class="p">,</span> <span class="n">ha</span> <span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">,</span> <span class="n">va</span> <span class="o">=</span><span class="s1">&#39;top&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;green&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Zoom in terminal region [0-600bp]&quot;</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="p">)</span>
-
-<span class="n">ax3</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">df_res</span><span class="p">[</span><span class="n">df_W</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="p">[</span><span class="s2">&quot;polynuc&quot;</span><span class="p">,</span> <span class="s2">&quot;entropy&quot;</span><span class="p">]]</span>
-    <span class="o">.</span><span class="n">plot</span><span class="p">()</span>
-    <span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s2">&quot;center left&quot;</span><span class="p">,</span> <span class="n">bbox_to_anchor</span><span class="o">=</span><span class="p">(</span><span class="mf">0.75</span><span class="p">,</span> <span class="mf">0.15</span><span class="p">))</span>
-<span class="p">)</span>
-<span class="n">ax3</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;AFH chr1 left&quot;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="n">top</span><span class="o">=</span><span class="mf">1.6</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="mi">7000</span><span class="p">,</span> <span class="mi">7300</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">hlines</span><span class="p">(</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">xmin</span> <span class="o">=</span> <span class="mi">7000</span><span class="p">,</span> <span class="n">xmax</span> <span class="o">=</span> <span class="mi">7300</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s1">&#39;green&#39;</span><span class="p">,</span> <span class="n">linestyles</span><span class="o">=</span><span class="s1">&#39;dotted&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mi">7025</span><span class="p">,</span> <span class="mf">0.75</span><span class="p">,</span> <span class="s1">&#39;Threshold&#39;</span><span class="p">,</span> <span class="n">ha</span> <span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">,</span> <span class="n">va</span> <span class="o">=</span><span class="s1">&#39;top&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;green&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">hlines</span><span class="p">(</span><span class="mf">1.45</span><span class="p">,</span> <span class="n">xmin</span> <span class="o">=</span> <span class="mi">7089</span><span class="p">,</span> <span class="n">xmax</span> <span class="o">=</span> <span class="mi">7135</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s1">&#39;green&#39;</span><span class="p">,</span> <span class="n">linestyles</span><span class="o">=</span><span class="s1">&#39;solid&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mi">7089</span><span class="p">,</span> <span class="mf">1.55</span><span class="p">,</span> <span class="s1">&#39;Internal Telomere&#39;</span><span class="p">,</span> <span class="n">ha</span> <span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">,</span> <span class="n">va</span> <span class="o">=</span><span class="s1">&#39;top&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;green&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Zoom in internal region [7000-7300bp]&quot;</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>(<a class="reference external" href=".//index-1.py">Source code</a>)</p>
-<div class="figure align-default" id="id1">
-<img alt="_images/index-1_00.png" src="_images/index-1_00.png" />
-<p class="caption"><span class="caption-text">(<a class="reference external" href=".//index-1_00.png">png</a>, <a class="reference external" href=".//index-1_00.hires.png">hires.png</a>, <a class="reference external" href=".//index-1_00.pdf">pdf</a>)</span><a class="headerlink" href="#id1" title="Permalink to this image">¶</a></p>
-</div>
-<div class="figure align-default" id="id2">
-<img alt="_images/index-1_01.png" src="_images/index-1_01.png" />
-<p class="caption"><span class="caption-text">(<a class="reference external" href=".//index-1_01.png">png</a>, <a class="reference external" href=".//index-1_01.hires.png">hires.png</a>, <a class="reference external" href=".//index-1_01.pdf">pdf</a>)</span><a class="headerlink" href="#id2" title="Permalink to this image">¶</a></p>
-</div>
-<div class="figure align-default" id="id3">
-<img alt="_images/index-1_02.png" src="_images/index-1_02.png" />
-<p class="caption"><span class="caption-text">(<a class="reference external" href=".//index-1_02.png">png</a>, <a class="reference external" href=".//index-1_02.hires.png">hires.png</a>, <a class="reference external" href=".//index-1_02.pdf">pdf</a>)</span><a class="headerlink" href="#id3" title="Permalink to this image">¶</a></p>
+<img alt="_images/zoom_term.png" src="_images/zoom_term.png" />
+<img alt="_images/zoom_int.png" src="_images/zoom_int.png" />
 </div>
 <div class="section" id="installation">
-<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
 <p>install (mini)conda:</p>
 <blockquote>
 <div><p>see <a class="reference external" href="https://docs.conda.io/projects/conda/en/latest/user-guide/install/">https://docs.conda.io/projects/conda/en/latest/user-guide/install/</a></p>
@@ -246,27 +185,59 @@
 </div>
 <p>install the telofinder package:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ git clone https://github.com/GillesFischerSorbonne/telofinder.git
-
 $ <span class="nb">cd</span> telofinder
-
 $ conda env
-
 $ python setupy.py install
 </pre></div>
 </div>
 </div>
 <div class="section" id="usage">
-<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+<h1>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h1>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ conda activate telofinder
-
-$ python telofinder path_to_file<span class="o">(</span>s<span class="o">)</span>
+$ <span class="nb">cd</span> telofinder
+$ python analyze_telom_length.py fasta_path
 </pre></div>
 </div>
-<p>telofinder runs both on single and multiple (multi)fasta file(s).</p>
-<p>telofinder outputs 3 csv and 2 bed files containing the telomere calls and their coordinates, either as raw output or after merging consecutive calls</p>
+<div class="section" id="positional-arguments">
+<h2>Positional arguments<a class="headerlink" href="#positional-arguments" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><dl class="simple">
+<dt>fasta_path</dt><dd><p>path to a single (multi)fasta file or to a directory containing multiple fasta files</p>
+</dd>
+</dl>
+</div></blockquote>
+</div>
+<div class="section" id="optional-arguments">
+<h2>Optional arguments<a class="headerlink" href="#optional-arguments" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><dl class="option-list">
+<dt><kbd><span class="option">-f</span>, <span class="option">--force</span></kbd></dt>
+<dd><p>automatically replace the output 'telofinder_results' directory if present</p>
+</dd>
+<dt><kbd><span class="option">-e</span>, <span class="option">--entropy_threshold</span></kbd></dt>
+<dd><p>entropy threshold for telomere prediction,
+default = 0.8</p>
+</dd>
+<dt><kbd><span class="option">-n</span>, <span class="option">--polynuc_threshold</span></kbd></dt>
+<dd><p>poly-nucleotide threshold for telomere prediction,
+default = 0.8</p>
+</dd>
+<dt><kbd><span class="option">-s</span>, <span class="option">--nb_scanned_nt</span></kbd></dt>
+<dd><p>number of nucleotides scanned in sliding window starting from each sequence extrimity. If set to -1, the whole sequence will be scanned.</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>Telofinder outputs a directory called 'telofinder_results' including 3 csv and 2 bed files containing the telomere calls and their coordinates, either as raw output or after merging consecutive calls</p>
+</div>
+<div class="section" id="help">
+<h2>Help<a class="headerlink" href="#help" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ python analyze_telom_length.py --help
+</pre></div>
+</div>
+</div>
 </div>
 <div class="section" id="module-telofinder.analyze_telom_length">
-<span id="reference"></span><h2>Reference<a class="headerlink" href="#module-telofinder.analyze_telom_length" title="Permalink to this headline">¶</a></h2>
+<span id="reference"></span><h1>Reference<a class="headerlink" href="#module-telofinder.analyze_telom_length" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
 <dt id="telofinder.analyze_telom_length.base_compos">
 <code class="sig-name descname">base_compos</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sequence</span></em>, <em class="sig-param"><span class="n">base</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/telofinder/analyze_telom_length.html#base_compos"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#telofinder.analyze_telom_length.base_compos" title="Permalink to this definition">¶</a></dt>
@@ -327,7 +298,7 @@ interval corresponds to terminal or interal telomere</p>
 
 <dl class="py function">
 <dt id="telofinder.analyze_telom_length.export_results">
-<code class="sig-name descname">export_results</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">raw_df</span></em>, <em class="sig-param"><span class="n">telom_df</span></em>, <em class="sig-param"><span class="n">merged_telom_df</span></em>, <em class="sig-param"><span class="n">raw_outfile</span><span class="o">=</span><span class="default_value">'raw_df.csv'</span></em>, <em class="sig-param"><span class="n">telom_outfile</span><span class="o">=</span><span class="default_value">'telom_df.csv'</span></em>, <em class="sig-param"><span class="n">merged_telom_outfile</span><span class="o">=</span><span class="default_value">'merged_telom_df.csv'</span></em>, <em class="sig-param"><span class="n">bed_outfile</span><span class="o">=</span><span class="default_value">'telom.bed'</span></em>, <em class="sig-param"><span class="n">merged_bed_outfile</span><span class="o">=</span><span class="default_value">'telom_merged.bed'</span></em>, <em class="sig-param"><span class="n">outdir</span><span class="o">=</span><span class="default_value">'telofinder_results'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/telofinder/analyze_telom_length.html#export_results"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#telofinder.analyze_telom_length.export_results" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">export_results</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">raw_df</span></em>, <em class="sig-param"><span class="n">telom_df</span></em>, <em class="sig-param"><span class="n">merged_telom_df</span></em>, <em class="sig-param"><span class="n">outdir</span><span class="o">=</span><span class="default_value">'telofinder_results'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/telofinder/analyze_telom_length.html#export_results"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#telofinder.analyze_telom_length.export_results" title="Permalink to this definition">¶</a></dt>
 <dd><p>Produce output table files</p>
 </dd></dl>
 
@@ -420,7 +391,7 @@ Applied to detect start and end of telomere in nucleotide positions.</p>
 <dl class="py function">
 <dt id="telofinder.analyze_telom_length.plot_telom">
 <code class="sig-name descname">plot_telom</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">telom_df</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/telofinder/analyze_telom_length.html#plot_telom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#telofinder.analyze_telom_length.plot_telom" title="Permalink to this definition">¶</a></dt>
-<dd><p>Visualization of the watson and crick strand telomere location</p>
+<dd><p>Visualization of the watson and crick strand telomere detection</p>
 </dd></dl>
 
 <dl class="py function">
@@ -470,13 +441,12 @@ Applied to detect start and end of telomere in nucleotide positions.</p>
 
 </div>
 <div class="section" id="indices-and-tables">
-<h2>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h2>
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
 <ul class="simple">
 <li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
 <li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
 <li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
 </ul>
-</div>
 </div>
 
 

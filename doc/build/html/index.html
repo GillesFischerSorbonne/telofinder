@@ -91,6 +91,7 @@
 <li><a class="reference internal" href="#positional-arguments">Positional arguments</a></li>
 <li><a class="reference internal" href="#optional-arguments">Optional arguments</a></li>
 <li><a class="reference internal" href="#help">Help</a></li>
+<li><a class="reference internal" href="#output">Output</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#module-telofinder.analyze_telom_length">Reference</a></li>
@@ -223,17 +224,20 @@ default = 0.8</p>
 default = 0.8</p>
 </dd>
 <dt><kbd><span class="option">-s</span>, <span class="option">--nb_scanned_nt</span></kbd></dt>
-<dd><p>number of nucleotides scanned in sliding window starting from each sequence extrimity. If set to -1, the whole sequence will be scanned.</p>
+<dd><p>number of nucleotides scanned in sliding window starting from each sequence extrimity. If set to -1, the whole sequence will be scanned, default = 20 000 bp</p>
 </dd>
 </dl>
 </div></blockquote>
-<p>Telofinder outputs a directory called 'telofinder_results' including 3 csv and 2 bed files containing the telomere calls and their coordinates, either as raw output or after merging consecutive calls</p>
 </div>
 <div class="section" id="help">
 <h2>Help<a class="headerlink" href="#help" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ python analyze_telom_length.py --help
 </pre></div>
 </div>
+</div>
+<div class="section" id="output">
+<h2>Output<a class="headerlink" href="#output" title="Permalink to this headline">¶</a></h2>
+<p>Telofinder outputs a directory called <code class="docutils literal notranslate"><span class="pre">telofinder_results</span></code> including 3 csv and 2 bed files containing the telomere calls and their coordinates, either as raw output or after merging consecutive calls</p>
 </div>
 </div>
 <div class="section" id="module-telofinder.analyze_telom_length">
@@ -391,13 +395,21 @@ Applied to detect start and end of telomere in nucleotide positions.</p>
 <dl class="py function">
 <dt id="telofinder.analyze_telom_length.plot_telom">
 <code class="sig-name descname">plot_telom</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">telom_df</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/telofinder/analyze_telom_length.html#plot_telom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#telofinder.analyze_telom_length.plot_telom" title="Permalink to this definition">¶</a></dt>
-<dd><p>Visualization of the watson and crick strand telomere detection</p>
+<dd><p>Plotting the telomere detection on both left and right chromosome ends</p>
 </dd></dl>
 
 <dl class="py function">
 <dt id="telofinder.analyze_telom_length.run_on_fasta_dir">
 <code class="sig-name descname">run_on_fasta_dir</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fasta_dir_path</span></em>, <em class="sig-param"><span class="n">polynuc_thres</span></em>, <em class="sig-param"><span class="n">entropy_thres</span></em>, <em class="sig-param"><span class="n">nb_scanned_nt</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/telofinder/analyze_telom_length.html#run_on_fasta_dir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#telofinder.analyze_telom_length.run_on_fasta_dir" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run iteratively the telemore detection algorithm on all fasta files in a directory</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>fasta_dir</strong> -- path to fasta directory</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>a tuple of df, telo_df and telo_df_merged</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">

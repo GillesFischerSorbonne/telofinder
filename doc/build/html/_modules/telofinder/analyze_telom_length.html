@@ -210,14 +210,14 @@
         <span class="s2">&quot;--entropy_threshold&quot;</span><span class="p">,</span>
         <span class="n">default</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span>
         <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span>
-        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Entropy threshold for telomere prediction.&quot;</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Entropy threshold for telomere prediction. default=0.8&quot;</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
         <span class="s2">&quot;-n&quot;</span><span class="p">,</span>
         <span class="s2">&quot;--polynuc_threshold&quot;</span><span class="p">,</span>
         <span class="n">default</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span>
         <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span>
-        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Poly-nucleotide threshold for telomere prediction.&quot;</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Poly-nucleotide threshold for telomere prediction. default=0.8&quot;</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
         <span class="s2">&quot;-s&quot;</span><span class="p">,</span>
@@ -225,7 +225,7 @@
         <span class="n">default</span><span class="o">=</span><span class="mi">20000</span><span class="p">,</span>
         <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span>
         <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Number of nucleotides scanned in sliding window starting from each sequence</span><span class="se">\</span>
-<span class="s2">    extrimity. If set to -1, the whole sequence will be scanned.&quot;</span><span class="p">,</span>
+<span class="s2">    extrimity. If set to -1, the whole sequence will be scanned. default=20000&quot;</span><span class="p">,</span>
     <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span></div>
@@ -443,7 +443,7 @@
 
 
 <div class="viewcode-block" id="plot_telom"><a class="viewcode-back" href="../../index.html#telofinder.analyze_telom_length.plot_telom">[docs]</a><span class="k">def</span> <span class="nf">plot_telom</span><span class="p">(</span><span class="n">telom_df</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Visualization of the watson and crick strand telomere detection</span>
+    <span class="sd">&quot;&quot;&quot;Plotting the telomere detection on both left and right chromosome ends</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">df</span> <span class="o">=</span> <span class="n">telom_df</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">strand</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;W&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">]:</span>
@@ -568,7 +568,7 @@
 
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;chromosome </span><span class="si">{</span><span class="n">seq_record</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> done&quot;</span><span class="p">)</span>
 
-    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">df_list</span><span class="p">)</span>
+    <span class="n">raw_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">df_list</span><span class="p">)</span>
     <span class="n">telo_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">telo_df_list</span><span class="p">)</span>
     <span class="n">telo_df</span><span class="p">[</span><span class="s2">&quot;len&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">telo_df</span><span class="p">[</span><span class="s2">&quot;end&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">telo_df</span><span class="p">[</span><span class="s2">&quot;start&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
     <span class="n">telo_df</span> <span class="o">=</span> <span class="n">telo_df</span><span class="o">.</span><span class="n">astype</span><span class="p">({</span><span class="s2">&quot;start&quot;</span><span class="p">:</span> <span class="s2">&quot;Int64&quot;</span><span class="p">,</span> <span class="s2">&quot;end&quot;</span><span class="p">:</span> <span class="s2">&quot;Int64&quot;</span><span class="p">,</span> <span class="s2">&quot;len&quot;</span><span class="p">:</span> <span class="s2">&quot;Int64&quot;</span><span class="p">})</span>
@@ -582,11 +582,15 @@
         <span class="p">[</span><span class="s2">&quot;strain&quot;</span><span class="p">,</span> <span class="s2">&quot;chrom&quot;</span><span class="p">,</span> <span class="s2">&quot;side&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">,</span> <span class="s2">&quot;start&quot;</span><span class="p">,</span> <span class="s2">&quot;end&quot;</span><span class="p">,</span> <span class="s2">&quot;len&quot;</span><span class="p">,</span> <span class="s2">&quot;chrom_size&quot;</span><span class="p">]</span>
     <span class="p">]</span>
 
-    <span class="k">return</span> <span class="n">df</span><span class="p">,</span> <span class="n">telo_df</span><span class="p">,</span> <span class="n">telo_df_merged</span></div>
+    <span class="k">return</span> <span class="n">raw_df</span><span class="p">,</span> <span class="n">telo_df</span><span class="p">,</span> <span class="n">telo_df_merged</span></div>
 
 
 <div class="viewcode-block" id="run_on_fasta_dir"><a class="viewcode-back" href="../../index.html#telofinder.analyze_telom_length.run_on_fasta_dir">[docs]</a><span class="k">def</span> <span class="nf">run_on_fasta_dir</span><span class="p">(</span><span class="n">fasta_dir_path</span><span class="p">,</span> <span class="n">polynuc_thres</span><span class="p">,</span> <span class="n">entropy_thres</span><span class="p">,</span> <span class="n">nb_scanned_nt</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Run iteratively the telemore detection algorithm on all fasta files in a directory&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Run iteratively the telemore detection algorithm on all fasta files in a directory</span>
+
+<span class="sd">    :param fasta_dir: path to fasta directory</span>
+<span class="sd">    :return: a tuple of df, telo_df and telo_df_merged</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">raw_dfs</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">telom_dfs</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">merged_telom_dfs</span> <span class="o">=</span> <span class="p">[]</span>

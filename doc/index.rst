@@ -74,9 +74,7 @@ Optional arguments
     default = 0.8
 
   -s, --nb_scanned_nt
-    number of nucleotides scanned in sliding window starting from each sequence extrimity. If set to -1, the whole sequence will be scanned.
-
-Telofinder outputs a directory called 'telofinder_results' including 3 csv and 2 bed files containing the telomere calls and their coordinates, either as raw output or after merging consecutive calls
+    number of nucleotides scanned in sliding window starting from each sequence extrimity. If set to -1, the whole sequence will be scanned, default = 20 000 bp
 
 Help
 =====
@@ -85,6 +83,11 @@ Help
 
     $ python analyze_telom_length.py --help
 
+
+Output
+======
+
+Telofinder outputs a directory called ``telofinder_results`` including 3 csv and 2 bed files containing the telomere calls and their coordinates, either as raw output or after merging consecutive calls
 
 Reference
 ###########################

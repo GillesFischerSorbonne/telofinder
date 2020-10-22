@@ -7,25 +7,30 @@ from setuptools import setup, find_packages
 from setuptools import setup
 import glob
 
-_MAJOR = 0
-_MINOR = 1
+_MAJOR = 1
+_MINOR = 0
 _MICRO = 0
 version = "%d.%d.%d" % (_MAJOR, _MINOR, _MICRO)
 release = "%d.%d" % (_MAJOR, _MINOR)
 
 
 metainfo = {
-    "authors": {"main": ("XX", "XX")},
-    "maintainer": {"main": ("XX", "XX")},
+    "authors": {
+        "main": (
+            "Gilles Fischer",
+            "gilles.fischer@sorbonne-universite.fr",
+            "Etienne Kornobis",
+            "Thomas Cokelaer",
+        )
+    },
+    "maintainer": {"main": ("Gilles Fischer")},
     "version": version,
     "license": "new BSD",
-    "download_url": "https://github.com/GillesFischerSorbonne/telofinder".format(
-        version
-    ),
+    "download_url": "https://github.com/GillesFischerSorbonne/telofinder".format(version),
     "url": "http://github.com/GillesFisherSoronne/telofinder",
     "description": "A library for telomere prediction.",
     "platforms": ["Linux", "Unix"],
-    "keywords": ["NGS", "telomers"],
+    "keywords": ["genome assembly", "telomeres", "telomeric repeats"],
     "classifiers": [
         "Development Status :: 5 - Production/Stable",
         "Intended Audience :: Developers",
@@ -37,8 +42,6 @@ metainfo = {
         "Topic :: Software Development :: Libraries :: Python Modules",
         "Topic :: Scientific/Engineering :: Bio-Informatics",
         "Topic :: Scientific/Engineering :: Information Analysis",
-        "Topic :: Scientific/Engineering :: Mathematics",
-        "Topic :: Scientific/Engineering :: Physics",
     ],
 }
 

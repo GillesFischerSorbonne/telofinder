@@ -1,0 +1,9 @@
+biopython @ file:///Users/runner/miniforge3/conda-bld/biopython_1599231273515/work
+certifi==2020.6.20
+numpy @ file:///Users/runner/miniforge3/conda-bld/numpy_1597938419070/work
+pandas @ file:///Users/runner/miniforge3/conda-bld/pandas_1601982008167/work
+pybedtools==0.8.1
+pysam==0.16.0.1
+python-dateutil==2.8.1
+pytz==2020.1
+six @ file:///home/conda/feedstock_root/build_artifacts/six_1590081179328/work

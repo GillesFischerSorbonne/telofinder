@@ -62,14 +62,14 @@ def parse_arguments():
         "--entropy_threshold",
         default=0.8,
         type=float,
-        help="Entropy threshold for telomere prediction.",
+        help="Entropy threshold for telomere prediction. default=0.8",
     )
     parser.add_argument(
         "-n",
         "--polynuc_threshold",
         default=0.8,
         type=float,
-        help="Poly-nucleotide threshold for telomere prediction.",
+        help="Poly-nucleotide threshold for telomere prediction. default=0.8",
     )
     parser.add_argument(
         "-s",
@@ -77,7 +77,7 @@ def parse_arguments():
         default=20000,
         type=int,
         help="Number of nucleotides scanned in sliding window starting from each sequence\
-    extrimity. If set to -1, the whole sequence will be scanned.",
+    extrimity. If set to -1, the whole sequence will be scanned. default=20000",
     )
 
     return parser.parse_args()
@@ -420,7 +420,7 @@ def run_on_single_fasta(fasta_path, polynuc_thres, entropy_thres, nb_scanned_nt)
 
         print(f"chromosome {seq_record.name} done")
 
-    df = pd.concat(df_list)
+    raw_df = pd.concat(df_list)
     telo_df = pd.concat(telo_df_list)
     telo_df["len"] = telo_df["end"] - telo_df["start"] + 1
     telo_df = telo_df.astype({"start": "Int64", "end": "Int64", "len": "Int64"})
@@ -434,11 +434,15 @@ def run_on_single_fasta(fasta_path, polynuc_thres, entropy_thres, nb_scanned_nt)
         ["strain", "chrom", "side", "type", "start", "end", "len", "chrom_size"]
     ]
 
-    return df, telo_df, telo_df_merged
+    return raw_df, telo_df, telo_df_merged
 
 
 def run_on_fasta_dir(fasta_dir_path, polynuc_thres, entropy_thres, nb_scanned_nt):
-    """Run iteratively the telemore detection algorithm on all fasta files in a directory"""
+    """Run iteratively the telemore detection algorithm on all fasta files in a directory
+
+    :param fasta_dir: path to fasta directory
+    :return: a tuple of df, telo_df and telo_df_merged
+    """
     raw_dfs = []
     telom_dfs = []
     merged_telom_dfs = []

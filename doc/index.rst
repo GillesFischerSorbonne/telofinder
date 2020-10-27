@@ -76,6 +76,9 @@ Optional arguments
   -s, --nb_scanned_nt
     number of nucleotides scanned in sliding window starting from each sequence extrimity. If set to -1, the whole sequence will be scanned, default = 20 000 bp
 
+  -t, --threads
+    number of threads to use, default = 1
+
 Help
 =====
 

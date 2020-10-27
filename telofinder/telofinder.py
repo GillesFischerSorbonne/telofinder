@@ -329,7 +329,7 @@ def export_results(
         outdir.mkdir()
     except FileExistsError:
         pass
-    raw_df.to_csv(outdir / "raw_df.csv", index=False)
+    raw_df.to_csv(outdir / "raw_df.csv", index=True)
     telom_df.to_csv(outdir / "telom_df.csv", index=False)
     merged_telom_df.to_csv(outdir / "merged_telom_df.csv", index=False)
 

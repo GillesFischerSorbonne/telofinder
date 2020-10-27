@@ -94,7 +94,7 @@
 <li><a class="reference internal" href="#output">Output</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#module-telofinder.analyze_telom_length">Reference</a></li>
+<li><a class="reference internal" href="#reference">Reference</a></li>
 <li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
 </ul>
 </div>
@@ -196,7 +196,7 @@ $ python setupy.py install
 <h1>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h1>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ conda activate telofinder
 $ <span class="nb">cd</span> telofinder
-$ python analyze_telom_length.py fasta_path
+$ python telofinder.py
 </pre></div>
 </div>
 <div class="section" id="positional-arguments">
@@ -226,12 +226,15 @@ default = 0.8</p>
 <dt><kbd><span class="option">-s</span>, <span class="option">--nb_scanned_nt</span></kbd></dt>
 <dd><p>number of nucleotides scanned in sliding window starting from each sequence extrimity. If set to -1, the whole sequence will be scanned, default = 20 000 bp</p>
 </dd>
+<dt><kbd><span class="option">-t</span>, <span class="option">--threads</span></kbd></dt>
+<dd><p>number of threads to use, default = 1</p>
+</dd>
 </dl>
 </div></blockquote>
 </div>
 <div class="section" id="help">
 <h2>Help<a class="headerlink" href="#help" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ python analyze_telom_length.py --help
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ python telofinder.py --help
 </pre></div>
 </div>
 </div>
@@ -240,217 +243,8 @@ default = 0.8</p>
 <p>Telofinder outputs a directory called <code class="docutils literal notranslate"><span class="pre">telofinder_results</span></code> including 3 csv and 2 bed files containing the telomere calls and their coordinates, either as raw output or after merging consecutive calls</p>
 </div>
 </div>
-<div class="section" id="module-telofinder.analyze_telom_length">
-<span id="reference"></span><h1>Reference<a class="headerlink" href="#module-telofinder.analyze_telom_length" title="Permalink to this headline">¶</a></h1>
-<dl class="py function">
-<dt id="telofinder.analyze_telom_length.base_compos">
-<code class="sig-name descname">base_compos</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sequence</span></em>, <em class="sig-param"><span class="n">base</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/telofinder/analyze_telom_length.html#base_compos"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#telofinder.analyze_telom_length.base_compos" title="Permalink to this definition">¶</a></dt>
-<dd><p>Counts the number of a given base in a sequence</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>sequence</strong> -- fasta sequence</p></li>
-<li><p><strong>base</strong> -- base to count in the sequence</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>the number of that base in the sequence</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt id="telofinder.analyze_telom_length.classify_telomere">
-<code class="sig-name descname">classify_telomere</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">interval_chrom</span></em>, <em class="sig-param"><span class="n">chrom_len</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/telofinder/analyze_telom_length.html#classify_telomere"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#telofinder.analyze_telom_length.classify_telomere" title="Permalink to this definition">¶</a></dt>
-<dd><p>From a list of tuples obtained from get_consecutive_groups, identify if
-interval corresponds to terminal or interal telomere</p>
-</dd></dl>
-
-<dl class="py function">
-<dt id="telofinder.analyze_telom_length.compute_metrics">
-<code class="sig-name descname">compute_metrics</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">window</span></em>, <em class="sig-param"><span class="n">polynucleotide_list</span><span class="o">=</span><span class="default_value">['AC', 'CA', 'CC']</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/telofinder/analyze_telom_length.html#compute_metrics"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#telofinder.analyze_telom_length.compute_metrics" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compute entropy and polynucleotide proportion in the sequence window</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>window</strong> -- sliding window</p></li>
-<li><p><strong>polynucleotide_list</strong> -- a list of polynucleotides, default value is [&quot;AC&quot;, &quot;CA&quot;, &quot;CC&quot;]</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>a dictionary of entropy and polynucleotide proportion of the sequence window</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt id="telofinder.analyze_telom_length.count_polynuc_occurence">
-<code class="sig-name descname">count_polynuc_occurence</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sub_window</span></em>, <em class="sig-param"><span class="n">polynucleotide_list</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/telofinder/analyze_telom_length.html#count_polynuc_occurence"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#telofinder.analyze_telom_length.count_polynuc_occurence" title="Permalink to this definition">¶</a></dt>
-<dd><p>Define presence of polynucleotide in the window.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>sub_window</strong> -- the sequence of a sub_window</p></li>
-<li><p><strong>polynuleotide_list</strong> -- a list of polynucleotides. Note that all polynucleotides must be of the same size</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>a boolean for the presence of the sub_window in the polynucleotide list</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt id="telofinder.analyze_telom_length.export_results">
-<code class="sig-name descname">export_results</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">raw_df</span></em>, <em class="sig-param"><span class="n">telom_df</span></em>, <em class="sig-param"><span class="n">merged_telom_df</span></em>, <em class="sig-param"><span class="n">outdir</span><span class="o">=</span><span class="default_value">'telofinder_results'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/telofinder/analyze_telom_length.html#export_results"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#telofinder.analyze_telom_length.export_results" title="Permalink to this definition">¶</a></dt>
-<dd><p>Produce output table files</p>
-</dd></dl>
-
-<dl class="py function">
-<dt id="telofinder.analyze_telom_length.get_consecutive_groups">
-<code class="sig-name descname">get_consecutive_groups</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df_chrom</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/telofinder/analyze_telom_length.html#get_consecutive_groups"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#telofinder.analyze_telom_length.get_consecutive_groups" title="Permalink to this definition">¶</a></dt>
-<dd><p>From the raw dataframe get start and end of each telomere window.
-Applied to detect start and end of telomere in nucleotide positions.</p>
-</dd></dl>
-
-<dl class="py function">
-<dt id="telofinder.analyze_telom_length.get_entropy">
-<code class="sig-name descname">get_entropy</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">window</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/telofinder/analyze_telom_length.html#get_entropy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#telofinder.analyze_telom_length.get_entropy" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calculate the entropy of the window DNA sequence</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>window</strong> -- sliding window</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>entropy value of the sequence window</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt id="telofinder.analyze_telom_length.get_polynuc">
-<code class="sig-name descname">get_polynuc</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">window</span></em>, <em class="sig-param"><span class="n">polynucleotide_list</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/telofinder/analyze_telom_length.html#get_polynuc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#telofinder.analyze_telom_length.get_polynuc" title="Permalink to this definition">¶</a></dt>
-<dd><p>get the propbortion of polynuceotides in the window</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>window</strong> -- sliding window</p></li>
-<li><p><strong>polynucleotide_list</strong> -- a list of polynucleotides. Note that all polynucleotides must be of the same size</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>total polynucleotide proportion in the sliding window</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt id="telofinder.analyze_telom_length.get_strain_name">
-<code class="sig-name descname">get_strain_name</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/telofinder/analyze_telom_length.html#get_strain_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#telofinder.analyze_telom_length.get_strain_name" title="Permalink to this definition">¶</a></dt>
-<dd><p>Function to get the strain name from the name of the fasta file</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>filename</strong> -- path of fasta file</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>sequence name</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt id="telofinder.analyze_telom_length.output_dir_exists">
-<code class="sig-name descname">output_dir_exists</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">force</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/telofinder/analyze_telom_length.html#output_dir_exists"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#telofinder.analyze_telom_length.output_dir_exists" title="Permalink to this definition">¶</a></dt>
-<dd><p>Function to test if the 'telofinder_results' output diretory already exists.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>force</strong> -- overwrites the output directory otherwise exits program --force or -f</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>nothing</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt id="telofinder.analyze_telom_length.parse_arguments">
-<code class="sig-name descname">parse_arguments</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/telofinder/analyze_telom_length.html#parse_arguments"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#telofinder.analyze_telom_length.parse_arguments" title="Permalink to this definition">¶</a></dt>
-<dd><p>Function to parse and reuse the arguments of the command line</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>fasta_path</strong> -- path to a single fasta file or to a directory containing multiple fasta files</p></li>
-<li><p><strong>force</strong> -- force optional, overwrites the output directory otherwise exits program, optional</p></li>
-<li><p><strong>entropy_threshold</strong> -- optional, default = 0.8</p></li>
-<li><p><strong>polynuc_threshold</strong> -- optional, default = 0.8</p></li>
-<li><p><strong>nb_scanned_nt</strong> -- number of scanned nucleotides at each chromosome end, optional, default = 20 000</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>parser arguments</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt id="telofinder.analyze_telom_length.plot_telom">
-<code class="sig-name descname">plot_telom</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">telom_df</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/telofinder/analyze_telom_length.html#plot_telom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#telofinder.analyze_telom_length.plot_telom" title="Permalink to this definition">¶</a></dt>
-<dd><p>Plotting the telomere detection on both left and right chromosome ends</p>
-</dd></dl>
-
-<dl class="py function">
-<dt id="telofinder.analyze_telom_length.run_on_fasta_dir">
-<code class="sig-name descname">run_on_fasta_dir</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fasta_dir_path</span></em>, <em class="sig-param"><span class="n">polynuc_thres</span></em>, <em class="sig-param"><span class="n">entropy_thres</span></em>, <em class="sig-param"><span class="n">nb_scanned_nt</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/telofinder/analyze_telom_length.html#run_on_fasta_dir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#telofinder.analyze_telom_length.run_on_fasta_dir" title="Permalink to this definition">¶</a></dt>
-<dd><p>Run iteratively the telemore detection algorithm on all fasta files in a directory</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>fasta_dir</strong> -- path to fasta directory</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>a tuple of df, telo_df and telo_df_merged</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt id="telofinder.analyze_telom_length.run_on_single_fasta">
-<code class="sig-name descname">run_on_single_fasta</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fasta_path</span></em>, <em class="sig-param"><span class="n">polynuc_thres</span></em>, <em class="sig-param"><span class="n">entropy_thres</span></em>, <em class="sig-param"><span class="n">nb_scanned_nt</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/telofinder/analyze_telom_length.html#run_on_single_fasta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#telofinder.analyze_telom_length.run_on_single_fasta" title="Permalink to this definition">¶</a></dt>
-<dd><p>Run the telomere detection algorithm on a single fasta file</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>fasta_path</strong> -- path to fasta file</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>a tuple of df, telo_df and telo_df_merged</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt id="telofinder.analyze_telom_length.run_telofinder">
-<code class="sig-name descname">run_telofinder</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fasta_path</span></em>, <em class="sig-param"><span class="n">polynuc_thres</span></em>, <em class="sig-param"><span class="n">entropy_thres</span></em>, <em class="sig-param"><span class="n">nb_scanned_nt</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/telofinder/analyze_telom_length.html#run_telofinder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#telofinder.analyze_telom_length.run_telofinder" title="Permalink to this definition">¶</a></dt>
-<dd><p>Run telofinder on a single fasta file or on a fasta directory</p>
-</dd></dl>
-
-<dl class="py function">
-<dt id="telofinder.analyze_telom_length.sliding_window">
-<code class="sig-name descname">sliding_window</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sequence</span></em>, <em class="sig-param"><span class="n">start</span></em>, <em class="sig-param"><span class="n">end</span></em>, <em class="sig-param"><span class="n">size</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/telofinder/analyze_telom_length.html#sliding_window"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#telofinder.analyze_telom_length.sliding_window" title="Permalink to this definition">¶</a></dt>
-<dd><p>Apply a sliding window of length = size to a sequence from start to end</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>sequence</strong> -- fasta sequence</p></li>
-<li><p><strong>start</strong> -- starting coordinate of the sequence</p></li>
-<li><p><strong>end</strong> -- ending coordinate of the sequence</p></li>
-<li><p><strong>size</strong> -- size of the sliding window</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>the coordinate and the sequence of the window</p>
-</dd>
-</dl>
-</dd></dl>
-
+<div class="section" id="reference">
+<h1>Reference<a class="headerlink" href="#reference" title="Permalink to this headline">¶</a></h1>
 </div>
 <div class="section" id="indices-and-tables">
 <h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
@@ -474,7 +268,7 @@ Applied to detect start and end of telomere in nucleotide positions.</p>
     <p>
         &copy; Copyright XX, 2020
       <span class="lastupdated">
-        Last updated on Oct 21, 2020.
+        Last updated on Oct 27, 2020.
       </span>
 
     </p>

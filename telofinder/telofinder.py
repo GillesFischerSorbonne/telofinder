@@ -41,6 +41,7 @@ def parse_arguments():
     :param entropy_threshold: optional, default = 0.8 
     :param polynuc_threshold: optional, default = 0.8
     :param nb_scanned_nt: number of scanned nucleotides at each chromosome end, optional, default = 20 000
+    :param threads: Number of threads to use. Multithreaded calculations currently occurs at the level of sequences within a fasta file."
     :return: parser arguments
     """
     parser = argparse.ArgumentParser(
@@ -338,9 +339,7 @@ def export_results(
 
     merged_bed_df = merged_telom_df[["chrom", "start", "end", "type"]].copy()
     merged_bed_df.dropna(inplace=True)
-    merged_bed_df.to_csv(
-        outdir / "telom_merged.bed", sep="\t", header=None, index=False
-    )
+    merged_bed_df.to_csv(outdir / "telom_merged.bed", sep="\t", header=None, index=False)
 
 
 def run_on_single_seq(seq_record, strain, polynuc_thres, entropy_thres, nb_scanned_nt):
@@ -362,9 +361,9 @@ def run_on_single_seq(seq_record, strain, polynuc_thres, entropy_thres, nb_scann
     df_W = pd.DataFrame(seq_dict_W).transpose()
 
     for i, window in sliding_window(seqC, 0, limit_seq, 20):
-        seq_dict_C[
-            (strain, seq_record.name, (len(seqC) - i - 1), "C")
-        ] = compute_metrics(window)
+        seq_dict_C[(strain, seq_record.name, (len(seqC) - i - 1), "C")] = compute_metrics(
+            window
+        )
 
     df_C = pd.DataFrame(seq_dict_C).transpose()
 
@@ -399,9 +398,7 @@ def run_on_single_seq(seq_record, strain, polynuc_thres, entropy_thres, nb_scann
             on=["chrom", "start"],
             how="left",
         )
-        telo_df_merged.loc[
-            telo_df_merged.end > len(seq_record.seq) - 20, "type"
-        ] = "term"
+        telo_df_merged.loc[telo_df_merged.end > len(seq_record.seq) - 20, "type"] = "term"
         telo_df_merged.loc[telo_df_merged.start < 20, "type"] = "term"
 
     telo_df_merged["strain"] = strain
@@ -417,9 +414,7 @@ def run_on_single_seq(seq_record, strain, polynuc_thres, entropy_thres, nb_scann
     return (df_chro, telo_df, telo_df_merged)
 
 
-def run_on_single_fasta(
-    fasta_path, polynuc_thres, entropy_thres, nb_scanned_nt, threads
-):
+def run_on_single_fasta(fasta_path, polynuc_thres, entropy_thres, nb_scanned_nt, threads):
     """Run the telomere detection algorithm on a single fasta file
 
     :param fasta_path: path to fasta file

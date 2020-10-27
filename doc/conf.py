@@ -15,7 +15,9 @@ import sys, os
 import sphinx
 
 # sys.path.insert(0, os.path.abspath('sphinxext'))
-sys.path.insert(0, os.path.abspath("../telofinder"))
+sys.path.insert(0, os.path.abspath(".."))
+import telofinder
+
 
 pkg_name = "telofinder"
 
@@ -23,9 +25,11 @@ pkg_name = "telofinder"
 # import matplotlib
 # matplotlib.use('Agg')
 
-import pkg_resources
+# import pkg_resources
 
-version = pkg_resources.require(pkg_name)[0].version
+# version = pkg_resources.require(pkg_name)[0].version
+
+version = telofinder.__version__
 
 # import matplotlib
 # import matplotlib.sphinxext

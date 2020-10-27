@@ -8,3 +8,4 @@ pytz==2020.1
 six==1.15.0
 easydev==0.10.1
 numpydoc==1.1.0
+matplotlib==3.3.2

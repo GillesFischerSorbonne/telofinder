@@ -7,6 +7,8 @@ import pandas as pd
 import numpy as np
 from collections import Counter
 import pybedtools
+from multiprocessing import Pool
+from functools import partial
 
 
 def output_dir_exists(force):
@@ -78,6 +80,14 @@ def parse_arguments():
         type=int,
         help="Number of nucleotides scanned in sliding window starting from each sequence\
     extrimity. If set to -1, the whole sequence will be scanned. default=20000",
+    )
+    parser.add_argument(
+        "-t",
+        "--threads",
+        default=1,
+        type=int,
+        help="Number of threads to use. Multithreaded calculations currently occurs\
+    at the level of sequences within a fasta file.",
     )
 
     return parser.parse_args()
@@ -328,10 +338,88 @@ def export_results(
 
     merged_bed_df = merged_telom_df[["chrom", "start", "end", "type"]].copy()
     merged_bed_df.dropna(inplace=True)
-    merged_bed_df.to_csv(outdir / "telom_merged.bed", sep="\t", header=None, index=False)
+    merged_bed_df.to_csv(
+        outdir / "telom_merged.bed", sep="\t", header=None, index=False
+    )
 
 
-def run_on_single_fasta(fasta_path, polynuc_thres, entropy_thres, nb_scanned_nt):
+def run_on_single_seq(seq_record, strain, polynuc_thres, entropy_thres, nb_scanned_nt):
+    seqW = str(seq_record.seq)
+    revcomp = seq_record.reverse_complement()
+    seqC = str(revcomp.seq)
+
+    if nb_scanned_nt == -1:
+        limit_seq = len(seqW)
+    else:
+        limit_seq = min(nb_scanned_nt, len(seqW))
+
+    seq_dict_W = {}
+    seq_dict_C = {}
+
+    for i, window in sliding_window(seqW, 0, limit_seq, 20):
+        seq_dict_W[(strain, seq_record.name, i, "W")] = compute_metrics(window)
+
+    df_W = pd.DataFrame(seq_dict_W).transpose()
+
+    for i, window in sliding_window(seqC, 0, limit_seq, 20):
+        seq_dict_C[
+            (strain, seq_record.name, (len(seqC) - i - 1), "C")
+        ] = compute_metrics(window)
+
+    df_C = pd.DataFrame(seq_dict_C).transpose()
+
+    df_chro = pd.concat([df_W, df_C])
+
+    df_chro.loc[
+        (df_chro["entropy"] < entropy_thres) & (df_chro["polynuc"] > polynuc_thres),
+        "predict_telom",
+    ] = 1.0
+
+    df_chro["predict_telom"].fillna(0, inplace=True)
+
+    telo_groups = get_consecutive_groups(df_chro)
+    telo_list = classify_telomere(telo_groups, len(seq_record.seq))
+    telo_df = pd.DataFrame(telo_list)
+    telo_df["chrom"] = seq_record.name
+    telo_df["chrom_size"] = len(seq_record.seq)
+
+    if telo_df["start"].isnull().sum() == 4:
+        telo_df_merged = telo_df.copy()
+    else:
+        bed_df = telo_df[["chrom", "start", "end", "type"]].copy()
+        bed_df.dropna(inplace=True)
+        bed_df = bed_df.astype({"start": int, "end": int})
+        bed_file = pybedtools.BedTool().from_dataframe(bed_df)
+        bed_sort = bed_file.sort()
+        bed_merge = bed_sort.merge(d=20)
+        bed_df_merged = bed_merge.to_dataframe()
+        telo_df_merged = pd.merge(
+            bed_df_merged,
+            telo_df.dropna()[["chrom", "side", "type", "start", "chrom_size"]],
+            on=["chrom", "start"],
+            how="left",
+        )
+        telo_df_merged.loc[
+            telo_df_merged.end > len(seq_record.seq) - 20, "type"
+        ] = "term"
+        telo_df_merged.loc[telo_df_merged.start < 20, "type"] = "term"
+
+    telo_df_merged["strain"] = strain
+    telo_df_merged = telo_df_merged[
+        ["strain", "chrom", "side", "type", "start", "end", "chrom_size"]
+    ]
+
+    telo_df["strain"] = strain
+    telo_df = telo_df[["strain", "chrom", "side", "type", "start", "end"]]
+
+    print(f"chromosome {seq_record.name} done")
+
+    return (df_chro, telo_df, telo_df_merged)
+
+
+def run_on_single_fasta(
+    fasta_path, polynuc_thres, entropy_thres, nb_scanned_nt, threads
+):
     """Run the telomere detection algorithm on a single fasta file
 
     :param fasta_path: path to fasta file
@@ -341,91 +429,25 @@ def run_on_single_fasta(fasta_path, polynuc_thres, entropy_thres, nb_scanned_nt)
     print("\n", "-------------------------------", "\n")
     print(f"file {strain} executed")
 
-    df_list = []
-    telo_df_list = []
-    telo_df_merged_list = []
+    partial_ross = partial(
+        run_on_single_seq,
+        strain=strain,
+        polynuc_thres=polynuc_thres,
+        entropy_thres=entropy_thres,
+        nb_scanned_nt=nb_scanned_nt,
+    )
 
-    for seq_record in SeqIO.parse(fasta_path, "fasta"):
-        seqW = str(seq_record.seq)
-        revcomp = seq_record.reverse_complement()
-        seqC = str(revcomp.seq)
+    with Pool(threads) as p:
 
-        if nb_scanned_nt == -1:
-            limit_seq = len(seqW)
-        else:
-            limit_seq = min(nb_scanned_nt, len(seqW))
+        results = p.map(partial_ross, SeqIO.parse(fasta_path, "fasta"))
 
-        seq_dict_W = {}
-        seq_dict_C = {}
+    raw_df = pd.concat([r[0] for r in results])
 
-        for i, window in sliding_window(seqW, 0, limit_seq, 20):
-            seq_dict_W[(strain, seq_record.name, i, "W")] = compute_metrics(window)
-
-        df_W = pd.DataFrame(seq_dict_W).transpose()
-
-        for i, window in sliding_window(seqC, 0, limit_seq, 20):
-            seq_dict_C[
-                (strain, seq_record.name, (len(seqC) - i - 1), "C")
-            ] = compute_metrics(window)
-
-        df_C = pd.DataFrame(seq_dict_C).transpose()
-
-        df_chro = pd.concat([df_W, df_C])
-
-        df_chro.loc[
-            (df_chro["entropy"] < entropy_thres) & (df_chro["polynuc"] > polynuc_thres),
-            "predict_telom",
-        ] = 1.0
-
-        df_chro["predict_telom"].fillna(0, inplace=True)
-
-        telo_groups = get_consecutive_groups(df_chro)
-        telo_list = classify_telomere(telo_groups, len(seq_record.seq))
-        telo_df = pd.DataFrame(telo_list)
-        telo_df["chrom"] = seq_record.name
-        telo_df["chrom_size"] = len(seq_record.seq)
-
-        if telo_df["start"].isnull().sum() == 4:
-            telo_df_merged = telo_df.copy()
-        else:
-            bed_df = telo_df[["chrom", "start", "end", "type"]].copy()
-            bed_df.dropna(inplace=True)
-            bed_df = bed_df.astype({"start": int, "end": int})
-            bed_file = pybedtools.BedTool().from_dataframe(bed_df)
-            bed_sort = bed_file.sort()
-            bed_merge = bed_sort.merge(d=20)
-            bed_df_merged = bed_merge.to_dataframe()
-            telo_df_merged = pd.merge(
-                bed_df_merged,
-                telo_df.dropna()[["chrom", "side", "type", "start", "chrom_size"]],
-                on=["chrom", "start"],
-                how="left",
-            )
-            telo_df_merged.loc[
-                telo_df_merged.end > len(seq_record.seq) - 20, "type"
-            ] = "term"
-            telo_df_merged.loc[telo_df_merged.start < 20, "type"] = "term"
-
-        telo_df_merged["strain"] = strain
-        telo_df_merged = telo_df_merged[
-            ["strain", "chrom", "side", "type", "start", "end", "chrom_size"]
-        ]
-        telo_df_merged_list.append(telo_df_merged)
-
-        telo_df["strain"] = strain
-        telo_df = telo_df[["strain", "chrom", "side", "type", "start", "end"]]
-
-        df_list.append(df_chro)
-        telo_df_list.append(telo_df)
-
-        print(f"chromosome {seq_record.name} done")
-
-    raw_df = pd.concat(df_list)
-    telo_df = pd.concat(telo_df_list)
+    telo_df = pd.concat([r[1] for r in results])
     telo_df["len"] = telo_df["end"] - telo_df["start"] + 1
     telo_df = telo_df.astype({"start": "Int64", "end": "Int64", "len": "Int64"})
 
-    telo_df_merged = pd.concat(telo_df_merged_list)
+    telo_df_merged = pd.concat([r[2] for r in results])
     telo_df_merged["len"] = telo_df_merged["end"] - telo_df_merged["start"] + 1
     telo_df_merged = telo_df_merged.astype(
         {"start": "Int64", "end": "Int64", "len": "Int64", "chrom_size": "Int64"}
@@ -437,7 +459,9 @@ def run_on_single_fasta(fasta_path, polynuc_thres, entropy_thres, nb_scanned_nt)
     return raw_df, telo_df, telo_df_merged
 
 
-def run_on_fasta_dir(fasta_dir_path, polynuc_thres, entropy_thres, nb_scanned_nt):
+def run_on_fasta_dir(
+    fasta_dir_path, polynuc_thres, entropy_thres, nb_scanned_nt, threads
+):
     """Run iteratively the telemore detection algorithm on all fasta files in a directory
 
     :param fasta_dir: path to fasta directory
@@ -451,7 +475,7 @@ def run_on_fasta_dir(fasta_dir_path, polynuc_thres, entropy_thres, nb_scanned_nt
         for fasta in fasta_dir_path.glob(ext):
 
             raw_df, telom_df, merged_telom_df = run_on_single_fasta(
-                fasta, polynuc_thres, entropy_thres, nb_scanned_nt
+                fasta, polynuc_thres, entropy_thres, nb_scanned_nt, threads
             )
             raw_dfs.append(raw_df)
             telom_dfs.append(telom_df)
@@ -464,7 +488,7 @@ def run_on_fasta_dir(fasta_dir_path, polynuc_thres, entropy_thres, nb_scanned_nt
     return total_raw_df, total_telom_df, total_merged_telom_df
 
 
-def run_telofinder(fasta_path, polynuc_thres, entropy_thres, nb_scanned_nt):
+def run_telofinder(fasta_path, polynuc_thres, entropy_thres, nb_scanned_nt, threads):
     """Run telofinder on a single fasta file or on a fasta directory"""
     fasta_path = Path(fasta_path)
 
@@ -473,7 +497,7 @@ def run_telofinder(fasta_path, polynuc_thres, entropy_thres, nb_scanned_nt):
             f"Running in iterative mode on all '*.fasta', '*.fas', '*.fa' files in '{fasta_path}'"
         )
         raw_df, telom_df, merged_telom_df = run_on_fasta_dir(
-            fasta_path, polynuc_thres, entropy_thres, nb_scanned_nt
+            fasta_path, polynuc_thres, entropy_thres, nb_scanned_nt, threads
         )
         export_results(raw_df, telom_df, merged_telom_df)
         return raw_df, telom_df, merged_telom_df
@@ -482,7 +506,7 @@ def run_telofinder(fasta_path, polynuc_thres, entropy_thres, nb_scanned_nt):
         print(f"Running in single fasta mode on '{fasta_path}'")
 
         raw_df, telom_df, merged_telom_df = run_on_single_fasta(
-            fasta_path, polynuc_thres, entropy_thres, nb_scanned_nt
+            fasta_path, polynuc_thres, entropy_thres, nb_scanned_nt, threads
         )
         export_results(raw_df, telom_df, merged_telom_df)
         return raw_df, telom_df, merged_telom_df
@@ -499,4 +523,5 @@ if __name__ == "__main__":
         args.polynuc_threshold,
         args.entropy_threshold,
         args.nb_scanned_nt,
+        args.threads,
     )

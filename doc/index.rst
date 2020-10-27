@@ -49,7 +49,7 @@ Usage
 
     $ conda activate telofinder
     $ cd telofinder
-    $ python analyze_telom_length.py fasta_path
+    $ python telofinder.py 
 
 
 
@@ -81,7 +81,7 @@ Help
 
 .. code-block:: bash
 
-    $ python analyze_telom_length.py --help
+    $ python telofinder.py --help
 
 
 Output
@@ -92,7 +92,7 @@ Telofinder outputs a directory called ``telofinder_results`` including 3 csv and
 Reference
 ###########################
 
-.. automodule:: telofinder.analyze_telom_length
+.. automodule:: telofinder.telofinder
     :members:
     :undoc-members:
 

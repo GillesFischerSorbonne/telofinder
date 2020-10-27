@@ -69,7 +69,7 @@ setup(
     zip_safe=False,
     # entry_points = {
     #    'console_scripts':[
-    #       'telofinder=src.telofinder.analyze_telom_length:main',
+    #       'telofinder=src.telofinder.telofinder:main',
     #    ]
     # },
 )

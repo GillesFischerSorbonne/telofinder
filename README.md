@@ -9,12 +9,12 @@ Telomere detection is based on calculation in a 20 bp sliding window of the foll
 
 ## Usage
 
-`$ python analyze_telom_length.py fasta_path_to_file(s)`  
+`$ python telofinder.py fasta_path_to_file(s)`  
 
 
 ## Help
 
-`$ python analyze_telom_length.py --help`
+`$ python telofinder.py --help`
 
 
 ## Output

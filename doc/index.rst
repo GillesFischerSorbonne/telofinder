@@ -5,7 +5,7 @@
 Telofinder
 ###########################
 
-A python package to determine the location and the size of telomeric repeats (both terminal and internal) from genome assemblies.
+A python package to determine the location and the size of telomeric repeats (both terminal and internal) from genome assemblies. This version of the program only works for yeast genomes (telomere sequence TG\ :sub:`1-3`\)
 
 Telomere detection is based on calculation in a 20 bp sliding window of the following two metrics:
     - DNA sequence entropy < entropy_threshold (default=0.8)

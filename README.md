@@ -7,7 +7,7 @@ Telomere detection is based on calculation in a 20 bp sliding window of the foll
 - DNA sequence entropy < entropy_threshold (default=0.8)  
 - proportion of polynucleotides (default_list = ["CC", "CA", "AC"]) >  polynuc_threshold (default=0.8) 
 
-The complete documentation available at [Read The Docs!](https://telofinder.readthedocs.io/en/latest/) 
+The complete documentation is available at [Read The Docs](https://telofinder.readthedocs.io/en/latest/) 
 
 ## Usage
 

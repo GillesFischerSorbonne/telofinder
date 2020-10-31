@@ -42,6 +42,7 @@ def parse_arguments():
     :param polynuc_threshold: optional, default = 0.8
     :param nb_scanned_nt: number of scanned nucleotides at each chromosome end, optional, default = 20 000
     :param threads: Number of threads to use. Multithreaded calculations currently occurs at the level of sequences within a fasta file."
+    :param raw: Outputs raw_df.csv containing the values of all sliding windows
     :return: parser arguments
     """
     parser = argparse.ArgumentParser(
@@ -89,6 +90,12 @@ def parse_arguments():
         type=int,
         help="Number of threads to use. Multithreaded calculations currently occurs\
     at the level of sequences within a fasta file.",
+    )
+    parser.add_argument(
+        "-r",
+        "--raw",
+        action="store_true",
+        help="Outputs the raw dataframe (raw_df.csv) containing the values of all sliding windows.",
     )
 
     return parser.parse_args()
@@ -320,16 +327,16 @@ def plot_telom(telom_df):
 
 
 def export_results(
-    raw_df, telom_df, merged_telom_df, outdir="telofinder_results",
+    raw_df, telom_df, merged_telom_df, raw, outdir="telofinder_results",
 ):
-    """ Produce output table files 
+    """ Produce output table files
     """
     outdir = Path(outdir)
     try:
         outdir.mkdir()
     except FileExistsError:
         pass
-    raw_df.to_csv(outdir / "raw_df.csv", index=True)
+
     telom_df.to_csv(outdir / "telom_df.csv", index=False)
     merged_telom_df.to_csv(outdir / "merged_telom_df.csv", index=False)
 
@@ -340,6 +347,9 @@ def export_results(
     merged_bed_df = merged_telom_df[["chrom", "start", "end", "type"]].copy()
     merged_bed_df.dropna(inplace=True)
     merged_bed_df.to_csv(outdir / "telom_merged.bed", sep="\t", header=None, index=False)
+
+    if raw:
+        raw_df.to_csv(outdir / "raw_df.csv", index=True)
 
 
 def run_on_single_seq(seq_record, strain, polynuc_thres, entropy_thres, nb_scanned_nt):
@@ -483,7 +493,7 @@ def run_on_fasta_dir(
     return total_raw_df, total_telom_df, total_merged_telom_df
 
 
-def run_telofinder(fasta_path, polynuc_thres, entropy_thres, nb_scanned_nt, threads):
+def run_telofinder(fasta_path, polynuc_thres, entropy_thres, nb_scanned_nt, threads, raw):
     """Run telofinder on a single fasta file or on a fasta directory"""
     fasta_path = Path(fasta_path)
 
@@ -503,7 +513,7 @@ def run_telofinder(fasta_path, polynuc_thres, entropy_thres, nb_scanned_nt, thre
         raw_df, telom_df, merged_telom_df = run_on_single_fasta(
             fasta_path, polynuc_thres, entropy_thres, nb_scanned_nt, threads
         )
-        export_results(raw_df, telom_df, merged_telom_df)
+        export_results(raw_df, telom_df, merged_telom_df, raw)
         return raw_df, telom_df, merged_telom_df
     else:
         raise IOError(f"'{fasta_path}' is not a directory or a file.")
@@ -519,4 +529,6 @@ if __name__ == "__main__":
         args.entropy_threshold,
         args.nb_scanned_nt,
         args.threads,
+        args.raw,
     )
+    # export_raw_df(args.raw)

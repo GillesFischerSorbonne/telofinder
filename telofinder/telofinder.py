@@ -476,7 +476,7 @@ def run_on_fasta_dir(
     telom_dfs = []
     merged_telom_dfs = []
 
-    for ext in ["*.fasta", "*.fas", "*.fa"]:
+    for ext in ["*.fasta", "*.fas", "*.fa", "*.fsa"]:
         for fasta in fasta_dir_path.glob(ext):
 
             raw_df, telom_df, merged_telom_df = run_on_single_fasta(
@@ -499,12 +499,12 @@ def run_telofinder(fasta_path, polynuc_thres, entropy_thres, nb_scanned_nt, thre
 
     if fasta_path.is_dir():
         print(
-            f"Running in iterative mode on all '*.fasta', '*.fas', '*.fa' files in '{fasta_path}'"
+            f"Running in iterative mode on all '*.fasta', '*.fas', '*.fa', '*.fsa' files in '{fasta_path}'"
         )
         raw_df, telom_df, merged_telom_df = run_on_fasta_dir(
             fasta_path, polynuc_thres, entropy_thres, nb_scanned_nt, threads
         )
-        export_results(raw_df, telom_df, merged_telom_df)
+        export_results(raw_df, telom_df, merged_telom_df, raw)
         return raw_df, telom_df, merged_telom_df
 
     elif fasta_path.is_file():

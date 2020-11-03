@@ -49,7 +49,7 @@ Usage
 
     $ conda activate telofinder
     $ cd telofinder
-    $ python telofinder.py 
+    $ python telofinder.py [fasta_path] 
 
 
 

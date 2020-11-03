@@ -196,7 +196,7 @@ $ python setupy.py install
 <h1>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h1>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ conda activate telofinder
 $ <span class="nb">cd</span> telofinder
-$ python telofinder.py
+$ python telofinder.py <span class="o">[</span>fasta_path<span class="o">]</span>
 </pre></div>
 </div>
 <div class="section" id="positional-arguments">
@@ -229,6 +229,9 @@ default = 0.8</p>
 <dt><kbd><span class="option">-t</span>, <span class="option">--threads</span></kbd></dt>
 <dd><p>number of threads to use, default = 1</p>
 </dd>
+<dt><kbd><span class="option">-r</span>, <span class="option">--raw</span></kbd></dt>
+<dd><p>outputs the raw dataframe (raw_df.csv) containing the values of all sliding windows</p>
+</dd>
 </dl>
 </div></blockquote>
 </div>
@@ -240,7 +243,7 @@ default = 0.8</p>
 </div>
 <div class="section" id="output">
 <h2>Output<a class="headerlink" href="#output" title="Permalink to this headline">¶</a></h2>
-<p>Telofinder outputs a directory called <code class="docutils literal notranslate"><span class="pre">telofinder_results</span></code> including 3 csv and 2 bed files containing the telomere calls and their coordinates, either as raw output or after merging consecutive calls</p>
+<p>Telofinder outputs a directory called <code class="docutils literal notranslate"><span class="pre">telofinder_results</span></code> including 2 csv and 2 bed files containing the telomere calls and their coordinates, either as raw output or after merging consecutive calls</p>
 </div>
 </div>
 <div class="section" id="module-telofinder.telofinder">
@@ -305,7 +308,7 @@ interval corresponds to terminal or interal telomere</p>
 
 <dl class="py function">
 <dt id="telofinder.telofinder.export_results">
-<code class="sig-name descname">export_results</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">raw_df</span></em>, <em class="sig-param"><span class="n">telom_df</span></em>, <em class="sig-param"><span class="n">merged_telom_df</span></em>, <em class="sig-param"><span class="n">outdir</span><span class="o">=</span><span class="default_value">'telofinder_results'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/telofinder/telofinder.html#export_results"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#telofinder.telofinder.export_results" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">export_results</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">raw_df</span></em>, <em class="sig-param"><span class="n">telom_df</span></em>, <em class="sig-param"><span class="n">merged_telom_df</span></em>, <em class="sig-param"><span class="n">raw</span></em>, <em class="sig-param"><span class="n">outdir</span><span class="o">=</span><span class="default_value">'telofinder_results'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/telofinder/telofinder.html#export_results"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#telofinder.telofinder.export_results" title="Permalink to this definition">¶</a></dt>
 <dd><p>Produce output table files</p>
 </dd></dl>
 
@@ -388,6 +391,7 @@ Applied to detect start and end of telomere in nucleotide positions.</p>
 <li><p><strong>polynuc_threshold</strong> -- optional, default = 0.8</p></li>
 <li><p><strong>nb_scanned_nt</strong> -- number of scanned nucleotides at each chromosome end, optional, default = 20 000</p></li>
 <li><p><strong>threads</strong> -- Number of threads to use. Multithreaded calculations currently occurs at the level of sequences within a fasta file.&quot;</p></li>
+<li><p><strong>raw</strong> -- Outputs raw_df.csv containing the values of all sliding windows</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -437,7 +441,7 @@ Applied to detect start and end of telomere in nucleotide positions.</p>
 
 <dl class="py function">
 <dt id="telofinder.telofinder.run_telofinder">
-<code class="sig-name descname">run_telofinder</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fasta_path</span></em>, <em class="sig-param"><span class="n">polynuc_thres</span></em>, <em class="sig-param"><span class="n">entropy_thres</span></em>, <em class="sig-param"><span class="n">nb_scanned_nt</span></em>, <em class="sig-param"><span class="n">threads</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/telofinder/telofinder.html#run_telofinder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#telofinder.telofinder.run_telofinder" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">run_telofinder</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fasta_path</span></em>, <em class="sig-param"><span class="n">polynuc_thres</span></em>, <em class="sig-param"><span class="n">entropy_thres</span></em>, <em class="sig-param"><span class="n">nb_scanned_nt</span></em>, <em class="sig-param"><span class="n">threads</span></em>, <em class="sig-param"><span class="n">raw</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/telofinder/telofinder.html#run_telofinder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#telofinder.telofinder.run_telofinder" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run telofinder on a single fasta file or on a fasta directory</p>
 </dd></dl>
 
@@ -483,7 +487,7 @@ Applied to detect start and end of telomere in nucleotide positions.</p>
     <p>
         &copy; Copyright XX, 2020
       <span class="lastupdated">
-        Last updated on Oct 28, 2020.
+        Last updated on Nov 03, 2020.
       </span>
 
     </p>

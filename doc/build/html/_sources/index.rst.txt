@@ -49,7 +49,7 @@ Usage
 
     $ conda activate telofinder
     $ cd telofinder
-    $ python telofinder.py 
+    $ python telofinder.py [fasta_path] 
 
 
 
@@ -79,6 +79,9 @@ Optional arguments
   -t, --threads
     number of threads to use, default = 1
 
+  -r, --raw
+    outputs the raw dataframe (raw_df.csv) containing the values of all sliding windows
+
 Help
 =====
 
@@ -90,7 +93,7 @@ Help
 Output
 ======
 
-Telofinder outputs a directory called ``telofinder_results`` including 3 csv and 2 bed files containing the telomere calls and their coordinates, either as raw output or after merging consecutive calls
+Telofinder outputs a directory called ``telofinder_results`` including 2 csv and 2 bed files containing the telomere calls and their coordinates, either as raw output or after merging consecutive calls
 
 Reference
 ###########################

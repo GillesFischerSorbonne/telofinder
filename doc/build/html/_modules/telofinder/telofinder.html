@@ -190,6 +190,7 @@
 <span class="sd">    :param polynuc_threshold: optional, default = 0.8</span>
 <span class="sd">    :param nb_scanned_nt: number of scanned nucleotides at each chromosome end, optional, default = 20 000</span>
 <span class="sd">    :param threads: Number of threads to use. Multithreaded calculations currently occurs at the level of sequences within a fasta file.&quot;</span>
+<span class="sd">    :param raw: Outputs raw_df.csv containing the values of all sliding windows</span>
 <span class="sd">    :return: parser arguments</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span>
@@ -237,6 +238,12 @@
         <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span>
         <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Number of threads to use. Multithreaded calculations currently occurs</span><span class="se">\</span>
 <span class="s2">    at the level of sequences within a fasta file.&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;-r&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;--raw&quot;</span><span class="p">,</span>
+        <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Outputs the raw dataframe (raw_df.csv) containing the values of all sliding windows.&quot;</span><span class="p">,</span>
     <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span></div>
@@ -468,16 +475,16 @@
 
 
 <div class="viewcode-block" id="export_results"><a class="viewcode-back" href="../../index.html#telofinder.telofinder.export_results">[docs]</a><span class="k">def</span> <span class="nf">export_results</span><span class="p">(</span>
-    <span class="n">raw_df</span><span class="p">,</span> <span class="n">telom_df</span><span class="p">,</span> <span class="n">merged_telom_df</span><span class="p">,</span> <span class="n">outdir</span><span class="o">=</span><span class="s2">&quot;telofinder_results&quot;</span><span class="p">,</span>
+    <span class="n">raw_df</span><span class="p">,</span> <span class="n">telom_df</span><span class="p">,</span> <span class="n">merged_telom_df</span><span class="p">,</span> <span class="n">raw</span><span class="p">,</span> <span class="n">outdir</span><span class="o">=</span><span class="s2">&quot;telofinder_results&quot;</span><span class="p">,</span>
 <span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Produce output table files </span>
+    <span class="sd">&quot;&quot;&quot; Produce output table files</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">outdir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">outdir</span><span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">outdir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">()</span>
     <span class="k">except</span> <span class="ne">FileExistsError</span><span class="p">:</span>
         <span class="k">pass</span>
-    <span class="n">raw_df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">outdir</span> <span class="o">/</span> <span class="s2">&quot;raw_df.csv&quot;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
     <span class="n">telom_df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">outdir</span> <span class="o">/</span> <span class="s2">&quot;telom_df.csv&quot;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="n">merged_telom_df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">outdir</span> <span class="o">/</span> <span class="s2">&quot;merged_telom_df.csv&quot;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
@@ -487,7 +494,10 @@
 
     <span class="n">merged_bed_df</span> <span class="o">=</span> <span class="n">merged_telom_df</span><span class="p">[[</span><span class="s2">&quot;chrom&quot;</span><span class="p">,</span> <span class="s2">&quot;start&quot;</span><span class="p">,</span> <span class="s2">&quot;end&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
     <span class="n">merged_bed_df</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">merged_bed_df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">outdir</span> <span class="o">/</span> <span class="s2">&quot;telom_merged.bed&quot;</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+    <span class="n">merged_bed_df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">outdir</span> <span class="o">/</span> <span class="s2">&quot;telom_merged.bed&quot;</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">raw</span><span class="p">:</span>
+        <span class="n">raw_df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">outdir</span> <span class="o">/</span> <span class="s2">&quot;raw_df.csv&quot;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="run_on_single_seq"><a class="viewcode-back" href="../../index.html#telofinder.telofinder.run_on_single_seq">[docs]</a><span class="k">def</span> <span class="nf">run_on_single_seq</span><span class="p">(</span><span class="n">seq_record</span><span class="p">,</span> <span class="n">strain</span><span class="p">,</span> <span class="n">polynuc_thres</span><span class="p">,</span> <span class="n">entropy_thres</span><span class="p">,</span> <span class="n">nb_scanned_nt</span><span class="p">):</span>
@@ -614,7 +624,7 @@
     <span class="n">telom_dfs</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">merged_telom_dfs</span> <span class="o">=</span> <span class="p">[]</span>
 
-    <span class="k">for</span> <span class="n">ext</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;*.fasta&quot;</span><span class="p">,</span> <span class="s2">&quot;*.fas&quot;</span><span class="p">,</span> <span class="s2">&quot;*.fa&quot;</span><span class="p">]:</span>
+    <span class="k">for</span> <span class="n">ext</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;*.fasta&quot;</span><span class="p">,</span> <span class="s2">&quot;*.fas&quot;</span><span class="p">,</span> <span class="s2">&quot;*.fa&quot;</span><span class="p">,</span> <span class="s2">&quot;*.fsa&quot;</span><span class="p">]:</span>
         <span class="k">for</span> <span class="n">fasta</span> <span class="ow">in</span> <span class="n">fasta_dir_path</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">ext</span><span class="p">):</span>
 
             <span class="n">raw_df</span><span class="p">,</span> <span class="n">telom_df</span><span class="p">,</span> <span class="n">merged_telom_df</span> <span class="o">=</span> <span class="n">run_on_single_fasta</span><span class="p">(</span>
@@ -631,18 +641,18 @@
     <span class="k">return</span> <span class="n">total_raw_df</span><span class="p">,</span> <span class="n">total_telom_df</span><span class="p">,</span> <span class="n">total_merged_telom_df</span></div>
 
 
-<div class="viewcode-block" id="run_telofinder"><a class="viewcode-back" href="../../index.html#telofinder.telofinder.run_telofinder">[docs]</a><span class="k">def</span> <span class="nf">run_telofinder</span><span class="p">(</span><span class="n">fasta_path</span><span class="p">,</span> <span class="n">polynuc_thres</span><span class="p">,</span> <span class="n">entropy_thres</span><span class="p">,</span> <span class="n">nb_scanned_nt</span><span class="p">,</span> <span class="n">threads</span><span class="p">):</span>
+<div class="viewcode-block" id="run_telofinder"><a class="viewcode-back" href="../../index.html#telofinder.telofinder.run_telofinder">[docs]</a><span class="k">def</span> <span class="nf">run_telofinder</span><span class="p">(</span><span class="n">fasta_path</span><span class="p">,</span> <span class="n">polynuc_thres</span><span class="p">,</span> <span class="n">entropy_thres</span><span class="p">,</span> <span class="n">nb_scanned_nt</span><span class="p">,</span> <span class="n">threads</span><span class="p">,</span> <span class="n">raw</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Run telofinder on a single fasta file or on a fasta directory&quot;&quot;&quot;</span>
     <span class="n">fasta_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">fasta_path</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">fasta_path</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
         <span class="nb">print</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Running in iterative mode on all &#39;*.fasta&#39;, &#39;*.fas&#39;, &#39;*.fa&#39; files in &#39;</span><span class="si">{</span><span class="n">fasta_path</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Running in iterative mode on all &#39;*.fasta&#39;, &#39;*.fas&#39;, &#39;*.fa&#39;, &#39;*.fsa&#39; files in &#39;</span><span class="si">{</span><span class="n">fasta_path</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
         <span class="p">)</span>
         <span class="n">raw_df</span><span class="p">,</span> <span class="n">telom_df</span><span class="p">,</span> <span class="n">merged_telom_df</span> <span class="o">=</span> <span class="n">run_on_fasta_dir</span><span class="p">(</span>
             <span class="n">fasta_path</span><span class="p">,</span> <span class="n">polynuc_thres</span><span class="p">,</span> <span class="n">entropy_thres</span><span class="p">,</span> <span class="n">nb_scanned_nt</span><span class="p">,</span> <span class="n">threads</span>
         <span class="p">)</span>
-        <span class="n">export_results</span><span class="p">(</span><span class="n">raw_df</span><span class="p">,</span> <span class="n">telom_df</span><span class="p">,</span> <span class="n">merged_telom_df</span><span class="p">)</span>
+        <span class="n">export_results</span><span class="p">(</span><span class="n">raw_df</span><span class="p">,</span> <span class="n">telom_df</span><span class="p">,</span> <span class="n">merged_telom_df</span><span class="p">,</span> <span class="n">raw</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">raw_df</span><span class="p">,</span> <span class="n">telom_df</span><span class="p">,</span> <span class="n">merged_telom_df</span>
 
     <span class="k">elif</span> <span class="n">fasta_path</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
@@ -651,7 +661,7 @@
         <span class="n">raw_df</span><span class="p">,</span> <span class="n">telom_df</span><span class="p">,</span> <span class="n">merged_telom_df</span> <span class="o">=</span> <span class="n">run_on_single_fasta</span><span class="p">(</span>
             <span class="n">fasta_path</span><span class="p">,</span> <span class="n">polynuc_thres</span><span class="p">,</span> <span class="n">entropy_thres</span><span class="p">,</span> <span class="n">nb_scanned_nt</span><span class="p">,</span> <span class="n">threads</span>
         <span class="p">)</span>
-        <span class="n">export_results</span><span class="p">(</span><span class="n">raw_df</span><span class="p">,</span> <span class="n">telom_df</span><span class="p">,</span> <span class="n">merged_telom_df</span><span class="p">)</span>
+        <span class="n">export_results</span><span class="p">(</span><span class="n">raw_df</span><span class="p">,</span> <span class="n">telom_df</span><span class="p">,</span> <span class="n">merged_telom_df</span><span class="p">,</span> <span class="n">raw</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">raw_df</span><span class="p">,</span> <span class="n">telom_df</span><span class="p">,</span> <span class="n">merged_telom_df</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">fasta_path</span><span class="si">}</span><span class="s2">&#39; is not a directory or a file.&quot;</span><span class="p">)</span></div>
@@ -667,7 +677,9 @@
         <span class="n">args</span><span class="o">.</span><span class="n">entropy_threshold</span><span class="p">,</span>
         <span class="n">args</span><span class="o">.</span><span class="n">nb_scanned_nt</span><span class="p">,</span>
         <span class="n">args</span><span class="o">.</span><span class="n">threads</span><span class="p">,</span>
+        <span class="n">args</span><span class="o">.</span><span class="n">raw</span><span class="p">,</span>
     <span class="p">)</span>
+    <span class="c1"># export_raw_df(args.raw)</span>
 </pre></div>
 
            </div>
@@ -682,7 +694,7 @@
     <p>
         &copy; Copyright XX, 2020
       <span class="lastupdated">
-        Last updated on Oct 28, 2020.
+        Last updated on Nov 03, 2020.
       </span>
 
     </p>

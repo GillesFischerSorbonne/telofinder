@@ -193,6 +193,8 @@ def compute_metrics(window, polynucleotide_list=["AC", "CA", "CC"]):
     :return: a dictionary of entropy and polynucleotide proportion of the sequence window
     """
 
+    # polynucleotide_list_chlamy=["AA", "AC", "CC", "CT", "TC", "TA"]
+
     metrics = {
         "entropy": get_entropy(window),
         "polynuc": get_polynuc(window, polynucleotide_list),
@@ -531,4 +533,3 @@ if __name__ == "__main__":
         args.threads,
         args.raw,
     )
-    # export_raw_df(args.raw)

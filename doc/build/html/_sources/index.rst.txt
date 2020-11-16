@@ -37,7 +37,7 @@ install the telofinder package:
 
     $ git clone https://github.com/GillesFischerSorbonne/telofinder.git
     $ cd telofinder
-    $ conda env
+    $ conda env create
     $ python setupy.py install
 
 

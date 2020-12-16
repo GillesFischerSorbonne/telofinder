@@ -159,7 +159,7 @@ def get_polynuc(window, polynucleotide_list):
     :return: total polynucleotide proportion in the sliding window
     """
     sum_dinuc = 0
-    for _, sub_window in sliding_window(window, 0, len(window), 2):
+    for _, sub_window in sliding_window(window.upper(), 0, len(window), 2):
         sum_dinuc += count_polynuc_occurence(sub_window, polynucleotide_list)
     freq_dinuc = sum_dinuc / (len(window) - 1)
     return freq_dinuc
@@ -174,10 +174,10 @@ def get_entropy(window):
     entropy = 0
 
     for base in ["A", "T", "G", "C"]:
-        if window.count(base) == 0:
+        if window.upper().count(base) == 0:
             proba_base = 0
         else:
-            freq_base = window.count(base) / len(window)
+            freq_base = window.upper().count(base) / len(window)
             proba_base = -(freq_base * np.log(freq_base))
 
         entropy += proba_base

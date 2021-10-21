@@ -11,12 +11,12 @@ The complete documentation is available at [Read The Docs](https://telofinder.re
 
 ## Usage
 
-`$ python telofinder.py fasta_path_to_file(s)`  
+    telofinder fasta_path_to_file(s)
 
 
 ## Help
 
-`$ python telofinder.py --help`
+    telofinder.py --help
 
 
 ## Output

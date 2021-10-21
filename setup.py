@@ -71,7 +71,7 @@ setup(
     zip_safe=False,
     entry_points={
         "console_scripts": [
-            "telofinder=telofinder.telofinder:main",
+            "telofinder=telofinder.main:main",
         ]
     },
 )

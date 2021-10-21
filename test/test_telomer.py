@@ -1,10 +1,9 @@
+from . import test_dir
+
+import telofinder.telofinder as tf
+
+filename = f"{test_dir}/data/AFH_chrI.fasta"
 
 
-
-from telofinder import get_data
-from telofinder import analyze_telom_length  as alt
-filename = get_data("test.telo.blocks.fasta")
-
-def test_telomer():
-    # put your code here below and remove the pass statement
-    df = alt.run_telofinder(filename)
+def test_run_on_single_fasta():
+    df = tf.run_on_single_fasta(filename, 0.8, 0.8, 8000, 1)

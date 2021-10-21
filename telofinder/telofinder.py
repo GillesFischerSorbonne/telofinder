@@ -16,8 +16,6 @@ import pysam
 from telofinder.plotting import plot_telom
 
 
-
-
 def get_strain_name(filename):
     """Function to get the strain name from the name of the fasta file
 
@@ -231,7 +229,6 @@ def classify_telomere(interval_chrom, chrom_len):
     return classif_dict_list
 
 
-
 def export_results(
     raw_df,
     telom_df,
@@ -406,7 +403,6 @@ def run_on_fasta_dir(
     total_merged_telom_df = pd.concat(merged_telom_dfs)
 
     return total_raw_df, total_telom_df, total_merged_telom_df
-
 
 
 def get_telomeric_reads(bam_file, telo_df_merged, outdir="telofinder_telomeric_reads"):

@@ -1,11 +1,8 @@
 # -*- coding: utf-8 -*-
 # License: 3-clause BSD
 __revision__ = "$Id: $"  # for the SVN Id
-import sys
-import os
+
 from setuptools import setup, find_packages
-from setuptools import setup
-import glob
 
 _MAJOR = 1
 _MINOR = 0
@@ -13,6 +10,7 @@ _MICRO = 0
 version = "%d.%d.%d" % (_MAJOR, _MINOR, _MICRO)
 release = "%d.%d" % (_MAJOR, _MINOR)
 
+requirements = open("requirements.txt").read().split()
 
 metainfo = {
     "authors": {
@@ -26,7 +24,9 @@ metainfo = {
     "maintainer": {"main": ("Gilles Fischer")},
     "version": version,
     "license": "new BSD",
-    "download_url": "https://github.com/GillesFischerSorbonne/telofinder".format(version),
+    "download_url": "https://github.com/GillesFischerSorbonne/telofinder".format(
+        version
+    ),
     "url": "http://github.com/GillesFisherSoronne/telofinder",
     "description": "A library for telomere prediction.",
     "platforms": ["Linux", "Unix"],
@@ -64,12 +64,14 @@ setup(
     # package installation
     # package_dir = {'telofinder': 'src/python_script'},
     packages=find_packages(),
-    install_requires=["matplotlib", "Bio", "easydev"],
-    package_data={"telofinder.data": ["*.*"],},
+    install_requires=requirements,
+    package_data={
+        "telofinder.data": ["*.*"],
+    },
     zip_safe=False,
-     entry_points = {
-        'console_scripts':[
-           'telofinder=telofinder.main:main',
+    entry_points={
+        "console_scripts": [
+            "telofinder=telofinder.telofinder:main",
         ]
-     },
+    },
 )

@@ -67,9 +67,9 @@ setup(
     install_requires=["matplotlib", "Bio", "easydev"],
     package_data={"telofinder.data": ["*.*"],},
     zip_safe=False,
-    # entry_points = {
-    #    'console_scripts':[
-    #       'telofinder=src.telofinder.telofinder:main',
-    #    ]
-    # },
+     entry_points = {
+        'console_scripts':[
+           'telofinder=telofinder.main:main',
+        ]
+     },
 )

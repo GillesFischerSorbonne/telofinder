@@ -1,5 +1,7 @@
 import sys
 from Bio import SeqIO
+from Bio.SeqRecord import SeqRecord
+from Bio.Seq import Seq
 import os.path
 import argparse
 from pathlib import Path
@@ -9,6 +11,7 @@ from collections import Counter
 import pybedtools
 from multiprocessing import Pool
 from functools import partial
+import pysam
 
 
 def output_dir_exists(force):
@@ -38,7 +41,7 @@ def parse_arguments():
 
     :param fasta_path: path to a single fasta file or to a directory containing multiple fasta files
     :param force: force optional, overwrites the output directory otherwise exits program, optional
-    :param entropy_threshold: optional, default = 0.8 
+    :param entropy_threshold: optional, default = 0.8
     :param polynuc_threshold: optional, default = 0.8
     :param nb_scanned_nt: number of scanned nucleotides at each chromosome end, optional, default = 20 000
     :param threads: Number of threads to use. Multithreaded calculations currently occurs at the level of sequences within a fasta file."
@@ -152,7 +155,7 @@ def count_polynuc_occurence(sub_window, polynucleotide_list):
 
 
 def get_polynuc(window, polynucleotide_list):
-    """ get the propbortion of polynuceotides in the window
+    """get the propbortion of polynuceotides in the window
 
     :param window: sliding window
     :param polynucleotide_list: a list of polynucleotides. Note that all polynucleotides must be of the same size
@@ -315,8 +318,7 @@ def classify_telomere(interval_chrom, chrom_len):
 
 
 def plot_telom(telom_df):
-    """Plotting the telomere detection on both left and right chromosome ends
-    """
+    """Plotting the telomere detection on both left and right chromosome ends"""
     df = telom_df.reset_index()
     for strand in ["W", "C"]:
         ax = (
@@ -329,10 +331,13 @@ def plot_telom(telom_df):
 
 
 def export_results(
-    raw_df, telom_df, merged_telom_df, raw, outdir="telofinder_results",
+    raw_df,
+    telom_df,
+    merged_telom_df,
+    raw,
+    outdir="telofinder_results",
 ):
-    """ Produce output table files
-    """
+    """Produce output table files"""
     outdir = Path(outdir)
     try:
         outdir.mkdir()
@@ -348,7 +353,9 @@ def export_results(
 
     merged_bed_df = merged_telom_df[["chrom", "start", "end", "type"]].copy()
     merged_bed_df.dropna(inplace=True)
-    merged_bed_df.to_csv(outdir / "telom_merged.bed", sep="\t", header=None, index=False)
+    merged_bed_df.to_csv(
+        outdir / "telom_merged.bed", sep="\t", header=None, index=False
+    )
 
     if raw:
         raw_df.to_csv(outdir / "raw_df.csv", index=True)
@@ -373,9 +380,9 @@ def run_on_single_seq(seq_record, strain, polynuc_thres, entropy_thres, nb_scann
     df_W = pd.DataFrame(seq_dict_W).transpose()
 
     for i, window in sliding_window(seqC, 0, limit_seq, 20):
-        seq_dict_C[(strain, seq_record.name, (len(seqC) - i - 1), "C")] = compute_metrics(
-            window
-        )
+        seq_dict_C[
+            (strain, seq_record.name, (len(seqC) - i - 1), "C")
+        ] = compute_metrics(window)
 
     df_C = pd.DataFrame(seq_dict_C).transpose()
 
@@ -410,7 +417,9 @@ def run_on_single_seq(seq_record, strain, polynuc_thres, entropy_thres, nb_scann
             on=["chrom", "start"],
             how="left",
         )
-        telo_df_merged.loc[telo_df_merged.end > len(seq_record.seq) - 20, "type"] = "term"
+        telo_df_merged.loc[
+            telo_df_merged.end > len(seq_record.seq) - 20, "type"
+        ] = "term"
         telo_df_merged.loc[telo_df_merged.start < 20, "type"] = "term"
 
     telo_df_merged["strain"] = strain
@@ -426,7 +435,9 @@ def run_on_single_seq(seq_record, strain, polynuc_thres, entropy_thres, nb_scann
     return (df_chro, telo_df, telo_df_merged)
 
 
-def run_on_single_fasta(fasta_path, polynuc_thres, entropy_thres, nb_scanned_nt, threads):
+def run_on_single_fasta(
+    fasta_path, polynuc_thres, entropy_thres, nb_scanned_nt, threads
+):
     """Run the telomere detection algorithm on a single fasta file
 
     :param fasta_path: path to fasta file
@@ -495,7 +506,9 @@ def run_on_fasta_dir(
     return total_raw_df, total_telom_df, total_merged_telom_df
 
 
-def run_telofinder(fasta_path, polynuc_thres, entropy_thres, nb_scanned_nt, threads, raw):
+def run_telofinder(
+    fasta_path, polynuc_thres, entropy_thres, nb_scanned_nt, threads, raw
+):
     """Run telofinder on a single fasta file or on a fasta directory"""
     fasta_path = Path(fasta_path)
 
@@ -519,6 +532,53 @@ def run_telofinder(fasta_path, polynuc_thres, entropy_thres, nb_scanned_nt, thre
         return raw_df, telom_df, merged_telom_df
     else:
         raise IOError(f"'{fasta_path}' is not a directory or a file.")
+
+
+def get_telomeric_reads(bam_file, telo_df_merged, outdir="telofinder_telomeric_reads"):
+    """Extract telomeric reads from a bam file corresponding to telomere detected
+    and reported in telo_df_merged
+
+    :param bam_file: An indexed bam alignment file.  :param telo_df_merged:
+    Merged DataFrame with telomeric informations (from one of the run_telofinder
+    functions)
+    """
+
+    outdir = Path(outdir)
+    outdir.mkdir()
+
+    stats = []
+
+    for chro, start, end in telo_df_merged.apply(
+        lambda x: (x.chrom, x.start, x.end), axis=1
+    ):
+
+        out_sam = outdir / f"telomeric_reads_{chro}_{start}_{end}.sam"
+        out_fas = outdir / f"telomeric_reads_{chro}_{start}_{end}.fas"
+
+        with open(out_sam, "w") as sam:
+            with open(out_fas, "w") as fas:
+                with pysam.AlignmentFile(bam_file) as bam:
+                    for rd in bam.fetch(chro, start, end):
+
+                        if rd.mapq > 0:
+
+                            sam.write(str(rd))
+                            fas.write(f">{rd.qname}\n{rd.query_sequence}\n")
+
+                            stats.append(
+                                {
+                                    "bam": Path(bam_file).stem,
+                                    "chro": chro,
+                                    "start": start,
+                                    "end": end,
+                                    "read_len": len(rd.query_sequence),
+                                }
+                            )
+
+        df, telo_df, merged_telo_df = run_on_single_fasta(
+            out_fas, 0.8, 0.8, 8000, threads=4
+        )
+    return merged_telo_df
 
 
 # Main program

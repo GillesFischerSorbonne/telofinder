@@ -581,8 +581,8 @@ def get_telomeric_reads(bam_file, telo_df_merged, outdir="telofinder_telomeric_r
     return merged_telo_df
 
 
-# Main program
-if __name__ == "__main__":
+def main():
+
     args = parse_arguments()
     output_dir_exists(args.force)
     run_telofinder(
@@ -593,3 +593,7 @@ if __name__ == "__main__":
         args.threads,
         args.raw,
     )
+
+
+if __name__ == "__main__":
+    main()

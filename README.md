@@ -1,5 +1,8 @@
 # telofinder
 
+[![Tests](https://github.com/GillesFischerSorbonne/telofinder/actions/workflows/main.yml/badge.svg)](https://github.com/GillesFischerSorbonne/telofinder/actions/workflows/main.yml)
+
+
 A python package to determine the location and the size of telomeric repeats (both terminal and internal) from genome assemblies.
 
 Telomere detection is based on calculation in a 20 bp sliding window of the following two metrics:

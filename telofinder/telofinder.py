@@ -13,7 +13,101 @@ from multiprocessing import Pool
 from functools import partial
 import pysam
 
-from telofinder.plotting import plot_telom
+
+def output_dir_exists(force):
+    """Function to test if the 'telofinder_results' output diretory already exists.
+
+    :param force: overwrites the output directory otherwise exits program --force or -f
+    :return: nothing
+    """
+    dir_exists = os.path.isdir("telofinder_results")
+    if dir_exists:
+        if force:
+            print("Replacing the existing 'telofinder_results' directory.")
+        else:
+            sys.exit(
+                print(
+                    "\n",
+                    "Warning!!! A directory called 'telofinder_results' already exists.",
+                    "\n",
+                    "delete this directory before running the script or use the option --force",
+                    "\n",
+                )
+            )
+
+
+def parse_arguments():
+    """Function to parse and reuse the arguments of the command line
+
+    :param fasta_path: path to a single fasta file or to a directory containing multiple fasta files
+    :param force: force optional, overwrites the output directory otherwise exits program, optional
+    :param entropy_threshold: optional, default = 0.8
+    :param polynuc_threshold: optional, default = 0.8
+    :param nb_scanned_nt: number of scanned nucleotides at each chromosome end, optional, default = 20 000
+    :param threads: Number of threads to use. Multithreaded calculations currently occurs at the level of sequences within a fasta file."
+    :param raw: Outputs raw_df.csv containing the values of all sliding windows
+    :return: parser arguments
+    """
+    parser = argparse.ArgumentParser(
+        description="This program determines the location and the size of telomeric repeats\
+        from genome assemblies. It runs both on single and multiple (multi)fasta file(s).\
+        It outputs 3 csv and 2 bed files containing the telomere calls and their coordinates\
+        either as raw output or after merging consecutive calls"
+    )
+    parser.add_argument(
+        "fasta_path",
+        help="Path to a single (multi)fasta file or to a directory containing multiple fasta files.",
+    )
+    parser.add_argument(
+        "-f",
+        "--force",
+        action="store_true",
+        help="Automatically replace the output 'telofinder_results' directory if present.",
+    )
+    parser.add_argument(
+        "-e",
+        "--entropy_threshold",
+        default=0.8,
+        type=float,
+        help="Entropy threshold for telomere prediction. default=0.8",
+    )
+    parser.add_argument(
+        "-n",
+        "--polynuc_threshold",
+        default=0.8,
+        type=float,
+        help="Poly-nucleotide threshold for telomere prediction. default=0.8",
+    )
+    parser.add_argument(
+        "-s",
+        "--nb_scanned_nt",
+        default=20000,
+        type=int,
+        help="Number of nucleotides scanned in sliding window starting from each sequence\
+    extrimity. If set to -1, the whole sequence will be scanned. default=20000",
+    )
+    parser.add_argument(
+        "-t",
+        "--threads",
+        default=1,
+        type=int,
+        help="Number of threads to use. Multithreaded calculations currently occurs\
+    at the level of sequences within a fasta file.",
+    )
+    parser.add_argument(
+        "-r",
+        "--raw",
+        action="store_true",
+        help="Outputs the raw dataframe (raw_df.csv) containing the values of all sliding windows.",
+    )
+    parser.add_argument(
+        "-o",
+        "--outdir",
+        default="telofinder_results",
+        help="Path to the output directory.",
+    )
+
+    return parser.parse_args()
 
 
 def get_strain_name(filename):
@@ -151,12 +245,8 @@ def classify_telomere(interval_chrom, chrom_len):
 
     interval_W = interval_chrom["W"][:]
     if interval_W == []:
-        classif_dict_list.append(
-            {"start": None, "end": None, "side": "Left", "type": "term"}
-        )
-        classif_dict_list.append(
-            {"start": None, "end": None, "side": "Left", "type": "intern"}
-        )
+        classif_dict_list.append({"start": None, "end": None, "side": "Left", "type": "term"})
+        classif_dict_list.append({"start": None, "end": None, "side": "Left", "type": "intern"})
     elif min(interval_W)[0] == 0:
         classif_dict_list.append(
             {
@@ -189,12 +279,8 @@ def classify_telomere(interval_chrom, chrom_len):
 
     interval_C = interval_chrom["C"][:]
     if interval_C == []:
-        classif_dict_list.append(
-            {"start": None, "end": None, "side": "Right", "type": "term"}
-        )
-        classif_dict_list.append(
-            {"start": None, "end": None, "side": "Right", "type": "intern"}
-        )
+        classif_dict_list.append({"start": None, "end": None, "side": "Right", "type": "term"})
+        classif_dict_list.append({"start": None, "end": None, "side": "Right", "type": "intern"})
     elif max(interval_C)[1] == (chrom_len - 1):
         classif_dict_list.append(
             {
@@ -234,7 +320,7 @@ def export_results(
     telom_df,
     merged_telom_df,
     raw,
-    outdir="telofinder_results",
+    outdir,
 ):
     """Produce output table files"""
     outdir = Path(outdir)
@@ -252,9 +338,7 @@ def export_results(
 
     merged_bed_df = merged_telom_df[["chrom", "start", "end", "type"]].copy()
     merged_bed_df.dropna(inplace=True)
-    merged_bed_df.to_csv(
-        outdir / "telom_merged.bed", sep="\t", header=None, index=False
-    )
+    merged_bed_df.to_csv(outdir / "telom_merged.bed", sep="\t", header=None, index=False)
 
     if raw:
         raw_df.to_csv(outdir / "raw_df.csv", index=True)
@@ -279,9 +363,7 @@ def run_on_single_seq(seq_record, strain, polynuc_thres, entropy_thres, nb_scann
     df_W = pd.DataFrame(seq_dict_W).transpose()
 
     for i, window in sliding_window(seqC, 0, limit_seq, 20):
-        seq_dict_C[
-            (strain, seq_record.name, (len(seqC) - i - 1), "C")
-        ] = compute_metrics(window)
+        seq_dict_C[(strain, seq_record.name, (len(seqC) - i - 1), "C")] = compute_metrics(window)
 
     df_C = pd.DataFrame(seq_dict_C).transpose()
 
@@ -316,15 +398,11 @@ def run_on_single_seq(seq_record, strain, polynuc_thres, entropy_thres, nb_scann
             on=["chrom", "start"],
             how="left",
         )
-        telo_df_merged.loc[
-            telo_df_merged.end > len(seq_record.seq) - 20, "type"
-        ] = "term"
+        telo_df_merged.loc[telo_df_merged.end > len(seq_record.seq) - 20, "type"] = "term"
         telo_df_merged.loc[telo_df_merged.start < 20, "type"] = "term"
 
     telo_df_merged["strain"] = strain
-    telo_df_merged = telo_df_merged[
-        ["strain", "chrom", "side", "type", "start", "end", "chrom_size"]
-    ]
+    telo_df_merged = telo_df_merged[["strain", "chrom", "side", "type", "start", "end", "chrom_size"]]
 
     telo_df["strain"] = strain
     telo_df = telo_df[["strain", "chrom", "side", "type", "start", "end"]]
@@ -334,9 +412,7 @@ def run_on_single_seq(seq_record, strain, polynuc_thres, entropy_thres, nb_scann
     return (df_chro, telo_df, telo_df_merged)
 
 
-def run_on_single_fasta(
-    fasta_path, polynuc_thres, entropy_thres, nb_scanned_nt, threads
-):
+def run_on_single_fasta(fasta_path, polynuc_thres, entropy_thres, nb_scanned_nt, threads):
     """Run the telomere detection algorithm on a single fasta file
 
     :param fasta_path: path to fasta file
@@ -366,19 +442,13 @@ def run_on_single_fasta(
 
     telo_df_merged = pd.concat([r[2] for r in results])
     telo_df_merged["len"] = telo_df_merged["end"] - telo_df_merged["start"] + 1
-    telo_df_merged = telo_df_merged.astype(
-        {"start": "Int64", "end": "Int64", "len": "Int64", "chrom_size": "Int64"}
-    )
-    telo_df_merged = telo_df_merged[
-        ["strain", "chrom", "side", "type", "start", "end", "len", "chrom_size"]
-    ]
+    telo_df_merged = telo_df_merged.astype({"start": "Int64", "end": "Int64", "len": "Int64", "chrom_size": "Int64"})
+    telo_df_merged = telo_df_merged[["strain", "chrom", "side", "type", "start", "end", "len", "chrom_size"]]
 
     return raw_df, telo_df, telo_df_merged
 
 
-def run_on_fasta_dir(
-    fasta_dir_path, polynuc_thres, entropy_thres, nb_scanned_nt, threads
-):
+def run_on_fasta_dir(fasta_dir_path, polynuc_thres, entropy_thres, nb_scanned_nt, threads):
     """Run iteratively the telemore detection algorithm on all fasta files in a directory
 
     :param fasta_dir: path to fasta directory
@@ -405,7 +475,31 @@ def run_on_fasta_dir(
     return total_raw_df, total_telom_df, total_merged_telom_df
 
 
-def get_telomeric_reads(bam_file, telo_df_merged, outdir="telofinder_telomeric_reads"):
+def run_telofinder(fasta_path, polynuc_thres, entropy_thres, nb_scanned_nt, threads, raw, outdir):
+    """Run telofinder on a single fasta file or on a fasta directory"""
+    fasta_path = Path(fasta_path)
+
+    if fasta_path.is_dir():
+        print(f"Running in iterative mode on all '*.fasta', '*.fas', '*.fa', '*.fsa' files in '{fasta_path}'")
+        raw_df, telom_df, merged_telom_df = run_on_fasta_dir(
+            fasta_path, polynuc_thres, entropy_thres, nb_scanned_nt, threads
+        )
+        export_results(raw_df, telom_df, merged_telom_df, raw, outdir)
+        return raw_df, telom_df, merged_telom_df
+
+    elif fasta_path.is_file():
+        print(f"Running in single fasta mode on '{fasta_path}'")
+
+        raw_df, telom_df, merged_telom_df = run_on_single_fasta(
+            fasta_path, polynuc_thres, entropy_thres, nb_scanned_nt, threads
+        )
+        export_results(raw_df, telom_df, merged_telom_df, raw, outdir)
+        return raw_df, telom_df, merged_telom_df
+    else:
+        raise IOError(f"'{fasta_path}' is not a directory or a file.")
+
+
+def get_telomeric_reads(bam_file, telo_df_merged, outdir):
     """Extract telomeric reads from a bam file corresponding to telomere detected
     and reported in telo_df_merged
 
@@ -417,38 +511,32 @@ def get_telomeric_reads(bam_file, telo_df_merged, outdir="telofinder_telomeric_r
     outdir = Path(outdir)
     outdir.mkdir()
 
-    stats = []
+    for chro, start, end in telo_df_merged.apply(lambda x: (x.chrom, x.start, x.end), axis=1):
 
-    for chro, start, end in telo_df_merged.apply(
-        lambda x: (x.chrom, x.start, x.end), axis=1
-    ):
+        out_bam_path = outdir / f"telomeric_reads_{chro}_{start}_{end}.bam"
+        out_fas_path = outdir / f"telomeric_reads_{chro}_{start}_{end}.fas"
 
-        out_sam = outdir / f"telomeric_reads_{chro}_{start}_{end}.sam"
-        out_fas = outdir / f"telomeric_reads_{chro}_{start}_{end}.fas"
+        with pysam.AlignmentFile(bam_file) as bam:
+            with pysam.AlignmentFile(out_bam_path, "wb", template=bam) as out_bam:
+                with open(out_fas_path, "w") as out_fas:
 
-        with open(out_sam, "w") as sam:
-            with open(out_fas, "w") as fas:
-                with pysam.AlignmentFile(bam_file) as bam:
                     for rd in bam.fetch(chro, start, end):
-
                         if rd.mapq > 0:
 
-                            sam.write(str(rd))
-                            fas.write(f">{rd.qname}\n{rd.query_sequence}\n")
-
-                            stats.append(
-                                {
-                                    "bam": Path(bam_file).stem,
-                                    "chro": chro,
-                                    "start": start,
-                                    "end": end,
-                                    "read_len": len(rd.query_sequence),
-                                }
-                            )
-
-        df, telo_df, merged_telo_df = run_on_single_fasta(
-            out_fas, 0.8, 0.8, 8000, threads=4
-        )
-    return merged_telo_df
+                            out_bam.write(rd)
+                            out_fas.write(f">{rd.qname}\n{rd.query_sequence}\n")
 
 
+# Main program
+if __name__ == "__main__":
+    args = parse_arguments()
+    output_dir_exists(args.force)
+    run_telofinder(
+        args.fasta_path,
+        args.polynuc_threshold,
+        args.entropy_threshold,
+        args.nb_scanned_nt,
+        args.threads,
+        args.raw,
+        args.outdir,
+    )

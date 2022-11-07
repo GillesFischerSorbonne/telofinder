@@ -87,6 +87,16 @@ def parse_arguments():
     extrimity. If set to -1, the whole sequence will be scanned. default=20000",
     )
     parser.add_argument(
+        "-d",
+        "--direction",
+        default="both",
+        choices=["both", "forward", "reverse"],
+        nargs=1,
+        type=str,
+        help="Whether to detect telomores on both, forward or reverse strand (useful only when searching telomeres in telomeric reads",
+    )
+
+    parser.add_argument(
         "-t",
         "--threads",
         default=1,
@@ -325,7 +335,7 @@ def export_results(
     """Produce output table files"""
     outdir = Path(outdir)
     try:
-        outdir.mkdir()
+        outdir.mkdir(parents=True)
     except FileExistsError:
         pass
 
@@ -344,30 +354,38 @@ def export_results(
         raw_df.to_csv(outdir / "raw_df.csv", index=True)
 
 
-def run_on_single_seq(seq_record, strain, polynuc_thres, entropy_thres, nb_scanned_nt):
-    seqW = str(seq_record.seq)
-    revcomp = seq_record.reverse_complement()
-    seqC = str(revcomp.seq)
+def run_on_single_seq(seq_record, strain, polynuc_thres, entropy_thres, nb_scanned_nt, direction):
 
     if nb_scanned_nt == -1:
-        limit_seq = len(seqW)
+        limit_seq = len(seq_record.seq)
     else:
-        limit_seq = min(nb_scanned_nt, len(seqW))
+        limit_seq = min(nb_scanned_nt, len(seq_record.seq))
 
-    seq_dict_W = {}
-    seq_dict_C = {}
+    if direction in ["both", "forward"]:
+        seqW = str(seq_record.seq)
+        seq_dict_W = {}
 
-    for i, window in sliding_window(seqW, 0, limit_seq, 20):
-        seq_dict_W[(strain, seq_record.name, i, "W")] = compute_metrics(window)
+        for i, window in sliding_window(seqW, 0, limit_seq, 20):
+            seq_dict_W[(strain, seq_record.name, i, "W")] = compute_metrics(window)
 
-    df_W = pd.DataFrame(seq_dict_W).transpose()
+        df_W = pd.DataFrame(seq_dict_W).transpose()
 
-    for i, window in sliding_window(seqC, 0, limit_seq, 20):
-        seq_dict_C[(strain, seq_record.name, (len(seqC) - i - 1), "C")] = compute_metrics(window)
+    if direction in ["both", "reverse"]:
+        revcomp = seq_record.reverse_complement()
+        seqC = str(revcomp.seq)
+        seq_dict_C = {}
 
-    df_C = pd.DataFrame(seq_dict_C).transpose()
+        for i, window in sliding_window(seqC, 0, limit_seq, 20):
+            seq_dict_C[(strain, seq_record.name, (len(seqC) - i - 1), "C")] = compute_metrics(window)
 
-    df_chro = pd.concat([df_W, df_C])
+        df_C = pd.DataFrame(seq_dict_C).transpose()
+
+    if direction == "both":
+        df_chro = pd.concat([df_W, df_C])
+    elif direction == "forward":
+        df_chro = df_W
+    elif direction == "reverse":
+        df_chro = df_C
 
     df_chro.loc[
         (df_chro["entropy"] < entropy_thres) & (df_chro["polynuc"] > polynuc_thres),
@@ -412,7 +430,7 @@ def run_on_single_seq(seq_record, strain, polynuc_thres, entropy_thres, nb_scann
     return (df_chro, telo_df, telo_df_merged)
 
 
-def run_on_single_fasta(fasta_path, polynuc_thres, entropy_thres, nb_scanned_nt, threads):
+def run_on_single_fasta(fasta_path, polynuc_thres, entropy_thres, nb_scanned_nt, direction, threads):
     """Run the telomere detection algorithm on a single fasta file
 
     :param fasta_path: path to fasta file
@@ -428,6 +446,7 @@ def run_on_single_fasta(fasta_path, polynuc_thres, entropy_thres, nb_scanned_nt,
         polynuc_thres=polynuc_thres,
         entropy_thres=entropy_thres,
         nb_scanned_nt=nb_scanned_nt,
+        direction=direction,
     )
 
     with Pool(threads) as p:
@@ -448,7 +467,7 @@ def run_on_single_fasta(fasta_path, polynuc_thres, entropy_thres, nb_scanned_nt,
     return raw_df, telo_df, telo_df_merged
 
 
-def run_on_fasta_dir(fasta_dir_path, polynuc_thres, entropy_thres, nb_scanned_nt, threads):
+def run_on_fasta_dir(fasta_dir_path, polynuc_thres, entropy_thres, nb_scanned_nt, direction, threads):
     """Run iteratively the telemore detection algorithm on all fasta files in a directory
 
     :param fasta_dir: path to fasta directory
@@ -462,7 +481,7 @@ def run_on_fasta_dir(fasta_dir_path, polynuc_thres, entropy_thres, nb_scanned_nt
         for fasta in fasta_dir_path.glob(ext):
 
             raw_df, telom_df, merged_telom_df = run_on_single_fasta(
-                fasta, polynuc_thres, entropy_thres, nb_scanned_nt, threads
+                fasta, polynuc_thres, entropy_thres, nb_scanned_nt, direction, threads
             )
             raw_dfs.append(raw_df)
             telom_dfs.append(telom_df)
@@ -475,14 +494,14 @@ def run_on_fasta_dir(fasta_dir_path, polynuc_thres, entropy_thres, nb_scanned_nt
     return total_raw_df, total_telom_df, total_merged_telom_df
 
 
-def run_telofinder(fasta_path, polynuc_thres, entropy_thres, nb_scanned_nt, threads, raw, outdir):
+def run_telofinder(fasta_path, polynuc_thres, entropy_thres, nb_scanned_nt, direction, threads, raw, outdir):
     """Run telofinder on a single fasta file or on a fasta directory"""
     fasta_path = Path(fasta_path)
 
     if fasta_path.is_dir():
         print(f"Running in iterative mode on all '*.fasta', '*.fas', '*.fa', '*.fsa' files in '{fasta_path}'")
         raw_df, telom_df, merged_telom_df = run_on_fasta_dir(
-            fasta_path, polynuc_thres, entropy_thres, nb_scanned_nt, threads
+            fasta_path, polynuc_thres, entropy_thres, nb_scanned_nt, direction, threads
         )
         export_results(raw_df, telom_df, merged_telom_df, raw, outdir)
         return raw_df, telom_df, merged_telom_df
@@ -491,7 +510,7 @@ def run_telofinder(fasta_path, polynuc_thres, entropy_thres, nb_scanned_nt, thre
         print(f"Running in single fasta mode on '{fasta_path}'")
 
         raw_df, telom_df, merged_telom_df = run_on_single_fasta(
-            fasta_path, polynuc_thres, entropy_thres, nb_scanned_nt, threads
+            fasta_path, polynuc_thres, entropy_thres, nb_scanned_nt, direction, threads
         )
         export_results(raw_df, telom_df, merged_telom_df, raw, outdir)
         return raw_df, telom_df, merged_telom_df
@@ -499,7 +518,9 @@ def run_telofinder(fasta_path, polynuc_thres, entropy_thres, nb_scanned_nt, thre
         raise IOError(f"'{fasta_path}' is not a directory or a file.")
 
 
-def get_telomeric_reads(bam_file, telo_df_merged, outdir):
+def get_telomere_in_telomeric_reads(
+    bam_file, telo_df_merged, outdir, polynuc_thres, entropy_thres, nb_scanned_nt, threads
+):
     """Extract telomeric reads from a bam file corresponding to telomere detected
     and reported in telo_df_merged
 
@@ -509,9 +530,11 @@ def get_telomeric_reads(bam_file, telo_df_merged, outdir):
     """
 
     outdir = Path(outdir)
-    outdir.mkdir()
+    outdir.mkdir(parents=True)
 
-    for chro, start, end in telo_df_merged.apply(lambda x: (x.chrom, x.start, x.end), axis=1):
+    for chro, start, end, side, ttype in telo_df_merged.apply(
+        lambda x: (x.chrom, x.start, x.end, x.side, x.type), axis=1
+    ):
 
         out_bam_path = outdir / f"telomeric_reads_{chro}_{start}_{end}.bam"
         out_fas_path = outdir / f"telomeric_reads_{chro}_{start}_{end}.fas"
@@ -526,6 +549,31 @@ def get_telomeric_reads(bam_file, telo_df_merged, outdir):
                             out_bam.write(rd)
                             out_fas.write(f">{rd.qname}\n{rd.query_sequence}\n")
 
+        if side == "Left":
+            raw_df, telom_df, merged_telom_df = run_on_single_fasta(
+                out_fas_path, polynuc_thres, entropy_thres, nb_scanned_nt, "forward", threads
+            )
+            merged_telom_df["telomere_original_type"] = ttype
+            export_results(
+                raw_df,
+                telom_df,
+                merged_telom_df,
+                raw=False,
+                outdir=outdir / f"tf_on_reads_{chro}_{start}_{end}_forward",
+            )
+        if side == "Right":
+            raw_df, telom_df, merged_telom_df = run_on_single_fasta(
+                out_fas_path, polynuc_thres, entropy_thres, nb_scanned_nt, "reverse", threads
+            )
+            merged_telom_df["telomere_original_type"] = ttype
+            export_results(
+                raw_df,
+                telom_df,
+                merged_telom_df,
+                raw=False,
+                outdir=outdir / f"tf_on_reads_{chro}_{start}_{end}_reverse",
+            )
+
 
 # Main program
 if __name__ == "__main__":
@@ -536,6 +584,7 @@ if __name__ == "__main__":
         args.polynuc_threshold,
         args.entropy_threshold,
         args.nb_scanned_nt,
+        args.direction,
         args.threads,
         args.raw,
         args.outdir,

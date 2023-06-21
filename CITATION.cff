@@ -1,0 +1,9 @@
+cff-version: 1.1.0
+message: "If you use this software, please cite it as below."
+authors:
+  - family-names: Gilles
+    given-names: Fischer
+    orcid: https://orcid.org/my-orcid?orcid=0000-0001-5732-2682
+title: GillesFischerSorbonne/telofinder: Telofinder
+version: v1.0.0
+date-released: 2023-06-21

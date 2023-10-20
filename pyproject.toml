@@ -1,0 +1,31 @@
+[tool.poetry]
+name = "telofinder"
+version = "1.0.0"
+description = "A python package to determine the location and the size of telomeric repeats (both terminal and internal) from genome assemblies."
+authors = ["Gilles Fischer"]
+readme = "README.md"
+license = "new BSD"
+
+[tool.poetry.dependencies]
+python = ">=3.10,<3.13"
+biopython = "^1.81"
+numpy = "^1.26.1"
+pandas = "^2.1.1"
+pybedtools = "^0.9.1"
+pysam = "^0.22.0"
+python-dateutil = "^2.8.2"
+pytz = "^2023.3.post1"
+six = "^1.16.0"
+numpydoc = "^1.6.0"
+matplotlib = "^3.8.0"
+
+
+[tool.poetry.group.test.dependencies]
+pytest = "^7.4.2"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+telofinder = "telofinder.main:main"

@@ -1,6 +1,4 @@
-
-
-:Python version: Python 3.6, 3.7.3; most modules are Python2.7 compatible.
+:Python version: Python 3.10, 3.11
 
 Telofinder
 ###########################

@@ -355,7 +355,6 @@ def export_results(
 
 
 def run_on_single_seq(seq_record, strain, polynuc_thres, entropy_thres, nb_scanned_nt, direction):
-
     if nb_scanned_nt == -1:
         limit_seq = len(seq_record.seq)
     else:
@@ -450,7 +449,6 @@ def run_on_single_fasta(fasta_path, polynuc_thres, entropy_thres, nb_scanned_nt,
     )
 
     with Pool(threads) as p:
-
         results = p.map(partial_ross, SeqIO.parse(fasta_path, "fasta"))
 
     raw_df = pd.concat([r[0] for r in results])
@@ -479,7 +477,6 @@ def run_on_fasta_dir(fasta_dir_path, polynuc_thres, entropy_thres, nb_scanned_nt
 
     for ext in ["*.fasta", "*.fas", "*.fa", "*.fsa"]:
         for fasta in fasta_dir_path.glob(ext):
-
             raw_df, telom_df, merged_telom_df = run_on_single_fasta(
                 fasta, polynuc_thres, entropy_thres, nb_scanned_nt, direction, threads
             )
@@ -524,9 +521,8 @@ def get_telomere_in_telomeric_reads(
     """Extract telomeric reads from a bam file corresponding to telomere detected
     and reported in telo_df_merged
 
-    :param bam_file: An indexed bam alignment file.  :param telo_df_merged:
-    Merged DataFrame with telomeric informations (from one of the run_telofinder
-    functions)
+    :param bam_file: An indexed bam alignment file.
+    :param telo_df_merged: Merged DataFrame with telomeric informations (from one of the run_telofinder functions)
     """
 
     outdir = Path(outdir)
@@ -535,17 +531,14 @@ def get_telomere_in_telomeric_reads(
     for chro, start, end, side, ttype in telo_df_merged.apply(
         lambda x: (x.chrom, x.start, x.end, x.side, x.type), axis=1
     ):
-
         out_bam_path = outdir / f"telomeric_reads_{chro}_{start}_{end}.bam"
         out_fas_path = outdir / f"telomeric_reads_{chro}_{start}_{end}.fas"
 
         with pysam.AlignmentFile(bam_file) as bam:
             with pysam.AlignmentFile(out_bam_path, "wb", template=bam) as out_bam:
                 with open(out_fas_path, "w") as out_fas:
-
                     for rd in bam.fetch(chro, start, end):
                         if rd.mapq > 0:
-
                             out_bam.write(rd)
                             out_fas.write(f">{rd.qname}\n{rd.query_sequence}\n")
 

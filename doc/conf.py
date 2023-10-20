@@ -41,9 +41,6 @@ title = "Telofinder"
 copyright = author + ", 2020"
 project = "Telofinder"
 
-import easydev
-from easydev import get_path_sphinx_themes
-
 
 # -- General configuration -----------------------------------------------------
 

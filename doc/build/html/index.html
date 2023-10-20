@@ -1,88 +1,48 @@
-
-
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Telofinder &mdash; Telofinder 1.0.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/plot_directive.css" type="text/css" />
+      <link rel="stylesheet" href="_static/graphviz.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
-
-  
-  
-  
-  
-
-  
-  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
-  
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/doctools.js"></script>
-        <script src="_static/language_data.js"></script>
-    
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-
-    
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/graphviz.css" type="text/css" />
+        <script src="_static/documentation_options.js?v=8d563738"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
 
           
-            <a href="#" class="icon icon-home"> Telofinder
           
-
-          
+          <a href="#" class="icon icon-home">
+            Telofinder
           </a>
-
-          
-            
-            
               <div class="version">
                 Current version: 1.0.0
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <!-- Local TOC -->
               <div class="local-toc"><ul>
 <li><a class="reference internal" href="#">Telofinder</a></li>
@@ -94,74 +54,55 @@
 <li><a class="reference internal" href="#output">Output</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#module-telofinder.telofinder">Reference</a></li>
+<li><a class="reference internal" href="#module-telofinder.telofinder">Reference</a><ul>
+<li><a class="reference internal" href="#telofinder.telofinder.base_compos"><code class="docutils literal notranslate"><span class="pre">base_compos()</span></code></a></li>
+<li><a class="reference internal" href="#telofinder.telofinder.classify_telomere"><code class="docutils literal notranslate"><span class="pre">classify_telomere()</span></code></a></li>
+<li><a class="reference internal" href="#telofinder.telofinder.compute_metrics"><code class="docutils literal notranslate"><span class="pre">compute_metrics()</span></code></a></li>
+<li><a class="reference internal" href="#telofinder.telofinder.count_polynuc_occurence"><code class="docutils literal notranslate"><span class="pre">count_polynuc_occurence()</span></code></a></li>
+<li><a class="reference internal" href="#telofinder.telofinder.export_results"><code class="docutils literal notranslate"><span class="pre">export_results()</span></code></a></li>
+<li><a class="reference internal" href="#telofinder.telofinder.get_consecutive_groups"><code class="docutils literal notranslate"><span class="pre">get_consecutive_groups()</span></code></a></li>
+<li><a class="reference internal" href="#telofinder.telofinder.get_entropy"><code class="docutils literal notranslate"><span class="pre">get_entropy()</span></code></a></li>
+<li><a class="reference internal" href="#telofinder.telofinder.get_polynuc"><code class="docutils literal notranslate"><span class="pre">get_polynuc()</span></code></a></li>
+<li><a class="reference internal" href="#telofinder.telofinder.get_strain_name"><code class="docutils literal notranslate"><span class="pre">get_strain_name()</span></code></a></li>
+<li><a class="reference internal" href="#telofinder.telofinder.get_telomere_in_telomeric_reads"><code class="docutils literal notranslate"><span class="pre">get_telomere_in_telomeric_reads()</span></code></a></li>
+<li><a class="reference internal" href="#telofinder.telofinder.output_dir_exists"><code class="docutils literal notranslate"><span class="pre">output_dir_exists()</span></code></a></li>
+<li><a class="reference internal" href="#telofinder.telofinder.parse_arguments"><code class="docutils literal notranslate"><span class="pre">parse_arguments()</span></code></a></li>
+<li><a class="reference internal" href="#telofinder.telofinder.run_on_fasta_dir"><code class="docutils literal notranslate"><span class="pre">run_on_fasta_dir()</span></code></a></li>
+<li><a class="reference internal" href="#telofinder.telofinder.run_on_single_fasta"><code class="docutils literal notranslate"><span class="pre">run_on_single_fasta()</span></code></a></li>
+<li><a class="reference internal" href="#telofinder.telofinder.run_on_single_seq"><code class="docutils literal notranslate"><span class="pre">run_on_single_seq()</span></code></a></li>
+<li><a class="reference internal" href="#telofinder.telofinder.run_telofinder"><code class="docutils literal notranslate"><span class="pre">run_telofinder()</span></code></a></li>
+<li><a class="reference internal" href="#telofinder.telofinder.sliding_window"><code class="docutils literal notranslate"><span class="pre">sliding_window()</span></code></a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
 </ul>
 </div>
-            
-          
         </div>
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="#">Telofinder</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
-      <li><a href="#">Docs</a> &raquo;</li>
-        
-      <li>Telofinder</li>
-    
-    
+      <li><a href="#" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Telofinder</li>
       <li class="wy-breadcrumbs-aside">
-        
-            
             <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="telofinder">
-<h1>Telofinder<a class="headerlink" href="#telofinder" title="Permalink to this headline">¶</a></h1>
+             
+  <section id="telofinder">
+<h1>Telofinder<a class="headerlink" href="#telofinder" title="Link to this heading">¶</a></h1>
 <p>A python package to determine the location and the size of telomeric repeats (both terminal and internal) from genome assemblies. This version of the program only works for yeast genomes (telomere sequence TG<sub>1-3</sub>)</p>
 <dl class="simple">
 <dt>Telomere detection is based on calculation in a 20 bp sliding window of the following two metrics:</dt><dd><ul class="simple">
@@ -173,43 +114,46 @@
 <img alt="_images/polynuc_entropy_8kb.png" src="_images/polynuc_entropy_8kb.png" />
 <img alt="_images/zoom_term.png" src="_images/zoom_term.png" />
 <img alt="_images/zoom_int.png" src="_images/zoom_int.png" />
-</div>
-<div class="section" id="installation">
-<h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
-<p>install (mini)conda:</p>
+</section>
+<section id="installation">
+<h1>Installation<a class="headerlink" href="#installation" title="Link to this heading">¶</a></h1>
+<p>You need to have bedtools in your PATH for telofinder to work.</p>
+<p>Install (mini)conda:</p>
 <blockquote>
 <div><p>see <a class="reference external" href="https://docs.conda.io/projects/conda/en/latest/user-guide/install/">https://docs.conda.io/projects/conda/en/latest/user-guide/install/</a></p>
 </div></blockquote>
-<p>add channels:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ conda config --add channels conda-forge bioconda
+<p>Configure channels and add dependencies:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>conda<span class="w"> </span>config<span class="w"> </span>--add<span class="w"> </span>channels<span class="w"> </span>conda-forge<span class="w"> </span>bioconda
+$<span class="w"> </span>conda<span class="w"> </span>create<span class="w"> </span>-n<span class="w"> </span>telofinder<span class="w"> </span><span class="nv">python</span><span class="o">=</span><span class="m">3</span>.10
+$<span class="w"> </span>conda<span class="w"> </span>activate<span class="w"> </span>telofinder
+$<span class="w"> </span>conda<span class="w"> </span>install<span class="w"> </span>bedtools
 </pre></div>
 </div>
 <p>install the telofinder package:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ git clone https://github.com/GillesFischerSorbonne/telofinder.git
-$ <span class="nb">cd</span> telofinder
-$ conda env create
-$ python setupy.py install
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/GillesFischerSorbonne/telofinder.git
+$<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>telofinder
+$<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>.
 </pre></div>
 </div>
-</div>
-<div class="section" id="usage">
-<h1>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h1>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ conda activate telofinder
-$ <span class="nb">cd</span> telofinder
-$ python telofinder.py <span class="o">[</span>fasta_path<span class="o">]</span>
+</section>
+<section id="usage">
+<h1>Usage<a class="headerlink" href="#usage" title="Link to this heading">¶</a></h1>
+<p>Using the conda environment created during Installation:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>conda<span class="w"> </span>activate<span class="w"> </span>telofinder
+$<span class="w"> </span>telofinder<span class="w"> </span><span class="o">[</span>fasta_path<span class="o">]</span>
 </pre></div>
 </div>
-<div class="section" id="positional-arguments">
-<h2>Positional arguments<a class="headerlink" href="#positional-arguments" title="Permalink to this headline">¶</a></h2>
+<section id="positional-arguments">
+<h2>Positional arguments<a class="headerlink" href="#positional-arguments" title="Link to this heading">¶</a></h2>
 <blockquote>
 <div><dl class="simple">
 <dt>fasta_path</dt><dd><p>path to a single (multi)fasta file or to a directory containing multiple fasta files</p>
 </dd>
 </dl>
 </div></blockquote>
-</div>
-<div class="section" id="optional-arguments">
-<h2>Optional arguments<a class="headerlink" href="#optional-arguments" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="optional-arguments">
+<h2>Optional arguments<a class="headerlink" href="#optional-arguments" title="Link to this heading">¶</a></h2>
 <blockquote>
 <div><dl class="option-list">
 <dt><kbd><span class="option">-f</span>, <span class="option">--force</span></kbd></dt>
@@ -234,156 +178,171 @@ default = 0.8</p>
 </dd>
 </dl>
 </div></blockquote>
-</div>
-<div class="section" id="help">
-<h2>Help<a class="headerlink" href="#help" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ python telofinder.py --help
+</section>
+<section id="help">
+<h2>Help<a class="headerlink" href="#help" title="Link to this heading">¶</a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>python<span class="w"> </span>telofinder.py<span class="w"> </span>--help
 </pre></div>
 </div>
-</div>
-<div class="section" id="output">
-<h2>Output<a class="headerlink" href="#output" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="output">
+<h2>Output<a class="headerlink" href="#output" title="Link to this heading">¶</a></h2>
 <p>Telofinder outputs a directory called <code class="docutils literal notranslate"><span class="pre">telofinder_results</span></code> including 2 csv and 2 bed files containing the telomere calls and their coordinates, either as raw output or after merging consecutive calls</p>
-</div>
-</div>
-<div class="section" id="module-telofinder.telofinder">
-<span id="reference"></span><h1>Reference<a class="headerlink" href="#module-telofinder.telofinder" title="Permalink to this headline">¶</a></h1>
+</section>
+</section>
+<section id="module-telofinder.telofinder">
+<span id="reference"></span><h1>Reference<a class="headerlink" href="#module-telofinder.telofinder" title="Link to this heading">¶</a></h1>
 <dl class="py function">
-<dt id="telofinder.telofinder.base_compos">
-<code class="sig-name descname">base_compos</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sequence</span></em>, <em class="sig-param"><span class="n">base</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/telofinder/telofinder.html#base_compos"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#telofinder.telofinder.base_compos" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="telofinder.telofinder.base_compos">
+<span class="sig-name descname"><span class="pre">base_compos</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sequence</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/telofinder/telofinder.html#base_compos"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#telofinder.telofinder.base_compos" title="Link to this definition">¶</a></dt>
 <dd><p>Counts the number of a given base in a sequence</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>sequence</strong> -- fasta sequence</p></li>
 <li><p><strong>base</strong> -- base to count in the sequence</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>the number of that base in the sequence</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
-<dt id="telofinder.telofinder.classify_telomere">
-<code class="sig-name descname">classify_telomere</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">interval_chrom</span></em>, <em class="sig-param"><span class="n">chrom_len</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/telofinder/telofinder.html#classify_telomere"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#telofinder.telofinder.classify_telomere" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="telofinder.telofinder.classify_telomere">
+<span class="sig-name descname"><span class="pre">classify_telomere</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">interval_chrom</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chrom_len</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/telofinder/telofinder.html#classify_telomere"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#telofinder.telofinder.classify_telomere" title="Link to this definition">¶</a></dt>
 <dd><p>From a list of tuples obtained from get_consecutive_groups, identify if
 interval corresponds to terminal or interal telomere</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="telofinder.telofinder.compute_metrics">
-<code class="sig-name descname">compute_metrics</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">window</span></em>, <em class="sig-param"><span class="n">polynucleotide_list</span><span class="o">=</span><span class="default_value">['AC', 'CA', 'CC']</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/telofinder/telofinder.html#compute_metrics"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#telofinder.telofinder.compute_metrics" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="telofinder.telofinder.compute_metrics">
+<span class="sig-name descname"><span class="pre">compute_metrics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">window</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">polynucleotide_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['AC',</span> <span class="pre">'CA',</span> <span class="pre">'CC']</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/telofinder/telofinder.html#compute_metrics"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#telofinder.telofinder.compute_metrics" title="Link to this definition">¶</a></dt>
 <dd><p>Compute entropy and polynucleotide proportion in the sequence window</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>window</strong> -- sliding window</p></li>
 <li><p><strong>polynucleotide_list</strong> -- a list of polynucleotides, default value is [&quot;AC&quot;, &quot;CA&quot;, &quot;CC&quot;]</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>a dictionary of entropy and polynucleotide proportion of the sequence window</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
-<dt id="telofinder.telofinder.count_polynuc_occurence">
-<code class="sig-name descname">count_polynuc_occurence</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sub_window</span></em>, <em class="sig-param"><span class="n">polynucleotide_list</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/telofinder/telofinder.html#count_polynuc_occurence"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#telofinder.telofinder.count_polynuc_occurence" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="telofinder.telofinder.count_polynuc_occurence">
+<span class="sig-name descname"><span class="pre">count_polynuc_occurence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sub_window</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">polynucleotide_list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/telofinder/telofinder.html#count_polynuc_occurence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#telofinder.telofinder.count_polynuc_occurence" title="Link to this definition">¶</a></dt>
 <dd><p>Define presence of polynucleotide in the window.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>sub_window</strong> -- the sequence of a sub_window</p></li>
 <li><p><strong>polynuleotide_list</strong> -- a list of polynucleotides. Note that all polynucleotides must be of the same size</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>a boolean for the presence of the sub_window in the polynucleotide list</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
-<dt id="telofinder.telofinder.export_results">
-<code class="sig-name descname">export_results</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">raw_df</span></em>, <em class="sig-param"><span class="n">telom_df</span></em>, <em class="sig-param"><span class="n">merged_telom_df</span></em>, <em class="sig-param"><span class="n">raw</span></em>, <em class="sig-param"><span class="n">outdir</span><span class="o">=</span><span class="default_value">'telofinder_results'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/telofinder/telofinder.html#export_results"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#telofinder.telofinder.export_results" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="telofinder.telofinder.export_results">
+<span class="sig-name descname"><span class="pre">export_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">raw_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">telom_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">merged_telom_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raw</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outdir</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/telofinder/telofinder.html#export_results"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#telofinder.telofinder.export_results" title="Link to this definition">¶</a></dt>
 <dd><p>Produce output table files</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="telofinder.telofinder.get_consecutive_groups">
-<code class="sig-name descname">get_consecutive_groups</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df_chrom</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/telofinder/telofinder.html#get_consecutive_groups"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#telofinder.telofinder.get_consecutive_groups" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="telofinder.telofinder.get_consecutive_groups">
+<span class="sig-name descname"><span class="pre">get_consecutive_groups</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df_chrom</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/telofinder/telofinder.html#get_consecutive_groups"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#telofinder.telofinder.get_consecutive_groups" title="Link to this definition">¶</a></dt>
 <dd><p>From the raw dataframe get start and end of each telomere window.
 Applied to detect start and end of telomere in nucleotide positions.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="telofinder.telofinder.get_entropy">
-<code class="sig-name descname">get_entropy</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">window</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/telofinder/telofinder.html#get_entropy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#telofinder.telofinder.get_entropy" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="telofinder.telofinder.get_entropy">
+<span class="sig-name descname"><span class="pre">get_entropy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">window</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/telofinder/telofinder.html#get_entropy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#telofinder.telofinder.get_entropy" title="Link to this definition">¶</a></dt>
 <dd><p>Calculate the entropy of the window DNA sequence</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>window</strong> -- sliding window</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>entropy value of the sequence window</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
-<dt id="telofinder.telofinder.get_polynuc">
-<code class="sig-name descname">get_polynuc</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">window</span></em>, <em class="sig-param"><span class="n">polynucleotide_list</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/telofinder/telofinder.html#get_polynuc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#telofinder.telofinder.get_polynuc" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="telofinder.telofinder.get_polynuc">
+<span class="sig-name descname"><span class="pre">get_polynuc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">window</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">polynucleotide_list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/telofinder/telofinder.html#get_polynuc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#telofinder.telofinder.get_polynuc" title="Link to this definition">¶</a></dt>
 <dd><p>get the propbortion of polynuceotides in the window</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>window</strong> -- sliding window</p></li>
 <li><p><strong>polynucleotide_list</strong> -- a list of polynucleotides. Note that all polynucleotides must be of the same size</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>total polynucleotide proportion in the sliding window</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
-<dt id="telofinder.telofinder.get_strain_name">
-<code class="sig-name descname">get_strain_name</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/telofinder/telofinder.html#get_strain_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#telofinder.telofinder.get_strain_name" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="telofinder.telofinder.get_strain_name">
+<span class="sig-name descname"><span class="pre">get_strain_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/telofinder/telofinder.html#get_strain_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#telofinder.telofinder.get_strain_name" title="Link to this definition">¶</a></dt>
 <dd><p>Function to get the strain name from the name of the fasta file</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>filename</strong> -- path of fasta file</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>sequence name</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
-<dt id="telofinder.telofinder.output_dir_exists">
-<code class="sig-name descname">output_dir_exists</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">force</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/telofinder/telofinder.html#output_dir_exists"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#telofinder.telofinder.output_dir_exists" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="telofinder.telofinder.get_telomere_in_telomeric_reads">
+<span class="sig-name descname"><span class="pre">get_telomere_in_telomeric_reads</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bam_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">telo_df_merged</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outdir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">polynuc_thres</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">entropy_thres</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nb_scanned_nt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threads</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/telofinder/telofinder.html#get_telomere_in_telomeric_reads"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#telofinder.telofinder.get_telomere_in_telomeric_reads" title="Link to this definition">¶</a></dt>
+<dd><p>Extract telomeric reads from a bam file corresponding to telomere detected
+and reported in telo_df_merged</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>bam_file</strong> -- An indexed bam alignment file.</p></li>
+<li><p><strong>telo_df_merged</strong> -- Merged DataFrame with telomeric informations (from one of the run_telofinder functions)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="telofinder.telofinder.output_dir_exists">
+<span class="sig-name descname"><span class="pre">output_dir_exists</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">force</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/telofinder/telofinder.html#output_dir_exists"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#telofinder.telofinder.output_dir_exists" title="Link to this definition">¶</a></dt>
 <dd><p>Function to test if the 'telofinder_results' output diretory already exists.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>force</strong> -- overwrites the output directory otherwise exits program --force or -f</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>nothing</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
-<dt id="telofinder.telofinder.parse_arguments">
-<code class="sig-name descname">parse_arguments</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/telofinder/telofinder.html#parse_arguments"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#telofinder.telofinder.parse_arguments" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="telofinder.telofinder.parse_arguments">
+<span class="sig-name descname"><span class="pre">parse_arguments</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/telofinder/telofinder.html#parse_arguments"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#telofinder.telofinder.parse_arguments" title="Link to this definition">¶</a></dt>
 <dd><p>Function to parse and reuse the arguments of the command line</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>fasta_path</strong> -- path to a single fasta file or to a directory containing multiple fasta files</p></li>
 <li><p><strong>force</strong> -- force optional, overwrites the output directory otherwise exits program, optional</p></li>
@@ -394,63 +353,57 @@ Applied to detect start and end of telomere in nucleotide positions.</p>
 <li><p><strong>raw</strong> -- Outputs raw_df.csv containing the values of all sliding windows</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>parser arguments</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
-<dt id="telofinder.telofinder.plot_telom">
-<code class="sig-name descname">plot_telom</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">telom_df</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/telofinder/telofinder.html#plot_telom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#telofinder.telofinder.plot_telom" title="Permalink to this definition">¶</a></dt>
-<dd><p>Plotting the telomere detection on both left and right chromosome ends</p>
-</dd></dl>
-
-<dl class="py function">
-<dt id="telofinder.telofinder.run_on_fasta_dir">
-<code class="sig-name descname">run_on_fasta_dir</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fasta_dir_path</span></em>, <em class="sig-param"><span class="n">polynuc_thres</span></em>, <em class="sig-param"><span class="n">entropy_thres</span></em>, <em class="sig-param"><span class="n">nb_scanned_nt</span></em>, <em class="sig-param"><span class="n">threads</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/telofinder/telofinder.html#run_on_fasta_dir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#telofinder.telofinder.run_on_fasta_dir" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="telofinder.telofinder.run_on_fasta_dir">
+<span class="sig-name descname"><span class="pre">run_on_fasta_dir</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fasta_dir_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">polynuc_thres</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">entropy_thres</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nb_scanned_nt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">direction</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threads</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/telofinder/telofinder.html#run_on_fasta_dir"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#telofinder.telofinder.run_on_fasta_dir" title="Link to this definition">¶</a></dt>
 <dd><p>Run iteratively the telemore detection algorithm on all fasta files in a directory</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>fasta_dir</strong> -- path to fasta directory</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>a tuple of df, telo_df and telo_df_merged</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
-<dt id="telofinder.telofinder.run_on_single_fasta">
-<code class="sig-name descname">run_on_single_fasta</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fasta_path</span></em>, <em class="sig-param"><span class="n">polynuc_thres</span></em>, <em class="sig-param"><span class="n">entropy_thres</span></em>, <em class="sig-param"><span class="n">nb_scanned_nt</span></em>, <em class="sig-param"><span class="n">threads</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/telofinder/telofinder.html#run_on_single_fasta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#telofinder.telofinder.run_on_single_fasta" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="telofinder.telofinder.run_on_single_fasta">
+<span class="sig-name descname"><span class="pre">run_on_single_fasta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fasta_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">polynuc_thres</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">entropy_thres</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nb_scanned_nt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">direction</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threads</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/telofinder/telofinder.html#run_on_single_fasta"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#telofinder.telofinder.run_on_single_fasta" title="Link to this definition">¶</a></dt>
 <dd><p>Run the telomere detection algorithm on a single fasta file</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>fasta_path</strong> -- path to fasta file</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>a tuple of df, telo_df and telo_df_merged</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
-<dt id="telofinder.telofinder.run_on_single_seq">
-<code class="sig-name descname">run_on_single_seq</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">seq_record</span></em>, <em class="sig-param"><span class="n">strain</span></em>, <em class="sig-param"><span class="n">polynuc_thres</span></em>, <em class="sig-param"><span class="n">entropy_thres</span></em>, <em class="sig-param"><span class="n">nb_scanned_nt</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/telofinder/telofinder.html#run_on_single_seq"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#telofinder.telofinder.run_on_single_seq" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="telofinder.telofinder.run_on_single_seq">
+<span class="sig-name descname"><span class="pre">run_on_single_seq</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seq_record</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">polynuc_thres</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">entropy_thres</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nb_scanned_nt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">direction</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/telofinder/telofinder.html#run_on_single_seq"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#telofinder.telofinder.run_on_single_seq" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
-<dt id="telofinder.telofinder.run_telofinder">
-<code class="sig-name descname">run_telofinder</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fasta_path</span></em>, <em class="sig-param"><span class="n">polynuc_thres</span></em>, <em class="sig-param"><span class="n">entropy_thres</span></em>, <em class="sig-param"><span class="n">nb_scanned_nt</span></em>, <em class="sig-param"><span class="n">threads</span></em>, <em class="sig-param"><span class="n">raw</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/telofinder/telofinder.html#run_telofinder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#telofinder.telofinder.run_telofinder" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="telofinder.telofinder.run_telofinder">
+<span class="sig-name descname"><span class="pre">run_telofinder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fasta_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">polynuc_thres</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">entropy_thres</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nb_scanned_nt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">direction</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threads</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raw</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outdir</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/telofinder/telofinder.html#run_telofinder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#telofinder.telofinder.run_telofinder" title="Link to this definition">¶</a></dt>
 <dd><p>Run telofinder on a single fasta file or on a fasta directory</p>
 </dd></dl>
 
 <dl class="py function">
-<dt id="telofinder.telofinder.sliding_window">
-<code class="sig-name descname">sliding_window</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sequence</span></em>, <em class="sig-param"><span class="n">start</span></em>, <em class="sig-param"><span class="n">end</span></em>, <em class="sig-param"><span class="n">size</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/telofinder/telofinder.html#sliding_window"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#telofinder.telofinder.sliding_window" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="telofinder.telofinder.sliding_window">
+<span class="sig-name descname"><span class="pre">sliding_window</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sequence</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/telofinder/telofinder.html#sliding_window"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#telofinder.telofinder.sliding_window" title="Link to this definition">¶</a></dt>
 <dd><p>Apply a sliding window of length = size to a sequence from start to end</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>sequence</strong> -- fasta sequence</p></li>
 <li><p><strong>start</strong> -- starting coordinate of the sequence</p></li>
@@ -458,63 +411,50 @@ Applied to detect start and end of telomere in nucleotide positions.</p>
 <li><p><strong>size</strong> -- size of the sliding window</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>the coordinate and the sequence of the window</p>
 </dd>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="indices-and-tables">
-<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+</section>
+<section id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Link to this heading">¶</a></h1>
 <ul class="simple">
 <li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
 <li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
 <li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
 </ul>
-</div>
+</section>
 
 
            </div>
-           
           </div>
           <footer>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &copy; Copyright XX, 2020
-      <span class="lastupdated">
-        Last updated on Nov 16, 2020.
-      </span>
-
-    </p>
+    <p>&#169; Copyright XX, 2020.
+      <span class="lastupdated">Last updated on Oct 20, 2023.
+      </span></p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
-
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

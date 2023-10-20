@@ -1,153 +1,78 @@
-
-
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>telofinder.telofinder &mdash; Telofinder 1.0.0 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/plot_directive.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/graphviz.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
-
-  
-  
-  
-  
-
-  
-  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
-  
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-        <script src="../../_static/jquery.js"></script>
-        <script src="../../_static/underscore.js"></script>
-        <script src="../../_static/doctools.js"></script>
-        <script src="../../_static/language_data.js"></script>
-    
-    <script type="text/javascript" src="../../_static/js/theme.js"></script>
-
-    
-
-  
-  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../_static/graphviz.css" type="text/css" />
+        <script src="../../_static/documentation_options.js?v=8d563738"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
 
           
-            <a href="../../index.html" class="icon icon-home"> Telofinder
           
-
-          
+          <a href="../../index.html" class="icon icon-home">
+            Telofinder
           </a>
-
-          
-            
-            
               <div class="version">
                 Current version: 1.0.0
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <!-- Local TOC -->
               <div class="local-toc"></div>
-            
-          
         </div>
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../index.html">Telofinder</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
-      <li><a href="../../index.html">Docs</a> &raquo;</li>
-        
-          <li><a href="../index.html">Module code</a> &raquo;</li>
-        
-      <li>telofinder.telofinder</li>
-    
-    
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">telofinder.telofinder</li>
       <li class="wy-breadcrumbs-aside">
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
+             
   <h1>Source code for telofinder.telofinder</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">from</span> <span class="nn">Bio</span> <span class="kn">import</span> <span class="n">SeqIO</span>
+<span class="kn">from</span> <span class="nn">Bio.SeqRecord</span> <span class="kn">import</span> <span class="n">SeqRecord</span>
+<span class="kn">from</span> <span class="nn">Bio.Seq</span> <span class="kn">import</span> <span class="n">Seq</span>
 <span class="kn">import</span> <span class="nn">os.path</span>
 <span class="kn">import</span> <span class="nn">argparse</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
@@ -157,10 +82,13 @@
 <span class="kn">import</span> <span class="nn">pybedtools</span>
 <span class="kn">from</span> <span class="nn">multiprocessing</span> <span class="kn">import</span> <span class="n">Pool</span>
 <span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
+<span class="kn">import</span> <span class="nn">pysam</span>
 
 
-<div class="viewcode-block" id="output_dir_exists"><a class="viewcode-back" href="../../index.html#telofinder.telofinder.output_dir_exists">[docs]</a><span class="k">def</span> <span class="nf">output_dir_exists</span><span class="p">(</span><span class="n">force</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Function to test if the &#39;telofinder_results&#39; output diretory already exists.</span>
+<div class="viewcode-block" id="output_dir_exists">
+<a class="viewcode-back" href="../../index.html#telofinder.telofinder.output_dir_exists">[docs]</a>
+<span class="k">def</span> <span class="nf">output_dir_exists</span><span class="p">(</span><span class="n">force</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Function to test if the &#39;telofinder_results&#39; output diretory already exists.</span>
 
 <span class="sd">    :param force: overwrites the output directory otherwise exits program --force or -f</span>
 <span class="sd">    :return: nothing</span>
@@ -181,12 +109,15 @@
             <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="parse_arguments"><a class="viewcode-back" href="../../index.html#telofinder.telofinder.parse_arguments">[docs]</a><span class="k">def</span> <span class="nf">parse_arguments</span><span class="p">():</span>
-    <span class="sd">&quot;&quot;&quot;Function to parse and reuse the arguments of the command line</span>
+
+<div class="viewcode-block" id="parse_arguments">
+<a class="viewcode-back" href="../../index.html#telofinder.telofinder.parse_arguments">[docs]</a>
+<span class="k">def</span> <span class="nf">parse_arguments</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Function to parse and reuse the arguments of the command line</span>
 
 <span class="sd">    :param fasta_path: path to a single fasta file or to a directory containing multiple fasta files</span>
 <span class="sd">    :param force: force optional, overwrites the output directory otherwise exits program, optional</span>
-<span class="sd">    :param entropy_threshold: optional, default = 0.8 </span>
+<span class="sd">    :param entropy_threshold: optional, default = 0.8</span>
 <span class="sd">    :param polynuc_threshold: optional, default = 0.8</span>
 <span class="sd">    :param nb_scanned_nt: number of scanned nucleotides at each chromosome end, optional, default = 20 000</span>
 <span class="sd">    :param threads: Number of threads to use. Multithreaded calculations currently occurs at the level of sequences within a fasta file.&quot;</span>
@@ -232,6 +163,16 @@
 <span class="s2">    extrimity. If set to -1, the whole sequence will be scanned. default=20000&quot;</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;-d&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;--direction&quot;</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;both&quot;</span><span class="p">,</span>
+        <span class="n">choices</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;both&quot;</span><span class="p">,</span> <span class="s2">&quot;forward&quot;</span><span class="p">,</span> <span class="s2">&quot;reverse&quot;</span><span class="p">],</span>
+        <span class="n">nargs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Whether to detect telomores on both, forward or reverse strand (useful only when searching telomeres in telomeric reads&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
         <span class="s2">&quot;-t&quot;</span><span class="p">,</span>
         <span class="s2">&quot;--threads&quot;</span><span class="p">,</span>
         <span class="n">default</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
@@ -245,12 +186,21 @@
         <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span>
         <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Outputs the raw dataframe (raw_df.csv) containing the values of all sliding windows.&quot;</span><span class="p">,</span>
     <span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;-o&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;--outdir&quot;</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;telofinder_results&quot;</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Path to the output directory.&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span></div>
 
 
-<div class="viewcode-block" id="get_strain_name"><a class="viewcode-back" href="../../index.html#telofinder.telofinder.get_strain_name">[docs]</a><span class="k">def</span> <span class="nf">get_strain_name</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Function to get the strain name from the name of the fasta file</span>
+
+<div class="viewcode-block" id="get_strain_name">
+<a class="viewcode-back" href="../../index.html#telofinder.telofinder.get_strain_name">[docs]</a>
+<span class="k">def</span> <span class="nf">get_strain_name</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Function to get the strain name from the name of the fasta file</span>
 
 <span class="sd">    :param filename: path of fasta file</span>
 <span class="sd">    :return: sequence name</span>
@@ -259,8 +209,11 @@
     <span class="k">return</span> <span class="n">filepath</span><span class="o">.</span><span class="n">stem</span></div>
 
 
-<div class="viewcode-block" id="sliding_window"><a class="viewcode-back" href="../../index.html#telofinder.telofinder.sliding_window">[docs]</a><span class="k">def</span> <span class="nf">sliding_window</span><span class="p">(</span><span class="n">sequence</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">size</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Apply a sliding window of length = size to a sequence from start to end</span>
+
+<div class="viewcode-block" id="sliding_window">
+<a class="viewcode-back" href="../../index.html#telofinder.telofinder.sliding_window">[docs]</a>
+<span class="k">def</span> <span class="nf">sliding_window</span><span class="p">(</span><span class="n">sequence</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">size</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Apply a sliding window of length = size to a sequence from start to end</span>
 
 <span class="sd">    :param sequence: fasta sequence</span>
 <span class="sd">    :param start: starting coordinate of the sequence</span>
@@ -275,8 +228,11 @@
         <span class="k">yield</span> <span class="n">i</span><span class="p">,</span> <span class="n">window</span></div>
 
 
-<div class="viewcode-block" id="base_compos"><a class="viewcode-back" href="../../index.html#telofinder.telofinder.base_compos">[docs]</a><span class="k">def</span> <span class="nf">base_compos</span><span class="p">(</span><span class="n">sequence</span><span class="p">,</span> <span class="n">base</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Counts the number of a given base in a sequence</span>
+
+<div class="viewcode-block" id="base_compos">
+<a class="viewcode-back" href="../../index.html#telofinder.telofinder.base_compos">[docs]</a>
+<span class="k">def</span> <span class="nf">base_compos</span><span class="p">(</span><span class="n">sequence</span><span class="p">,</span> <span class="n">base</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Counts the number of a given base in a sequence</span>
 
 <span class="sd">    :param sequence: fasta sequence</span>
 <span class="sd">    :param base: base to count in the sequence</span>
@@ -286,8 +242,11 @@
     <span class="k">return</span> <span class="n">count</span></div>
 
 
-<div class="viewcode-block" id="count_polynuc_occurence"><a class="viewcode-back" href="../../index.html#telofinder.telofinder.count_polynuc_occurence">[docs]</a><span class="k">def</span> <span class="nf">count_polynuc_occurence</span><span class="p">(</span><span class="n">sub_window</span><span class="p">,</span> <span class="n">polynucleotide_list</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Define presence of polynucleotide in the window.</span>
+
+<div class="viewcode-block" id="count_polynuc_occurence">
+<a class="viewcode-back" href="../../index.html#telofinder.telofinder.count_polynuc_occurence">[docs]</a>
+<span class="k">def</span> <span class="nf">count_polynuc_occurence</span><span class="p">(</span><span class="n">sub_window</span><span class="p">,</span> <span class="n">polynucleotide_list</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Define presence of polynucleotide in the window.</span>
 
 <span class="sd">    :param sub_window: the sequence of a sub_window</span>
 <span class="sd">    :param polynuleotide_list: a list of polynucleotides. Note that all polynucleotides must be of the same size</span>
@@ -299,22 +258,28 @@
         <span class="k">return</span> <span class="mi">0</span></div>
 
 
-<div class="viewcode-block" id="get_polynuc"><a class="viewcode-back" href="../../index.html#telofinder.telofinder.get_polynuc">[docs]</a><span class="k">def</span> <span class="nf">get_polynuc</span><span class="p">(</span><span class="n">window</span><span class="p">,</span> <span class="n">polynucleotide_list</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; get the propbortion of polynuceotides in the window</span>
+
+<div class="viewcode-block" id="get_polynuc">
+<a class="viewcode-back" href="../../index.html#telofinder.telofinder.get_polynuc">[docs]</a>
+<span class="k">def</span> <span class="nf">get_polynuc</span><span class="p">(</span><span class="n">window</span><span class="p">,</span> <span class="n">polynucleotide_list</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;get the propbortion of polynuceotides in the window</span>
 
 <span class="sd">    :param window: sliding window</span>
 <span class="sd">    :param polynucleotide_list: a list of polynucleotides. Note that all polynucleotides must be of the same size</span>
 <span class="sd">    :return: total polynucleotide proportion in the sliding window</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">sum_dinuc</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">sub_window</span> <span class="ow">in</span> <span class="n">sliding_window</span><span class="p">(</span><span class="n">window</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">window</span><span class="p">),</span> <span class="mi">2</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">sub_window</span> <span class="ow">in</span> <span class="n">sliding_window</span><span class="p">(</span><span class="n">window</span><span class="o">.</span><span class="n">upper</span><span class="p">(),</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">window</span><span class="p">),</span> <span class="mi">2</span><span class="p">):</span>
         <span class="n">sum_dinuc</span> <span class="o">+=</span> <span class="n">count_polynuc_occurence</span><span class="p">(</span><span class="n">sub_window</span><span class="p">,</span> <span class="n">polynucleotide_list</span><span class="p">)</span>
     <span class="n">freq_dinuc</span> <span class="o">=</span> <span class="n">sum_dinuc</span> <span class="o">/</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">window</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">freq_dinuc</span></div>
 
 
-<div class="viewcode-block" id="get_entropy"><a class="viewcode-back" href="../../index.html#telofinder.telofinder.get_entropy">[docs]</a><span class="k">def</span> <span class="nf">get_entropy</span><span class="p">(</span><span class="n">window</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Calculate the entropy of the window DNA sequence</span>
+
+<div class="viewcode-block" id="get_entropy">
+<a class="viewcode-back" href="../../index.html#telofinder.telofinder.get_entropy">[docs]</a>
+<span class="k">def</span> <span class="nf">get_entropy</span><span class="p">(</span><span class="n">window</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the entropy of the window DNA sequence</span>
 
 <span class="sd">    :param window: sliding window</span>
 <span class="sd">    :return: entropy value of the sequence window</span>
@@ -322,10 +287,10 @@
     <span class="n">entropy</span> <span class="o">=</span> <span class="mi">0</span>
 
     <span class="k">for</span> <span class="n">base</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;T&quot;</span><span class="p">,</span> <span class="s2">&quot;G&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">]:</span>
-        <span class="k">if</span> <span class="n">window</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="n">base</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">window</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="n">base</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">proba_base</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">freq_base</span> <span class="o">=</span> <span class="n">window</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="n">base</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">window</span><span class="p">)</span>
+            <span class="n">freq_base</span> <span class="o">=</span> <span class="n">window</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="n">base</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">window</span><span class="p">)</span>
             <span class="n">proba_base</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="n">freq_base</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">freq_base</span><span class="p">))</span>
 
         <span class="n">entropy</span> <span class="o">+=</span> <span class="n">proba_base</span>
@@ -333,8 +298,11 @@
     <span class="k">return</span> <span class="n">entropy</span></div>
 
 
-<div class="viewcode-block" id="compute_metrics"><a class="viewcode-back" href="../../index.html#telofinder.telofinder.compute_metrics">[docs]</a><span class="k">def</span> <span class="nf">compute_metrics</span><span class="p">(</span><span class="n">window</span><span class="p">,</span> <span class="n">polynucleotide_list</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;AC&quot;</span><span class="p">,</span> <span class="s2">&quot;CA&quot;</span><span class="p">,</span> <span class="s2">&quot;CC&quot;</span><span class="p">]):</span>
-    <span class="sd">&quot;&quot;&quot;Compute entropy and polynucleotide proportion in the sequence window</span>
+
+<div class="viewcode-block" id="compute_metrics">
+<a class="viewcode-back" href="../../index.html#telofinder.telofinder.compute_metrics">[docs]</a>
+<span class="k">def</span> <span class="nf">compute_metrics</span><span class="p">(</span><span class="n">window</span><span class="p">,</span> <span class="n">polynucleotide_list</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;AC&quot;</span><span class="p">,</span> <span class="s2">&quot;CA&quot;</span><span class="p">,</span> <span class="s2">&quot;CC&quot;</span><span class="p">]):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute entropy and polynucleotide proportion in the sequence window</span>
 
 <span class="sd">    :param window: sliding window</span>
 <span class="sd">    :param polynucleotide_list: a list of polynucleotides, default value is [&quot;AC&quot;, &quot;CA&quot;, &quot;CC&quot;]</span>
@@ -358,8 +326,11 @@
     <span class="k">return</span> <span class="n">metrics</span></div>
 
 
-<div class="viewcode-block" id="get_consecutive_groups"><a class="viewcode-back" href="../../index.html#telofinder.telofinder.get_consecutive_groups">[docs]</a><span class="k">def</span> <span class="nf">get_consecutive_groups</span><span class="p">(</span><span class="n">df_chrom</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;From the raw dataframe get start and end of each telomere window.</span>
+
+<div class="viewcode-block" id="get_consecutive_groups">
+<a class="viewcode-back" href="../../index.html#telofinder.telofinder.get_consecutive_groups">[docs]</a>
+<span class="k">def</span> <span class="nf">get_consecutive_groups</span><span class="p">(</span><span class="n">df_chrom</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;From the raw dataframe get start and end of each telomere window.</span>
 <span class="sd">    Applied to detect start and end of telomere in nucleotide positions.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">df</span> <span class="o">=</span> <span class="n">df_chrom</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
@@ -376,20 +347,19 @@
     <span class="k">return</span> <span class="n">chrom_groups</span></div>
 
 
-<div class="viewcode-block" id="classify_telomere"><a class="viewcode-back" href="../../index.html#telofinder.telofinder.classify_telomere">[docs]</a><span class="k">def</span> <span class="nf">classify_telomere</span><span class="p">(</span><span class="n">interval_chrom</span><span class="p">,</span> <span class="n">chrom_len</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;From a list of tuples obtained from get_consecutive_groups, identify if</span>
+
+<div class="viewcode-block" id="classify_telomere">
+<a class="viewcode-back" href="../../index.html#telofinder.telofinder.classify_telomere">[docs]</a>
+<span class="k">def</span> <span class="nf">classify_telomere</span><span class="p">(</span><span class="n">interval_chrom</span><span class="p">,</span> <span class="n">chrom_len</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;From a list of tuples obtained from get_consecutive_groups, identify if</span>
 <span class="sd">    interval corresponds to terminal or interal telomere</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">classif_dict_list</span> <span class="o">=</span> <span class="p">[]</span>
 
     <span class="n">interval_W</span> <span class="o">=</span> <span class="n">interval_chrom</span><span class="p">[</span><span class="s2">&quot;W&quot;</span><span class="p">][:]</span>
     <span class="k">if</span> <span class="n">interval_W</span> <span class="o">==</span> <span class="p">[]:</span>
-        <span class="n">classif_dict_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-            <span class="p">{</span><span class="s2">&quot;start&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;end&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;side&quot;</span><span class="p">:</span> <span class="s2">&quot;Left&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;term&quot;</span><span class="p">}</span>
-        <span class="p">)</span>
-        <span class="n">classif_dict_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-            <span class="p">{</span><span class="s2">&quot;start&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;end&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;side&quot;</span><span class="p">:</span> <span class="s2">&quot;Left&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;intern&quot;</span><span class="p">}</span>
-        <span class="p">)</span>
+        <span class="n">classif_dict_list</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">&quot;start&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;end&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;side&quot;</span><span class="p">:</span> <span class="s2">&quot;Left&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;term&quot;</span><span class="p">})</span>
+        <span class="n">classif_dict_list</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">&quot;start&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;end&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;side&quot;</span><span class="p">:</span> <span class="s2">&quot;Left&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;intern&quot;</span><span class="p">})</span>
     <span class="k">elif</span> <span class="nb">min</span><span class="p">(</span><span class="n">interval_W</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="n">classif_dict_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
             <span class="p">{</span>
@@ -422,12 +392,8 @@
 
     <span class="n">interval_C</span> <span class="o">=</span> <span class="n">interval_chrom</span><span class="p">[</span><span class="s2">&quot;C&quot;</span><span class="p">][:]</span>
     <span class="k">if</span> <span class="n">interval_C</span> <span class="o">==</span> <span class="p">[]:</span>
-        <span class="n">classif_dict_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-            <span class="p">{</span><span class="s2">&quot;start&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;end&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;side&quot;</span><span class="p">:</span> <span class="s2">&quot;Right&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;term&quot;</span><span class="p">}</span>
-        <span class="p">)</span>
-        <span class="n">classif_dict_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-            <span class="p">{</span><span class="s2">&quot;start&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;end&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;side&quot;</span><span class="p">:</span> <span class="s2">&quot;Right&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;intern&quot;</span><span class="p">}</span>
-        <span class="p">)</span>
+        <span class="n">classif_dict_list</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">&quot;start&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;end&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;side&quot;</span><span class="p">:</span> <span class="s2">&quot;Right&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;term&quot;</span><span class="p">})</span>
+        <span class="n">classif_dict_list</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">&quot;start&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;end&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;side&quot;</span><span class="p">:</span> <span class="s2">&quot;Right&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;intern&quot;</span><span class="p">})</span>
     <span class="k">elif</span> <span class="nb">max</span><span class="p">(</span><span class="n">interval_C</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="p">(</span><span class="n">chrom_len</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
         <span class="n">classif_dict_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
             <span class="p">{</span>
@@ -462,28 +428,20 @@
     <span class="k">return</span> <span class="n">classif_dict_list</span></div>
 
 
-<div class="viewcode-block" id="plot_telom"><a class="viewcode-back" href="../../index.html#telofinder.telofinder.plot_telom">[docs]</a><span class="k">def</span> <span class="nf">plot_telom</span><span class="p">(</span><span class="n">telom_df</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Plotting the telomere detection on both left and right chromosome ends</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">df</span> <span class="o">=</span> <span class="n">telom_df</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
-    <span class="k">for</span> <span class="n">strand</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;W&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">]:</span>
-        <span class="n">ax</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">df</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s2">&quot;level_3==@strand&quot;</span><span class="p">)</span>
-            <span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="p">[</span><span class="s2">&quot;polynuc&quot;</span><span class="p">,</span> <span class="s2">&quot;entropy&quot;</span><span class="p">,</span> <span class="s2">&quot;predict_telom&quot;</span><span class="p">]]</span>
-            <span class="o">.</span><span class="n">plot</span><span class="p">()</span>
-            <span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s2">&quot;center left&quot;</span><span class="p">,</span> <span class="n">bbox_to_anchor</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">))</span>
-        <span class="p">)</span>
-        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">strand</span><span class="p">)</span></div>
 
-
-<div class="viewcode-block" id="export_results"><a class="viewcode-back" href="../../index.html#telofinder.telofinder.export_results">[docs]</a><span class="k">def</span> <span class="nf">export_results</span><span class="p">(</span>
-    <span class="n">raw_df</span><span class="p">,</span> <span class="n">telom_df</span><span class="p">,</span> <span class="n">merged_telom_df</span><span class="p">,</span> <span class="n">raw</span><span class="p">,</span> <span class="n">outdir</span><span class="o">=</span><span class="s2">&quot;telofinder_results&quot;</span><span class="p">,</span>
+<div class="viewcode-block" id="export_results">
+<a class="viewcode-back" href="../../index.html#telofinder.telofinder.export_results">[docs]</a>
+<span class="k">def</span> <span class="nf">export_results</span><span class="p">(</span>
+    <span class="n">raw_df</span><span class="p">,</span>
+    <span class="n">telom_df</span><span class="p">,</span>
+    <span class="n">merged_telom_df</span><span class="p">,</span>
+    <span class="n">raw</span><span class="p">,</span>
+    <span class="n">outdir</span><span class="p">,</span>
 <span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Produce output table files</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Produce output table files&quot;&quot;&quot;</span>
     <span class="n">outdir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">outdir</span><span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="n">outdir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">()</span>
+        <span class="n">outdir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">FileExistsError</span><span class="p">:</span>
         <span class="k">pass</span>
 
@@ -502,32 +460,40 @@
         <span class="n">raw_df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">outdir</span> <span class="o">/</span> <span class="s2">&quot;raw_df.csv&quot;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="run_on_single_seq"><a class="viewcode-back" href="../../index.html#telofinder.telofinder.run_on_single_seq">[docs]</a><span class="k">def</span> <span class="nf">run_on_single_seq</span><span class="p">(</span><span class="n">seq_record</span><span class="p">,</span> <span class="n">strain</span><span class="p">,</span> <span class="n">polynuc_thres</span><span class="p">,</span> <span class="n">entropy_thres</span><span class="p">,</span> <span class="n">nb_scanned_nt</span><span class="p">):</span>
-    <span class="n">seqW</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">seq_record</span><span class="o">.</span><span class="n">seq</span><span class="p">)</span>
-    <span class="n">revcomp</span> <span class="o">=</span> <span class="n">seq_record</span><span class="o">.</span><span class="n">reverse_complement</span><span class="p">()</span>
-    <span class="n">seqC</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">revcomp</span><span class="o">.</span><span class="n">seq</span><span class="p">)</span>
 
+<div class="viewcode-block" id="run_on_single_seq">
+<a class="viewcode-back" href="../../index.html#telofinder.telofinder.run_on_single_seq">[docs]</a>
+<span class="k">def</span> <span class="nf">run_on_single_seq</span><span class="p">(</span><span class="n">seq_record</span><span class="p">,</span> <span class="n">strain</span><span class="p">,</span> <span class="n">polynuc_thres</span><span class="p">,</span> <span class="n">entropy_thres</span><span class="p">,</span> <span class="n">nb_scanned_nt</span><span class="p">,</span> <span class="n">direction</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">nb_scanned_nt</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
-        <span class="n">limit_seq</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">seqW</span><span class="p">)</span>
+        <span class="n">limit_seq</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">seq_record</span><span class="o">.</span><span class="n">seq</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">limit_seq</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">nb_scanned_nt</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">seqW</span><span class="p">))</span>
+        <span class="n">limit_seq</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">nb_scanned_nt</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">seq_record</span><span class="o">.</span><span class="n">seq</span><span class="p">))</span>
 
-    <span class="n">seq_dict_W</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="n">seq_dict_C</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">if</span> <span class="n">direction</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;both&quot;</span><span class="p">,</span> <span class="s2">&quot;forward&quot;</span><span class="p">]:</span>
+        <span class="n">seqW</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">seq_record</span><span class="o">.</span><span class="n">seq</span><span class="p">)</span>
+        <span class="n">seq_dict_W</span> <span class="o">=</span> <span class="p">{}</span>
 
-    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">window</span> <span class="ow">in</span> <span class="n">sliding_window</span><span class="p">(</span><span class="n">seqW</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">limit_seq</span><span class="p">,</span> <span class="mi">20</span><span class="p">):</span>
-        <span class="n">seq_dict_W</span><span class="p">[(</span><span class="n">strain</span><span class="p">,</span> <span class="n">seq_record</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="s2">&quot;W&quot;</span><span class="p">)]</span> <span class="o">=</span> <span class="n">compute_metrics</span><span class="p">(</span><span class="n">window</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">window</span> <span class="ow">in</span> <span class="n">sliding_window</span><span class="p">(</span><span class="n">seqW</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">limit_seq</span><span class="p">,</span> <span class="mi">20</span><span class="p">):</span>
+            <span class="n">seq_dict_W</span><span class="p">[(</span><span class="n">strain</span><span class="p">,</span> <span class="n">seq_record</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="s2">&quot;W&quot;</span><span class="p">)]</span> <span class="o">=</span> <span class="n">compute_metrics</span><span class="p">(</span><span class="n">window</span><span class="p">)</span>
 
-    <span class="n">df_W</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">seq_dict_W</span><span class="p">)</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span>
+        <span class="n">df_W</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">seq_dict_W</span><span class="p">)</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span>
 
-    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">window</span> <span class="ow">in</span> <span class="n">sliding_window</span><span class="p">(</span><span class="n">seqC</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">limit_seq</span><span class="p">,</span> <span class="mi">20</span><span class="p">):</span>
-        <span class="n">seq_dict_C</span><span class="p">[(</span><span class="n">strain</span><span class="p">,</span> <span class="n">seq_record</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">seqC</span><span class="p">)</span> <span class="o">-</span> <span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">),</span> <span class="s2">&quot;C&quot;</span><span class="p">)]</span> <span class="o">=</span> <span class="n">compute_metrics</span><span class="p">(</span>
-            <span class="n">window</span>
-        <span class="p">)</span>
+    <span class="k">if</span> <span class="n">direction</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;both&quot;</span><span class="p">,</span> <span class="s2">&quot;reverse&quot;</span><span class="p">]:</span>
+        <span class="n">revcomp</span> <span class="o">=</span> <span class="n">seq_record</span><span class="o">.</span><span class="n">reverse_complement</span><span class="p">()</span>
+        <span class="n">seqC</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">revcomp</span><span class="o">.</span><span class="n">seq</span><span class="p">)</span>
+        <span class="n">seq_dict_C</span> <span class="o">=</span> <span class="p">{}</span>
 
-    <span class="n">df_C</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">seq_dict_C</span><span class="p">)</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">window</span> <span class="ow">in</span> <span class="n">sliding_window</span><span class="p">(</span><span class="n">seqC</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">limit_seq</span><span class="p">,</span> <span class="mi">20</span><span class="p">):</span>
+            <span class="n">seq_dict_C</span><span class="p">[(</span><span class="n">strain</span><span class="p">,</span> <span class="n">seq_record</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">seqC</span><span class="p">)</span> <span class="o">-</span> <span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">),</span> <span class="s2">&quot;C&quot;</span><span class="p">)]</span> <span class="o">=</span> <span class="n">compute_metrics</span><span class="p">(</span><span class="n">window</span><span class="p">)</span>
 
-    <span class="n">df_chro</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">df_W</span><span class="p">,</span> <span class="n">df_C</span><span class="p">])</span>
+        <span class="n">df_C</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">seq_dict_C</span><span class="p">)</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">direction</span> <span class="o">==</span> <span class="s2">&quot;both&quot;</span><span class="p">:</span>
+        <span class="n">df_chro</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">df_W</span><span class="p">,</span> <span class="n">df_C</span><span class="p">])</span>
+    <span class="k">elif</span> <span class="n">direction</span> <span class="o">==</span> <span class="s2">&quot;forward&quot;</span><span class="p">:</span>
+        <span class="n">df_chro</span> <span class="o">=</span> <span class="n">df_W</span>
+    <span class="k">elif</span> <span class="n">direction</span> <span class="o">==</span> <span class="s2">&quot;reverse&quot;</span><span class="p">:</span>
+        <span class="n">df_chro</span> <span class="o">=</span> <span class="n">df_C</span>
 
     <span class="n">df_chro</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span>
         <span class="p">(</span><span class="n">df_chro</span><span class="p">[</span><span class="s2">&quot;entropy&quot;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">entropy_thres</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">df_chro</span><span class="p">[</span><span class="s2">&quot;polynuc&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">polynuc_thres</span><span class="p">),</span>
@@ -562,9 +528,7 @@
         <span class="n">telo_df_merged</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">telo_df_merged</span><span class="o">.</span><span class="n">start</span> <span class="o">&lt;</span> <span class="mi">20</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;term&quot;</span>
 
     <span class="n">telo_df_merged</span><span class="p">[</span><span class="s2">&quot;strain&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">strain</span>
-    <span class="n">telo_df_merged</span> <span class="o">=</span> <span class="n">telo_df_merged</span><span class="p">[</span>
-        <span class="p">[</span><span class="s2">&quot;strain&quot;</span><span class="p">,</span> <span class="s2">&quot;chrom&quot;</span><span class="p">,</span> <span class="s2">&quot;side&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">,</span> <span class="s2">&quot;start&quot;</span><span class="p">,</span> <span class="s2">&quot;end&quot;</span><span class="p">,</span> <span class="s2">&quot;chrom_size&quot;</span><span class="p">]</span>
-    <span class="p">]</span>
+    <span class="n">telo_df_merged</span> <span class="o">=</span> <span class="n">telo_df_merged</span><span class="p">[[</span><span class="s2">&quot;strain&quot;</span><span class="p">,</span> <span class="s2">&quot;chrom&quot;</span><span class="p">,</span> <span class="s2">&quot;side&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">,</span> <span class="s2">&quot;start&quot;</span><span class="p">,</span> <span class="s2">&quot;end&quot;</span><span class="p">,</span> <span class="s2">&quot;chrom_size&quot;</span><span class="p">]]</span>
 
     <span class="n">telo_df</span><span class="p">[</span><span class="s2">&quot;strain&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">strain</span>
     <span class="n">telo_df</span> <span class="o">=</span> <span class="n">telo_df</span><span class="p">[[</span><span class="s2">&quot;strain&quot;</span><span class="p">,</span> <span class="s2">&quot;chrom&quot;</span><span class="p">,</span> <span class="s2">&quot;side&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">,</span> <span class="s2">&quot;start&quot;</span><span class="p">,</span> <span class="s2">&quot;end&quot;</span><span class="p">]]</span>
@@ -574,8 +538,11 @@
     <span class="k">return</span> <span class="p">(</span><span class="n">df_chro</span><span class="p">,</span> <span class="n">telo_df</span><span class="p">,</span> <span class="n">telo_df_merged</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="run_on_single_fasta"><a class="viewcode-back" href="../../index.html#telofinder.telofinder.run_on_single_fasta">[docs]</a><span class="k">def</span> <span class="nf">run_on_single_fasta</span><span class="p">(</span><span class="n">fasta_path</span><span class="p">,</span> <span class="n">polynuc_thres</span><span class="p">,</span> <span class="n">entropy_thres</span><span class="p">,</span> <span class="n">nb_scanned_nt</span><span class="p">,</span> <span class="n">threads</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Run the telomere detection algorithm on a single fasta file</span>
+
+<div class="viewcode-block" id="run_on_single_fasta">
+<a class="viewcode-back" href="../../index.html#telofinder.telofinder.run_on_single_fasta">[docs]</a>
+<span class="k">def</span> <span class="nf">run_on_single_fasta</span><span class="p">(</span><span class="n">fasta_path</span><span class="p">,</span> <span class="n">polynuc_thres</span><span class="p">,</span> <span class="n">entropy_thres</span><span class="p">,</span> <span class="n">nb_scanned_nt</span><span class="p">,</span> <span class="n">direction</span><span class="p">,</span> <span class="n">threads</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Run the telomere detection algorithm on a single fasta file</span>
 
 <span class="sd">    :param fasta_path: path to fasta file</span>
 <span class="sd">    :return: a tuple of df, telo_df and telo_df_merged</span>
@@ -590,10 +557,10 @@
         <span class="n">polynuc_thres</span><span class="o">=</span><span class="n">polynuc_thres</span><span class="p">,</span>
         <span class="n">entropy_thres</span><span class="o">=</span><span class="n">entropy_thres</span><span class="p">,</span>
         <span class="n">nb_scanned_nt</span><span class="o">=</span><span class="n">nb_scanned_nt</span><span class="p">,</span>
+        <span class="n">direction</span><span class="o">=</span><span class="n">direction</span><span class="p">,</span>
     <span class="p">)</span>
 
     <span class="k">with</span> <span class="n">Pool</span><span class="p">(</span><span class="n">threads</span><span class="p">)</span> <span class="k">as</span> <span class="n">p</span><span class="p">:</span>
-
         <span class="n">results</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">partial_ross</span><span class="p">,</span> <span class="n">SeqIO</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">fasta_path</span><span class="p">,</span> <span class="s2">&quot;fasta&quot;</span><span class="p">))</span>
 
     <span class="n">raw_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">results</span><span class="p">])</span>
@@ -604,20 +571,17 @@
 
     <span class="n">telo_df_merged</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">r</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">results</span><span class="p">])</span>
     <span class="n">telo_df_merged</span><span class="p">[</span><span class="s2">&quot;len&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">telo_df_merged</span><span class="p">[</span><span class="s2">&quot;end&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">telo_df_merged</span><span class="p">[</span><span class="s2">&quot;start&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
-    <span class="n">telo_df_merged</span> <span class="o">=</span> <span class="n">telo_df_merged</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span>
-        <span class="p">{</span><span class="s2">&quot;start&quot;</span><span class="p">:</span> <span class="s2">&quot;Int64&quot;</span><span class="p">,</span> <span class="s2">&quot;end&quot;</span><span class="p">:</span> <span class="s2">&quot;Int64&quot;</span><span class="p">,</span> <span class="s2">&quot;len&quot;</span><span class="p">:</span> <span class="s2">&quot;Int64&quot;</span><span class="p">,</span> <span class="s2">&quot;chrom_size&quot;</span><span class="p">:</span> <span class="s2">&quot;Int64&quot;</span><span class="p">}</span>
-    <span class="p">)</span>
-    <span class="n">telo_df_merged</span> <span class="o">=</span> <span class="n">telo_df_merged</span><span class="p">[</span>
-        <span class="p">[</span><span class="s2">&quot;strain&quot;</span><span class="p">,</span> <span class="s2">&quot;chrom&quot;</span><span class="p">,</span> <span class="s2">&quot;side&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">,</span> <span class="s2">&quot;start&quot;</span><span class="p">,</span> <span class="s2">&quot;end&quot;</span><span class="p">,</span> <span class="s2">&quot;len&quot;</span><span class="p">,</span> <span class="s2">&quot;chrom_size&quot;</span><span class="p">]</span>
-    <span class="p">]</span>
+    <span class="n">telo_df_merged</span> <span class="o">=</span> <span class="n">telo_df_merged</span><span class="o">.</span><span class="n">astype</span><span class="p">({</span><span class="s2">&quot;start&quot;</span><span class="p">:</span> <span class="s2">&quot;Int64&quot;</span><span class="p">,</span> <span class="s2">&quot;end&quot;</span><span class="p">:</span> <span class="s2">&quot;Int64&quot;</span><span class="p">,</span> <span class="s2">&quot;len&quot;</span><span class="p">:</span> <span class="s2">&quot;Int64&quot;</span><span class="p">,</span> <span class="s2">&quot;chrom_size&quot;</span><span class="p">:</span> <span class="s2">&quot;Int64&quot;</span><span class="p">})</span>
+    <span class="n">telo_df_merged</span> <span class="o">=</span> <span class="n">telo_df_merged</span><span class="p">[[</span><span class="s2">&quot;strain&quot;</span><span class="p">,</span> <span class="s2">&quot;chrom&quot;</span><span class="p">,</span> <span class="s2">&quot;side&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">,</span> <span class="s2">&quot;start&quot;</span><span class="p">,</span> <span class="s2">&quot;end&quot;</span><span class="p">,</span> <span class="s2">&quot;len&quot;</span><span class="p">,</span> <span class="s2">&quot;chrom_size&quot;</span><span class="p">]]</span>
 
     <span class="k">return</span> <span class="n">raw_df</span><span class="p">,</span> <span class="n">telo_df</span><span class="p">,</span> <span class="n">telo_df_merged</span></div>
 
 
-<div class="viewcode-block" id="run_on_fasta_dir"><a class="viewcode-back" href="../../index.html#telofinder.telofinder.run_on_fasta_dir">[docs]</a><span class="k">def</span> <span class="nf">run_on_fasta_dir</span><span class="p">(</span>
-    <span class="n">fasta_dir_path</span><span class="p">,</span> <span class="n">polynuc_thres</span><span class="p">,</span> <span class="n">entropy_thres</span><span class="p">,</span> <span class="n">nb_scanned_nt</span><span class="p">,</span> <span class="n">threads</span>
-<span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Run iteratively the telemore detection algorithm on all fasta files in a directory</span>
+
+<div class="viewcode-block" id="run_on_fasta_dir">
+<a class="viewcode-back" href="../../index.html#telofinder.telofinder.run_on_fasta_dir">[docs]</a>
+<span class="k">def</span> <span class="nf">run_on_fasta_dir</span><span class="p">(</span><span class="n">fasta_dir_path</span><span class="p">,</span> <span class="n">polynuc_thres</span><span class="p">,</span> <span class="n">entropy_thres</span><span class="p">,</span> <span class="n">nb_scanned_nt</span><span class="p">,</span> <span class="n">direction</span><span class="p">,</span> <span class="n">threads</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Run iteratively the telemore detection algorithm on all fasta files in a directory</span>
 
 <span class="sd">    :param fasta_dir: path to fasta directory</span>
 <span class="sd">    :return: a tuple of df, telo_df and telo_df_merged</span>
@@ -628,9 +592,8 @@
 
     <span class="k">for</span> <span class="n">ext</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;*.fasta&quot;</span><span class="p">,</span> <span class="s2">&quot;*.fas&quot;</span><span class="p">,</span> <span class="s2">&quot;*.fa&quot;</span><span class="p">,</span> <span class="s2">&quot;*.fsa&quot;</span><span class="p">]:</span>
         <span class="k">for</span> <span class="n">fasta</span> <span class="ow">in</span> <span class="n">fasta_dir_path</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">ext</span><span class="p">):</span>
-
             <span class="n">raw_df</span><span class="p">,</span> <span class="n">telom_df</span><span class="p">,</span> <span class="n">merged_telom_df</span> <span class="o">=</span> <span class="n">run_on_single_fasta</span><span class="p">(</span>
-                <span class="n">fasta</span><span class="p">,</span> <span class="n">polynuc_thres</span><span class="p">,</span> <span class="n">entropy_thres</span><span class="p">,</span> <span class="n">nb_scanned_nt</span><span class="p">,</span> <span class="n">threads</span>
+                <span class="n">fasta</span><span class="p">,</span> <span class="n">polynuc_thres</span><span class="p">,</span> <span class="n">entropy_thres</span><span class="p">,</span> <span class="n">nb_scanned_nt</span><span class="p">,</span> <span class="n">direction</span><span class="p">,</span> <span class="n">threads</span>
             <span class="p">)</span>
             <span class="n">raw_dfs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">raw_df</span><span class="p">)</span>
             <span class="n">telom_dfs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">telom_df</span><span class="p">)</span>
@@ -643,30 +606,88 @@
     <span class="k">return</span> <span class="n">total_raw_df</span><span class="p">,</span> <span class="n">total_telom_df</span><span class="p">,</span> <span class="n">total_merged_telom_df</span></div>
 
 
-<div class="viewcode-block" id="run_telofinder"><a class="viewcode-back" href="../../index.html#telofinder.telofinder.run_telofinder">[docs]</a><span class="k">def</span> <span class="nf">run_telofinder</span><span class="p">(</span><span class="n">fasta_path</span><span class="p">,</span> <span class="n">polynuc_thres</span><span class="p">,</span> <span class="n">entropy_thres</span><span class="p">,</span> <span class="n">nb_scanned_nt</span><span class="p">,</span> <span class="n">threads</span><span class="p">,</span> <span class="n">raw</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Run telofinder on a single fasta file or on a fasta directory&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="run_telofinder">
+<a class="viewcode-back" href="../../index.html#telofinder.telofinder.run_telofinder">[docs]</a>
+<span class="k">def</span> <span class="nf">run_telofinder</span><span class="p">(</span><span class="n">fasta_path</span><span class="p">,</span> <span class="n">polynuc_thres</span><span class="p">,</span> <span class="n">entropy_thres</span><span class="p">,</span> <span class="n">nb_scanned_nt</span><span class="p">,</span> <span class="n">direction</span><span class="p">,</span> <span class="n">threads</span><span class="p">,</span> <span class="n">raw</span><span class="p">,</span> <span class="n">outdir</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Run telofinder on a single fasta file or on a fasta directory&quot;&quot;&quot;</span>
     <span class="n">fasta_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">fasta_path</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">fasta_path</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
-        <span class="nb">print</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Running in iterative mode on all &#39;*.fasta&#39;, &#39;*.fas&#39;, &#39;*.fa&#39;, &#39;*.fsa&#39; files in &#39;</span><span class="si">{</span><span class="n">fasta_path</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
-        <span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Running in iterative mode on all &#39;*.fasta&#39;, &#39;*.fas&#39;, &#39;*.fa&#39;, &#39;*.fsa&#39; files in &#39;</span><span class="si">{</span><span class="n">fasta_path</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
         <span class="n">raw_df</span><span class="p">,</span> <span class="n">telom_df</span><span class="p">,</span> <span class="n">merged_telom_df</span> <span class="o">=</span> <span class="n">run_on_fasta_dir</span><span class="p">(</span>
-            <span class="n">fasta_path</span><span class="p">,</span> <span class="n">polynuc_thres</span><span class="p">,</span> <span class="n">entropy_thres</span><span class="p">,</span> <span class="n">nb_scanned_nt</span><span class="p">,</span> <span class="n">threads</span>
+            <span class="n">fasta_path</span><span class="p">,</span> <span class="n">polynuc_thres</span><span class="p">,</span> <span class="n">entropy_thres</span><span class="p">,</span> <span class="n">nb_scanned_nt</span><span class="p">,</span> <span class="n">direction</span><span class="p">,</span> <span class="n">threads</span>
         <span class="p">)</span>
-        <span class="n">export_results</span><span class="p">(</span><span class="n">raw_df</span><span class="p">,</span> <span class="n">telom_df</span><span class="p">,</span> <span class="n">merged_telom_df</span><span class="p">,</span> <span class="n">raw</span><span class="p">)</span>
+        <span class="n">export_results</span><span class="p">(</span><span class="n">raw_df</span><span class="p">,</span> <span class="n">telom_df</span><span class="p">,</span> <span class="n">merged_telom_df</span><span class="p">,</span> <span class="n">raw</span><span class="p">,</span> <span class="n">outdir</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">raw_df</span><span class="p">,</span> <span class="n">telom_df</span><span class="p">,</span> <span class="n">merged_telom_df</span>
 
     <span class="k">elif</span> <span class="n">fasta_path</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Running in single fasta mode on &#39;</span><span class="si">{</span><span class="n">fasta_path</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
 
         <span class="n">raw_df</span><span class="p">,</span> <span class="n">telom_df</span><span class="p">,</span> <span class="n">merged_telom_df</span> <span class="o">=</span> <span class="n">run_on_single_fasta</span><span class="p">(</span>
-            <span class="n">fasta_path</span><span class="p">,</span> <span class="n">polynuc_thres</span><span class="p">,</span> <span class="n">entropy_thres</span><span class="p">,</span> <span class="n">nb_scanned_nt</span><span class="p">,</span> <span class="n">threads</span>
+            <span class="n">fasta_path</span><span class="p">,</span> <span class="n">polynuc_thres</span><span class="p">,</span> <span class="n">entropy_thres</span><span class="p">,</span> <span class="n">nb_scanned_nt</span><span class="p">,</span> <span class="n">direction</span><span class="p">,</span> <span class="n">threads</span>
         <span class="p">)</span>
-        <span class="n">export_results</span><span class="p">(</span><span class="n">raw_df</span><span class="p">,</span> <span class="n">telom_df</span><span class="p">,</span> <span class="n">merged_telom_df</span><span class="p">,</span> <span class="n">raw</span><span class="p">)</span>
+        <span class="n">export_results</span><span class="p">(</span><span class="n">raw_df</span><span class="p">,</span> <span class="n">telom_df</span><span class="p">,</span> <span class="n">merged_telom_df</span><span class="p">,</span> <span class="n">raw</span><span class="p">,</span> <span class="n">outdir</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">raw_df</span><span class="p">,</span> <span class="n">telom_df</span><span class="p">,</span> <span class="n">merged_telom_df</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">fasta_path</span><span class="si">}</span><span class="s2">&#39; is not a directory or a file.&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="get_telomere_in_telomeric_reads">
+<a class="viewcode-back" href="../../index.html#telofinder.telofinder.get_telomere_in_telomeric_reads">[docs]</a>
+<span class="k">def</span> <span class="nf">get_telomere_in_telomeric_reads</span><span class="p">(</span>
+    <span class="n">bam_file</span><span class="p">,</span> <span class="n">telo_df_merged</span><span class="p">,</span> <span class="n">outdir</span><span class="p">,</span> <span class="n">polynuc_thres</span><span class="p">,</span> <span class="n">entropy_thres</span><span class="p">,</span> <span class="n">nb_scanned_nt</span><span class="p">,</span> <span class="n">threads</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Extract telomeric reads from a bam file corresponding to telomere detected</span>
+<span class="sd">    and reported in telo_df_merged</span>
+
+<span class="sd">    :param bam_file: An indexed bam alignment file.</span>
+<span class="sd">    :param telo_df_merged: Merged DataFrame with telomeric informations (from one of the run_telofinder functions)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">outdir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">outdir</span><span class="p">)</span>
+    <span class="n">outdir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">chro</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">side</span><span class="p">,</span> <span class="n">ttype</span> <span class="ow">in</span> <span class="n">telo_df_merged</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+        <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">chrom</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">end</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">side</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">type</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span>
+    <span class="p">):</span>
+        <span class="n">out_bam_path</span> <span class="o">=</span> <span class="n">outdir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;telomeric_reads_</span><span class="si">{</span><span class="n">chro</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">start</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">end</span><span class="si">}</span><span class="s2">.bam&quot;</span>
+        <span class="n">out_fas_path</span> <span class="o">=</span> <span class="n">outdir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;telomeric_reads_</span><span class="si">{</span><span class="n">chro</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">start</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">end</span><span class="si">}</span><span class="s2">.fas&quot;</span>
+
+        <span class="k">with</span> <span class="n">pysam</span><span class="o">.</span><span class="n">AlignmentFile</span><span class="p">(</span><span class="n">bam_file</span><span class="p">)</span> <span class="k">as</span> <span class="n">bam</span><span class="p">:</span>
+            <span class="k">with</span> <span class="n">pysam</span><span class="o">.</span><span class="n">AlignmentFile</span><span class="p">(</span><span class="n">out_bam_path</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">,</span> <span class="n">template</span><span class="o">=</span><span class="n">bam</span><span class="p">)</span> <span class="k">as</span> <span class="n">out_bam</span><span class="p">:</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">out_fas_path</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">out_fas</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">rd</span> <span class="ow">in</span> <span class="n">bam</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">chro</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">):</span>
+                        <span class="k">if</span> <span class="n">rd</span><span class="o">.</span><span class="n">mapq</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                            <span class="n">out_bam</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">rd</span><span class="p">)</span>
+                            <span class="n">out_fas</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&gt;</span><span class="si">{</span><span class="n">rd</span><span class="o">.</span><span class="n">qname</span><span class="si">}</span><span class="se">\n</span><span class="si">{</span><span class="n">rd</span><span class="o">.</span><span class="n">query_sequence</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">side</span> <span class="o">==</span> <span class="s2">&quot;Left&quot;</span><span class="p">:</span>
+            <span class="n">raw_df</span><span class="p">,</span> <span class="n">telom_df</span><span class="p">,</span> <span class="n">merged_telom_df</span> <span class="o">=</span> <span class="n">run_on_single_fasta</span><span class="p">(</span>
+                <span class="n">out_fas_path</span><span class="p">,</span> <span class="n">polynuc_thres</span><span class="p">,</span> <span class="n">entropy_thres</span><span class="p">,</span> <span class="n">nb_scanned_nt</span><span class="p">,</span> <span class="s2">&quot;forward&quot;</span><span class="p">,</span> <span class="n">threads</span>
+            <span class="p">)</span>
+            <span class="n">merged_telom_df</span><span class="p">[</span><span class="s2">&quot;telomere_original_type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ttype</span>
+            <span class="n">export_results</span><span class="p">(</span>
+                <span class="n">raw_df</span><span class="p">,</span>
+                <span class="n">telom_df</span><span class="p">,</span>
+                <span class="n">merged_telom_df</span><span class="p">,</span>
+                <span class="n">raw</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">outdir</span><span class="o">=</span><span class="n">outdir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;tf_on_reads_</span><span class="si">{</span><span class="n">chro</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">start</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">end</span><span class="si">}</span><span class="s2">_forward&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">side</span> <span class="o">==</span> <span class="s2">&quot;Right&quot;</span><span class="p">:</span>
+            <span class="n">raw_df</span><span class="p">,</span> <span class="n">telom_df</span><span class="p">,</span> <span class="n">merged_telom_df</span> <span class="o">=</span> <span class="n">run_on_single_fasta</span><span class="p">(</span>
+                <span class="n">out_fas_path</span><span class="p">,</span> <span class="n">polynuc_thres</span><span class="p">,</span> <span class="n">entropy_thres</span><span class="p">,</span> <span class="n">nb_scanned_nt</span><span class="p">,</span> <span class="s2">&quot;reverse&quot;</span><span class="p">,</span> <span class="n">threads</span>
+            <span class="p">)</span>
+            <span class="n">merged_telom_df</span><span class="p">[</span><span class="s2">&quot;telomere_original_type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ttype</span>
+            <span class="n">export_results</span><span class="p">(</span>
+                <span class="n">raw_df</span><span class="p">,</span>
+                <span class="n">telom_df</span><span class="p">,</span>
+                <span class="n">merged_telom_df</span><span class="p">,</span>
+                <span class="n">raw</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">outdir</span><span class="o">=</span><span class="n">outdir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;tf_on_reads_</span><span class="si">{</span><span class="n">chro</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">start</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">end</span><span class="si">}</span><span class="s2">_reverse&quot;</span><span class="p">,</span>
+            <span class="p">)</span></div>
+
 
 
 <span class="c1"># Main program</span>
@@ -678,51 +699,40 @@
         <span class="n">args</span><span class="o">.</span><span class="n">polynuc_threshold</span><span class="p">,</span>
         <span class="n">args</span><span class="o">.</span><span class="n">entropy_threshold</span><span class="p">,</span>
         <span class="n">args</span><span class="o">.</span><span class="n">nb_scanned_nt</span><span class="p">,</span>
+        <span class="n">args</span><span class="o">.</span><span class="n">direction</span><span class="p">,</span>
         <span class="n">args</span><span class="o">.</span><span class="n">threads</span><span class="p">,</span>
         <span class="n">args</span><span class="o">.</span><span class="n">raw</span><span class="p">,</span>
+        <span class="n">args</span><span class="o">.</span><span class="n">outdir</span><span class="p">,</span>
     <span class="p">)</span>
 </pre></div>
 
            </div>
-           
           </div>
           <footer>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &copy; Copyright XX, 2020
-      <span class="lastupdated">
-        Last updated on Nov 16, 2020.
-      </span>
-
-    </p>
+    <p>&#169; Copyright XX, 2020.
+      <span class="lastupdated">Last updated on Oct 20, 2023.
+      </span></p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
-
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

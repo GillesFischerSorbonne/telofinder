@@ -21,7 +21,9 @@ Telomere detection is based on calculation in a 20 bp sliding window of the foll
 Installation
 ###########################
 
-install (mini)conda:
+You need to have bedtools in your PATH for telofinder to work.
+
+Install (mini)conda:
 
     see https://docs.conda.io/projects/conda/en/latest/user-guide/install/
 
@@ -30,28 +32,27 @@ add channels:
 .. code-block:: bash
 
     $ conda config --add channels conda-forge bioconda
-
+    $ conda create -n telofinder python=3.10
+    $ conda activate telofinder
+    $ conda install bedtools
+ 
 install the telofinder package:
 
 .. code-block:: bash
 
     $ git clone https://github.com/GillesFischerSorbonne/telofinder.git
     $ cd telofinder
-    $ conda env create
-    $ python setupy.py install
-
-
+    $ pip install .
 
 Usage
 ###########################
-    
+
+Using the conda environment created during Installation:
+
 .. code-block:: bash
 
     $ conda activate telofinder
-    $ cd telofinder
-    $ python telofinder.py [fasta_path] 
-
-
+    $ telofinder [fasta_path] 
 
 Positional arguments
 ====================

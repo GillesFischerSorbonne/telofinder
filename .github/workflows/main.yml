@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - master
+      - dev
   pull_request:
     branches-ignore: []
 
@@ -14,7 +15,7 @@ jobs:
     strategy:
       max-parallel: 5
       matrix:
-        python: [3.7,3.8,3.9]
+        python: ["3.10"]
       fail-fast: false
 
     steps:
@@ -24,13 +25,9 @@ jobs:
       with:
         python-version: ${{ matrix.python }}
 
-    - name: conda
+    - name: bedtools
       run: |
-        echo $CONDA/bin >> $GITHUB_PATH
-    - name: Install dependencies conda
-      run: |
-        conda install -c conda-forge --quiet mamba python=${{ matrix.python }}
-        mamba install -c conda-forge -c bioconda --quiet -y bedtools
+        sudo apt-get install -y bedtools
     - name: Install the package itself
       run: |
           pip install .

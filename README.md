@@ -26,4 +26,7 @@ The complete documentation is available at [Read The Docs](https://telofinder.re
 
 Telofinder outputs a directory called `telofinder_results` including 3 csv and 2 bed files containing the telomere calls and their coordinates, either as raw output or after merging consecutive calls
 
+## Reference
+
+Please cite O’Donnell, S., Yue, JX., Saada, O.A. et al. Telomere-to-telomere assemblies of 142 strains characterize the genome structural landscape in Saccharomyces cerevisiae. Nat Genet 55, 1390–1399 (2023). [DOI](https://doi.org/10.1038/s41588-023-01459-y)
 

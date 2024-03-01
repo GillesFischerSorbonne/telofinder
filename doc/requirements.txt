@@ -1,0 +1,4 @@
+sphinx<7
+sphinx_rtd_theme
+sphinx_gallery
+sphinx_copybutton
